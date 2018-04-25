@@ -1,4 +1,5 @@
 #pragma once
+#include "Stone.h"
 
 using coord = int;
 
@@ -8,7 +9,7 @@ constexpr int Resign = -2;
 struct Move
 {
 	coord idx;
-	int color;
+	Stone color;
 
 	bool operator==(const Move& other) const noexcept
 	{

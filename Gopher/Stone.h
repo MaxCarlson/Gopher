@@ -9,3 +9,9 @@ enum Stone
 	OFFBOARD,
 	MAX
 };
+
+inline Stone flipColor(Stone stone)
+{
+	static constexpr Stone flip[] = { NONE, WHITE, BLACK, OFFBOARD };
+	return flip[stone];
+}

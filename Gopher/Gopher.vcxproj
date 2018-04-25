@@ -120,12 +120,11 @@
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MonteCarlo.cpp" />
-    <ClCompile Include="MoveGen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Move.h" />
-    <ClInclude Include="MoveGen.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Stone.h" />
   </ItemGroup>

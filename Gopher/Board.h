@@ -14,17 +14,37 @@ struct Group
 
 };
 
+struct Neighbors
+{
+	int n[Stone::MAX];
+};
+
 struct Board
 {
+public:
 
 	int moveCount;
 
 	// Stones info
 	int stones[BoardMaxIdx];
 
+
+	int freeCount;
 	// Free board positions
 	coord free[BoardMaxIdx];
-	
+
+	// Quick lookup of all an idx's neighbors
+	Neighbors neighbors[BoardMaxIdx];
+
+	int neighborCount(coord idx, Stone color) const;
+	bool isEyeLike(coord idx, Stone color) const;
+	bool isValid(const Move& m) const;
+
+
+	bool tryRandomMove(Stone color, coord& idx, int rng) const;
+	coord playRandom(Stone color);
+
+	Move ko;
 };
 
 
