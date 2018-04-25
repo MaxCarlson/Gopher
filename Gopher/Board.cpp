@@ -8,16 +8,16 @@ void printPos(const int i)
 	switch (i)
 	{
 	case Stone::NONE:
-		std::cout << " ";
+		std::cout << "   ";
 		break;
 	case Stone::BLACK:
-		std::cout << "b";
+		std::cout << " b ";
 		break;
 	case Stone::WHITE:
-		std::cout << "w";
+		std::cout << " w ";
 		break;
 	case Stone::OFFBOARD:
-		std::cout << "X";
+		std::cout << " X ";
 		break;
 	default:
 		std::cout << "BoardIdxIssue!";
@@ -29,10 +29,26 @@ void printBoard(const Board & board)
 	std::cout << '\n';
 	for (int i = 0; i < BoardMaxIdx; ++i)
 	{
-		printPos(board.stones[i]);
-		if (i % BoardSize == 0)
+		if (i % BoardRealSize == 0)
 			std::cout << '\n';
+		printPos(board.stones[i]);
 	}
+}
+
+void Board::init()
+{
+	std::memset(free,   0, sizeof(free));
+	std::memset(neighbors, Stone::NONE, sizeof(neighbors));
+
+	allStones([](int& idx)
+	{
+		idx = Stone::OFFBOARD;
+	});
+
+	allValidStones([](int& idx)
+	{
+		idx = Stone::NONE;
+	});
 }
 
 int Board::neighborCount(coord idx, Stone color) const

@@ -9,6 +9,7 @@
 int main()
 {
 	Board board;
+	board.init();
 
 	MonteCarlo monte(board);
 
