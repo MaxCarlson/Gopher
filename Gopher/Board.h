@@ -21,13 +21,10 @@ struct Neighbors
 
 struct Board
 {
-public:
-
 	int moveCount;
 
 	// Stones info
 	int stones[BoardMaxIdx];
-
 
 	int freeCount;
 	// Free board positions
@@ -36,6 +33,10 @@ public:
 	// Quick lookup of all an idx's neighbors
 	Neighbors neighbors[BoardMaxIdx];
 
+	// Figure out what exactly needs to be stored here
+	Move ko;
+
+public:
 	int neighborCount(coord idx, Stone color) const;
 	bool isEyeLike(coord idx, Stone color) const;
 	bool isValid(const Move& m) const;
@@ -44,8 +45,7 @@ public:
 	bool tryRandomMove(Stone color, coord& idx, int rng) const;
 	coord playRandom(Stone color);
 
-	Move ko;
+	friend void printBoard(const Board& board);
 };
 
 
-void printBoard(const Board& board);

@@ -12,5 +12,7 @@ int main()
 
 	MonteCarlo monte(board);
 
+	printBoard(board);
+
 	return 0;
 }

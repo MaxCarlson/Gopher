@@ -56,6 +56,18 @@ bool Board::isValid(const Move & m) const
 	// No ko's
 	if (ko == m)
 		return false;
+
+	return true;
+
+	// Is this an optimization? Why not allow non-eyelike - non ko
+	// moves if there's a group of stones ready to be captured on the board?
+	/*
+	foreach_neighbor(board, coord, {
+		group_t g = group_at(board, c);
+		groups_in_atari += (board_group_info(board, g).libs == 1);
+	});
+	return !!groups_in_atari;
+	*/
 }
 
 bool Board::tryRandomMove(Stone color, coord& idx, int rng) const 
@@ -64,6 +76,7 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng) const
 
 	Move m = { idx, color };
 
+	return true;
 }
 
 coord Board::playRandom(Stone color) 
