@@ -22,6 +22,8 @@ struct Board
 	// Stones info
 	int stones[BoardMaxIdx];
 
+	// Free board positions
+	coord free[BoardMaxIdx];
 	
 };
 
