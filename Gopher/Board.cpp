@@ -68,6 +68,8 @@ void Board::init()
 
 		free.emplace_back(idx);
 	});
+
+	// TODO: Generate zobrist hash stuff
 }
 
 int Board::neighborCount(coord idx, Stone color) const
@@ -80,7 +82,27 @@ bool Board::isEyeLike(coord idx, Stone color) const
 	return (neighborCount(idx, color) + neighborCount(idx, Stone::OFFBOARD)) == 4;
 }
 
-bool Board::isValid(const Move & m) const 
+bool Board::isFalseEyelike(coord idx, Stone color) const
+{
+	int numNeighbors[Stone::MAX] = { 0, 0, 0, 0 };
+
+	eachDiagonalNeighbor(idx, [](auto n)
+	{
+		++numNeighbors(at(idx));
+	});
+
+	// Do we have two enemy stones diagonally (or side of the board
+	// equivalent) ?
+	numNeighbors[flipColor(color)] += !!numNeighbors[Stone::OFFBOARD];
+	return numNeighbors[flipColor(color)] >= 2;
+}
+
+bool Board::isOnePointEye(coord idx, Stone color) const
+{
+	return isEyeLike(idx, color) && !isFalseEyelike(idx, color);
+}
+
+bool Board::isValid(const Move & m) const
 {
 	if(points[m.idx] != Stone::NONE)
 		return false;
@@ -95,7 +117,7 @@ bool Board::isValid(const Move & m) const
 	return true;
 
 	// Is this an optimization? Why not allow non-eyelike - non ko
-	// moves if there's a group of points ready to be captured on the board?
+	// moves if there's a group of points ready to be captured on the board (Atari)?
 	/*
 	foreach_neighbor(board, coord, {
 		group_t g = group_at(board, c);
@@ -105,11 +127,14 @@ bool Board::isValid(const Move & m) const
 	*/
 }
 
-bool Board::tryRandomMove(Stone color, coord& idx, int rng)  
+bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a playout policy instead of just looking at move validity
 {
 	idx = free[rng];
 
 	Move m = { idx, color };
+
+	if (isOnePointEye(m.idx, m.color) || !isValid(m))
+		return false;
 
 	return true;
 }
@@ -130,4 +155,8 @@ coord Board::playRandom(Stone color)
 	for(int i = 0; i < rng; ++i)
 		if (tryRandomMove(color, idx, rng))
 			return idx;
+}
+
+void Board::makeMove(const Move & m)
+{
 }

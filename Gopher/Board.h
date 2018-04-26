@@ -82,19 +82,30 @@ public:
 
 	int neighborCount(coord idx, Stone color) const;
 	bool isEyeLike(coord idx, Stone color) const;
+	bool isFalseEyelike(coord idx, Stone color) const;
+	bool isOnePointEye(coord idx, Stone color) const;
 	bool isValid(const Move& m) const;
-
 
 	bool tryRandomMove(Stone color, coord& idx, int rng);
 	coord playRandom(Stone color);
 
+	void makeMove(const Move& m);
+
 	friend void printBoard(const Board& board);
+
+	inline int at(int idx) { return points[idx]; }
 
 	template<class F>
 	void foreachPoint(F&& f);
 
 	template<class F>
 	void foreachNeighbor(int idx, F&& f);
+
+	template<class F>
+	void eachDiagonalNeighbor(int idx, F&& f);
+
+	template<class F>
+	void eachDiagonalNeighbor(int idx, F&& f) const { eachDiagonalNeighbor(idx, f); };
 };
 
 template<class F>
@@ -112,6 +123,15 @@ inline void Board::foreachNeighbor(int idx, F&& f)
 	f(points[idx + 1]);
 	f(points[idx - BoardRealSize]);
 	f(points[idx + BoardRealSize]);
+}
+
+template<class F>
+inline void Board::eachDiagonalNeighbor(int idx, F&& f)
+{
+	f(points[idx + BoardRealSize + 1]);
+	f(points[idx + BoardRealSize - 1]);
+	f(points[idx - BoardRealSize + 1]);
+	f(points[idx - BoardRealSize - 1]);
 }
 
 
