@@ -4,6 +4,7 @@
 
 constexpr int BoardSize = 19;
 constexpr int BoardRealSize = BoardSize + 2;
+constexpr int BoardRealSize2 = BoardRealSize * BoardRealSize;
 constexpr int BoardOffset = 2;
 constexpr int BoardMaxIdx = (BoardSize + BoardOffset) * (BoardSize + BoardOffset);
 constexpr int BoardMaxGroups = 228;//BoardSize * BoardSize * 2 / 3;
@@ -20,12 +21,18 @@ struct Neighbors
 	int n[Stone::MAX];
 };
 
+template<int size>
+class FastArray
+{
+
+};
+
 struct Board
 {
 	int moveCount;
 
 	// Stones info
-	int stones[BoardMaxIdx];
+	int points[BoardMaxIdx];
 
 	int freeCount;
 	// Free board positions
@@ -51,33 +58,17 @@ public:
 	friend void printBoard(const Board& board);
 
 	template<class F>
-	void allStones(F&& f);
+	void foreachPoint(F&& f);
 
 	template<class F>
-	void allValidStones(F&& f);
+	void allValidSpots(F&& f);
 };
 
 template<class F>
-inline void Board::allStones(F&& f)
+inline void Board::foreachPoint(F&& f)
 {
 	for (int i = 0; i < BoardMaxIdx; ++i)
-		f(stones[i]);
-}
-
-template<class F>
-inline void Board::allValidStones(F&& f)
-{
-	static constexpr int modAt = BoardSize - 2;
-	static constexpr int first = (BoardSize * 2) + 2;
-	static constexpr int last  = BoardSize - first;
-
-	for (int i = first; i < last; ++i)
-	{
-		if (i % modAt == 0)
-			i += 4;
-		else
-			f(stones[i]);
-	}
+		f(points[i]);
 }
 
 

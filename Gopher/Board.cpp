@@ -2,6 +2,10 @@
 #include "Random.h"
 #include <iostream>
 
+inline int getIdx(int x, int y)
+{
+	return y * BoardRealSize + x;
+}
 
 void printPos(const int i)
 {
@@ -24,31 +28,37 @@ void printPos(const int i)
 	}
 }
 
+void printRow(const Board& board, int row)
+{
+	std::cout << "| ";
+	for (int i = 0; i < BoardRealSize; ++i)
+		printPos(board.points[getIdx(i, row)]);
+	std::cout << " | \n";
+}
+
 void printBoard(const Board & board)
 {
 	std::cout << '\n';
-	for (int i = 0; i < BoardMaxIdx; ++i)
+	for (int i = 0; i < BoardRealSize; ++i)
 	{
-		if (i % BoardRealSize == 0)
-			std::cout << '\n';
-		printPos(board.stones[i]);
+		printRow(board, i);
 	}
+	std::cout << '\n';
 }
 
 void Board::init()
 {
-	std::memset(free,   0, sizeof(free));
-	std::memset(neighbors, Stone::NONE, sizeof(neighbors));
+	std::memset(this, 0, sizeof(Board));
 
-	allStones([](int& idx)
-	{
-		idx = Stone::OFFBOARD;
-	});
 
-	allValidStones([](int& idx)
-	{
-		idx = Stone::NONE;
-	});
+	// Set offboard margin
+	int topRow = BoardRealSize2 - BoardRealSize;
+	for (int i = 0; i < BoardRealSize; ++i)
+		points[i] = points[i + topRow] = Stone::OFFBOARD;
+
+	for (int i = 0; i <= topRow; i += BoardRealSize)
+		points[i] = points[BoardRealSize - 1 + i] = Stone::OFFBOARD;
+
 }
 
 int Board::neighborCount(coord idx, Stone color) const
@@ -63,7 +73,7 @@ bool Board::isEyeLike(coord idx, Stone color) const
 
 bool Board::isValid(const Move & m) const 
 {
-	if(stones[m.idx] != Stone::NONE)
+	if(points[m.idx] != Stone::NONE)
 		return false;
 
 	if (!isEyeLike(m.idx, flipColor(m.color)))
@@ -76,7 +86,7 @@ bool Board::isValid(const Move & m) const
 	return true;
 
 	// Is this an optimization? Why not allow non-eyelike - non ko
-	// moves if there's a group of stones ready to be captured on the board?
+	// moves if there's a group of points ready to be captured on the board?
 	/*
 	foreach_neighbor(board, coord, {
 		group_t g = group_at(board, c);
