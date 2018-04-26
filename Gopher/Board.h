@@ -66,7 +66,10 @@ struct Board
 {
 	int moveCount;
 
-	// Stones info
+	// Capture info for all ston types
+	int captures[Stone::MAX];
+
+	// Info about squares (points) on the board
 	int points[BoardMaxIdx];
 
 	FastArray<coord, BoardMaxIdx> free;
@@ -89,6 +92,11 @@ public:
 	bool tryRandomMove(Stone color, coord& idx, int rng);
 	coord playRandom(Stone color);
 
+	// Update functions for things that happen with moves
+	void updateNeighbor(coord idx, const Move& m);
+
+	// Move functions
+	void moveNonEye(const Move& m);
 	void makeMove(const Move& m);
 
 	friend void printBoard(const Board& board);

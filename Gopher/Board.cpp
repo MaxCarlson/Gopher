@@ -157,6 +157,40 @@ coord Board::playRandom(Stone color)
 			return idx;
 }
 
+void Board::updateNeighbor(coord idx, const Move& m)
+{
+	auto& nebr = neighbors[idx];
+
+	nebr.increment(m.color);
+
+	return;
+	// Handle groups here later
+}
+
+void Board::moveNonEye(const Move & m)
+{
+	foreachNeighbor(m.idx, [](auto idx)
+	{
+		updateNeighbor(idx, m);
+	});
+
+	// TODO: New group if applicable
+
+	// TODO: Update hash
+
+	ko = { Pass, Stone::NONE };
+
+	++moveCount;
+}
+
 void Board::makeMove(const Move & m)
 {
+	if (!isEyeLike(m.idx, flipColor(m.color)))
+	{
+		moveNonEye(m);
+	}
+	else
+	{
+
+	}
 }
