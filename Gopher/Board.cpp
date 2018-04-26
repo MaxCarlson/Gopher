@@ -50,7 +50,6 @@ void Board::init()
 {
 	std::memset(this, 0, sizeof(Board));
 
-
 	// Set offboard margin
 	int topRow = BoardRealSize2 - BoardRealSize;
 	for (int i = 0; i < BoardRealSize; ++i)
@@ -59,6 +58,16 @@ void Board::init()
 	for (int i = 0; i <= topRow; i += BoardRealSize)
 		points[i] = points[BoardRealSize - 1 + i] = Stone::OFFBOARD;
 
+	// Set neighbor values for all points that aren't offboard
+	// And create list of free positions
+	foreachPoint([&](coord idx)
+	{
+		if (points[idx] == Stone::OFFBOARD)
+			return;
+		neighbors[idx].increment(static_cast<Stone>(points[idx]));
+
+		free.emplace_back(idx);
+	});
 }
 
 int Board::neighborCount(coord idx, Stone color) const
@@ -96,7 +105,7 @@ bool Board::isValid(const Move & m) const
 	*/
 }
 
-bool Board::tryRandomMove(Stone color, coord& idx, int rng) const 
+bool Board::tryRandomMove(Stone color, coord& idx, int rng)  
 {
 	idx = free[rng];
 
@@ -108,13 +117,13 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng) const
 coord Board::playRandom(Stone color) 
 {
 	coord idx;
-	if (!freeCount)
+	if (!free.size())
 	{
 		// Handle no moves left
 	}
 
-	int rng = fastRandom(freeCount);
-	for (int i = rng; i < freeCount; ++i)
+	int rng = fastRandom(free.size());
+	for (int i = rng; i < free.size(); ++i)
 		if (tryRandomMove(color, idx, rng))
 			return idx;
 	
@@ -122,4 +131,3 @@ coord Board::playRandom(Stone color)
 		if (tryRandomMove(color, idx, rng))
 			return idx;
 }
-

@@ -9,6 +9,45 @@ constexpr int BoardOffset = 2;
 constexpr int BoardMaxIdx = (BoardSize + BoardOffset) * (BoardSize + BoardOffset);
 constexpr int BoardMaxGroups = 228;//BoardSize * BoardSize * 2 / 3;
 
+
+template<class Type, int size>
+class FastArray
+{
+
+	int mySize = 0;
+	Type items[size]; // TODO: use aligned storage!
+public:
+
+	Type & operator[](const int idx)
+	{
+		return items[idx];
+	}
+
+	const Type & operator[](const int idx) const
+	{
+		return items[idx];
+	}
+
+	template<class... Args>
+	void emplace_back(Args&& ...args)
+	{
+		new (&items[mySize]) Type(std::forward<Args>(args)...);
+		++mySize;
+	}
+
+	template<class Func>
+	void foreach(Func&& func)
+	{
+		for (int i = 0; i < mySize; ++i)
+			func(items[i]);
+	}
+
+	int size() const
+	{
+		return mySize;
+	}
+};
+
 using group = int;
 
 struct Group
@@ -19,12 +58,8 @@ struct Group
 struct Neighbors
 {
 	int n[Stone::MAX];
-};
 
-template<int size>
-class FastArray
-{
-
+	void increment(Stone type) { ++n[type]; }
 };
 
 struct Board
@@ -34,11 +69,9 @@ struct Board
 	// Stones info
 	int points[BoardMaxIdx];
 
-	int freeCount;
-	// Free board positions
-	coord free[BoardMaxIdx];
+	FastArray<coord, BoardMaxIdx> free;
 
-	// Quick lookup of all an idx's neighbors
+	// Number of neighbors a stone at idx has of each type
 	Neighbors neighbors[BoardMaxIdx];
 
 	// Figure out what exactly needs to be stored here
@@ -52,7 +85,7 @@ public:
 	bool isValid(const Move& m) const;
 
 
-	bool tryRandomMove(Stone color, coord& idx, int rng) const;
+	bool tryRandomMove(Stone color, coord& idx, int rng);
 	coord playRandom(Stone color);
 
 	friend void printBoard(const Board& board);
@@ -61,7 +94,7 @@ public:
 	void foreachPoint(F&& f);
 
 	template<class F>
-	void allValidSpots(F&& f);
+	void foreachNeighbor(int idx, F&& f);
 };
 
 template<class F>
@@ -69,6 +102,16 @@ inline void Board::foreachPoint(F&& f)
 {
 	for (int i = 0; i < BoardMaxIdx; ++i)
 		f(points[i]);
+}
+
+// Don't call of points that are offboard
+template<class F>
+inline void Board::foreachNeighbor(int idx, F&& f)
+{
+	f(points[idx - 1]);
+	f(points[idx + 1]);
+	f(points[idx - BoardRealSize]);
+	f(points[idx + BoardRealSize]);
 }
 
 
