@@ -73,12 +73,15 @@ struct GroupManager
 	groupId groupIds[BoardMaxIdx];
 
 	// Next stone in group
-	groupId nextStone[BoardMaxIdx];
+	coord nextStone[BoardMaxIdx];
 
-	// Info about groups, indexed by group id
+	// Info about groups, indexed by group id 
+	// (which is idx of first group stone)
 	Group groups[BoardMaxIdx];
 
 	Group& groupInfo(const coord idx) { return groups[groupIds[idx]]; }
+	Group& groupInfoById(const groupId id) { return groupInfo(id); }
+	coord& groupNextStone(const coord idx) { return nextStone[idx]; }
 };
 
 struct Neighbors
@@ -123,8 +126,10 @@ public:
 	coord playRandom(Stone color);
 
 	// Update functions for things that happen with moves
+	bool isGroupOneStone(const groupId id);
 	void groupAddLibs(groupId group, coord idx);
-	void groupRemoveLibs(coord idx, const Move& m);
+	void groupFindLibs(Group& group, groupId groupid, coord idx);
+	void groupRemoveLibs(groupId group, coord idx);
 	groupId updateNeighbor(coord idx, const Move& m, groupId group);
 
 	// Move functions
@@ -138,7 +143,8 @@ public:
 
 	friend void printBoard(const Board& board);
 
-	inline int at(int idx) { return points[idx]; }
+	inline int at(int idx) const { return points[idx]; }
+	inline int& at(int idx) { return points[idx]; }
 
 	template<class F>
 	void foreachPoint(F&& f);
@@ -151,8 +157,14 @@ public:
 
 	template<class F>
 	void eachDiagonalNeighbor(int idx, F&& f) const { eachDiagonalNeighbor(idx, f); };
+
+	// Loop through the each member in group, 
+	// llambda syntax should be [](int idx) { func }
+	template<class F>
+	void foreachInGroup(groupId id, F&& f);
 };
 
+// Llambda syntax is: [](int idx, int type){}
 template<class F>
 inline void Board::foreachPoint(F&& f)
 {
@@ -161,22 +173,34 @@ inline void Board::foreachPoint(F&& f)
 }
 
 // Don't call of points that are offboard
+// Llambda syntax is: [](int idx, int type){}
 template<class F>
 inline void Board::foreachNeighbor(int idx, F&& f)
 {
-	f(points[idx - 1]);
-	f(points[idx + 1]);
-	f(points[idx - BoardRealSize]);
-	f(points[idx + BoardRealSize]);
+	f(idx - 1, points[idx - 1]);
+	f(idx + 1, points[idx + 1]);
+	f(idx - BoardRealSize, points[idx - BoardRealSize]);
+	f(idx + BoardRealSize, points[idx + BoardRealSize]);
 }
 
+// Llambda syntax is: [](int idx, int type){}
 template<class F>
 inline void Board::eachDiagonalNeighbor(int idx, F&& f)
 {
-	f(points[idx + BoardRealSize + 1]);
-	f(points[idx + BoardRealSize - 1]);
-	f(points[idx - BoardRealSize + 1]);
-	f(points[idx - BoardRealSize - 1]);
+	f(idx + BoardRealSize + 1, points[idx + BoardRealSize + 1]);
+	f(idx + BoardRealSize - 1, points[idx + BoardRealSize - 1]);
+	f(idx - BoardRealSize + 1, points[idx - BoardRealSize + 1]);
+	f(idx - BoardRealSize - 1, points[idx - BoardRealSize - 1]);
+}
+
+template<class F>
+inline void Board::foreachInGroup(groupId id, F && f)
+{
+	while (id != 0)
+	{
+		f(id);
+		id = groups.groupNextStone(id);
+	}
 }
 
 

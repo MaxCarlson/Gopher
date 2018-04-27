@@ -87,9 +87,9 @@ bool Board::isFalseEyelike(coord idx, Stone color) const
 {
 	int numNeighbors[Stone::MAX] = { 0, 0, 0, 0 };
 
-	eachDiagonalNeighbor(idx, [&](auto n)
+	eachDiagonalNeighbor(idx, [&](int index, int id)
 	{
-		++numNeighbors(at(idx));
+		++numNeighbors[at(index)];
 	});
 
 	// Do we have two enemy stones diagonally (or side of the board
@@ -161,19 +161,96 @@ coord Board::playRandom(Stone color)
 	return 0;
 }
 
-void Board::groupAddLibs(groupId group, coord idx)
+// Pass this the idx of the first group stone
+// (also the group id)
+bool Board::isGroupOneStone(const groupId id)
 {
+	return groups.groupNextStone(id);
 }
 
-void Board::groupRemoveLibs(coord idx, const Move & m)
+void Board::groupAddLibs(groupId groupid, coord idx)
 {
+	Group& g = groups.groupInfoById(groupid);
+	//bool isSingleStone = isGroupOneStone(groupid);
 
+	if (g.libs < GroupLibCount)
+	{
+		// Don't add a liberty if we already have it
+		for (int i = 0; i < GroupLibCount; ++i)
+		{
+			if (g.lib[i] == idx) 
+				return;
+		}
+		g.lib[g.libs++] = idx;
+	}
+}
+
+void Board::groupFindLibs(Group & group, groupId groupid, coord idx) // TODO: If LIBERTY ISSUES ~~ Look here first
+{
+	// Taken from pachii
+	// Hash the indexes of our liberties so we can quickly
+	// check and make sure we're not double counting a liberty
+	unsigned char htable[BoardRealSize / 8];
+	auto gethashLib = [&](int lib) -> unsigned char { return (htable[lib >> 3] & (1 << (lib & 7))); } ;
+	auto sethashLib = [&](int lib) { htable[lib >> 3] |= (1 << (lib & 7)); };
+
+	for (int i = 0; i < GroupLibCount; ++i)
+		sethashLib(group.lib[i]);
+
+	sethashLib(idx);
+
+	foreachInGroup(groupid, [&](coord idx)
+	{
+		if (group.libs >= GroupLibCount)
+			return;
+
+		foreachNeighbor(idx, [&](int id, int type)
+		{
+			if (at(idx) + gethashLib(idx) != Stone::NONE || group.libs >= GroupLibCount)
+				return;
+
+			sethashLib(idx);
+			group.lib[group.libs++] = idx;
+		});
+	});
+}
+
+void Board::groupRemoveLibs(groupId groupid, coord idx)
+{
+	Group& g = groups.groupInfoById(groupid);
+	//bool isSingleStone = isGroupOneStone(groupid);
+
+	for (int i = 0; i < GroupLibCount; ++i)
+	{
+		if (g.lib[i] != idx)
+			continue;
+
+		// Replace liberty we lost
+		g.lib[i] = std::move(g.lib[--g.libs]);
+
+		if (g.libs > GroupLibRefill)
+			return; // No need to find more liberties
+
+		if (g.libs == GroupLibRefill)
+			groupFindLibs(g, groupid, idx);
+
+		// TODO: Cache group as capturable (g.libs == 1)
+		// TODO: Cache group as captured   (g.libs == 0)
+		return;
+	}
 }
 
 void Board::addToGroup(groupId group, coord neighbor, coord newStone)
 {
 	groupAt(newStone) = group;
+	groups.groupNextStone(newStone) = groups.groupNextStone(neighbor);
+	groups.groupNextStone(neighbor) = newStone;
 
+	foreachNeighbor(newStone, [&](int idx, int type)
+	{
+		if (at(idx) == Stone::NONE)
+			groupAddLibs(group, idx);
+	});
 }
 
 groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
@@ -188,7 +265,7 @@ groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
 		return moveGroup;
 
 	// Remove move idx liberty from group
-	groupRemoveLibs(m.idx, m);
+	groupRemoveLibs(ngroup, m.idx);
 
 	if (m.color == ncolor && ngroup != moveGroup)
 	{
@@ -208,7 +285,7 @@ void Board::moveNonEye(const Move & m)
 {
 	groupId g = 0;
 
-	foreachNeighbor(m.idx, [&](auto idx)
+	foreachNeighbor(m.idx, [&](int idx, int type)
 	{
 		g = updateNeighbor(idx, m, g);
 	});
