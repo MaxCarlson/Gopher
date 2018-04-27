@@ -68,7 +68,7 @@ void printBoardAsGroups(const Board& board)
 	{
 		std::cout << i << "|";
 		for (int j = 1; j < BoardRealSize - 1; ++j)
-			std::cout << " " << std::setw(3) << std::left << board.groups.groupIds[getIdx(i, j)];
+			std::cout << " " << std::setw(3) << std::left << board.groups.groupIds[getIdx(j, i)];
 		std::cout << " | \n";
 	}
 	std::cout << '\n';
@@ -93,7 +93,11 @@ void Board::init()
 		if (point == Stone::OFFBOARD)
 			return;
 
-		neighbors[idx].increment(static_cast<Stone>(points[idx]));
+		foreachNeighbor(idx, [&](int nidx, int type)
+		{	// No need to handle other types since this is default init
+			if (type == Stone::OFFBOARD)
+				neighbors[idx].increment(Stone::OFFBOARD);
+		});
 
 		free.emplace_back(idx);
 	});
@@ -248,9 +252,6 @@ groupId Board::newGroup(coord idx)
 
 	groupAt(idx) = gid;
 	groups.groupNextStone(idx) = 0;
-
-	printBoardAsGroups(*this);
-
 
 	return gid;
 }
@@ -427,6 +428,9 @@ void Board::makeMove(const Move & m)
 {
 	if (at(m.idx) != Stone::NONE) // Remove when done debugging
 		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
+
+	if (m.idx == 75)
+		int a = 5;
 
 	// We're not playing into an opponents eye
 	if (!isEyeLike(m.idx, flipColor(m.color)))
