@@ -12,16 +12,16 @@ void printPos(const int i)
 	switch (i)
 	{
 	case Stone::NONE:
-		std::cout << "   ";
+		std::cout << "  ";
 		break;
 	case Stone::BLACK:
-		std::cout << " b ";
+		std::cout << " b";
 		break;
 	case Stone::WHITE:
-		std::cout << " w ";
+		std::cout << " w";
 		break;
 	case Stone::OFFBOARD:
-		std::cout << " X ";
+		std::cout << " X";
 		break;
 	default:
 		std::cout << "BoardIdxIssue!";
@@ -30,16 +30,23 @@ void printPos(const int i)
 
 void printRow(const Board& board, int row)
 {
+	std::cout << row;
 	std::cout << "| ";
-	for (int i = 0; i < BoardRealSize; ++i)
+	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printPos(board.points[getIdx(i, row)]);
 	std::cout << " | \n";
 }
 
 void printBoard(const Board & board)
 {
+	std::cout << '\n' << "   ";
+	const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+
+	for (int i = 1; i < BoardRealSize - 1; ++i)
+		std::cout << ' ' << letters[i - 1];
+
 	std::cout << '\n';
-	for (int i = 0; i < BoardRealSize; ++i)
+	for (int i = 1; i < BoardRealSize - 1; ++i)
 	{
 		printRow(board, i);
 	}
@@ -425,6 +432,8 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a pla
 		return false;
 
 	makeMove(m);
+	printMove(m);
+
 	return true;
 }
 

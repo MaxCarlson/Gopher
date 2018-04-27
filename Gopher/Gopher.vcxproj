@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="defines.h" />
     <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="Random.h" />
