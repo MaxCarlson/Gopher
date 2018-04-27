@@ -10,6 +10,8 @@ constexpr int BoardMaxIdx = (BoardSize + BoardOffset) * (BoardSize + BoardOffset
 constexpr int BoardMaxGroups = 228;//BoardSize * BoardSize * 2 / 3;
 
 
+// As is don't pass in any type needing memory 
+// management
 template<class Type, int size>
 class FastArray
 {
@@ -35,6 +37,11 @@ public:
 		++mySize;
 	}
 
+	void erase(int idx)
+	{
+		std::swap(items[idx], items[--mySize]);
+	}
+
 	template<class Func>
 	void foreach(Func&& func)
 	{
@@ -48,11 +55,30 @@ public:
 	}
 };
 
-using group = int;
+static constexpr int GroupLibCount = 10;
+static constexpr int GroupLibRefill = 5;
+using groupId = int;
 
 struct Group
 {
+	// Liberty count
+	int libs;
+	// Exact liberty locations
+	coord lib[GroupLibCount];
+};
 
+struct GroupManager
+{
+	// Group id of stone at index idx
+	groupId groupIds[BoardMaxIdx];
+
+	// Next stone in group, Initial index by group id
+	groupId nextStone[BoardMaxIdx];
+
+	// Info about groups, indexed by group id
+	Group groups[BoardMaxIdx];
+
+	Group& groupInfo(const coord idx) { return groups[groupIds[idx]]; }
 };
 
 struct Neighbors
@@ -77,6 +103,8 @@ struct Board
 	// Number of neighbors a stone at idx has of each type
 	Neighbors neighbors[BoardMaxIdx];
 
+	GroupManager groups;
+
 	// Figure out what exactly needs to be stored here
 	Move ko;
 
@@ -98,6 +126,9 @@ public:
 	// Move functions
 	void moveNonEye(const Move& m);
 	void makeMove(const Move& m);
+
+	// Group functions
+	inline groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
 
 	friend void printBoard(const Board& board);
 

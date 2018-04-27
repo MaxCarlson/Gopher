@@ -174,6 +174,8 @@ void Board::moveNonEye(const Move & m)
 		updateNeighbor(idx, m);
 	});
 
+
+
 	// TODO: New group if applicable
 
 	// TODO: Update hash
@@ -188,9 +190,12 @@ void Board::makeMove(const Move & m)
 	if (!isEyeLike(m.idx, flipColor(m.color)))
 	{
 		moveNonEye(m);
+
+		// TODO: Handle group suicides by looking at our recent groups liberties
 	}
 	else
 	{
 
 	}
+
 }
