@@ -240,6 +240,23 @@ void Board::groupRemoveLibs(groupId groupid, coord idx)
 	}
 }
 
+groupId Board::newGroup(coord idx)
+{
+	groupId gid = idx;
+	Group& group = groups.groupInfoById(gid);
+
+	foreachNeighbor(idx, [&](int idx, int type)
+	{
+		if (at(idx) == Stone::NONE)
+			group.addLib(idx);
+	});
+
+	groupAt(idx) = gid;
+	groups.groupNextStone(idx) = 0;
+
+	return gid;
+}
+
 void Board::addToGroup(groupId group, coord neighbor, coord newStone)
 {
 	groupAt(newStone) = group;
@@ -251,6 +268,97 @@ void Board::addToGroup(groupId group, coord neighbor, coord newStone)
 		if (at(idx) == Stone::NONE)
 			groupAddLibs(group, idx);
 	});
+}
+
+void Board::mergeGroups(groupId groupTo, groupId groupFrom)
+{
+	Group& gto = groups.groupInfoById(groupTo);
+	Group& gfrom = groups.groupInfoById(groupFrom);
+
+	//bool oneStoneTo = isGroupOneStone(groupTo);
+	//bool oneStoneFrom = isGroupOneStone(groupFrom);
+
+	if (gto.libs < GroupLibCount)
+	{
+		for (int i = 0; i < gfrom.libs; ++i)
+		{
+			bool cont = false;
+			for (int j = 0; j < gto.libs; ++j)
+				if (gto.lib[j] == gfrom.lib[i])
+				{
+					cont = true;
+					break;
+				}
+			if (cont)
+				continue;
+
+			// TODO: Use oppertunity to cache possible captureable groups (gto.libs == 0)
+			// TODO: Use oppertunity to remove possible captureable groups (gto.libs == 1)
+
+			gto.lib[gto.libs++] = std::move(gfrom.lib[i]);
+			if (gto.libs >= GroupLibCount)
+				break;
+		}
+	}
+
+	// Set all stones in from group 
+	// to belong to groupTo
+	coord lastInGroup;
+	foreachInGroup(groupFrom, [&](coord idx)
+	{
+		lastInGroup = idx;
+		groups.groupIds[idx] = groupTo;
+	});
+
+	// Connect the group stons
+	groups.groupNextStone(lastInGroup) = groups.groupNextStone(groupTo);
+	groups.groupNextStone(groupTo) = groupFrom;
+
+	std::memset(&gfrom, 0, sizeof(Group));
+}
+
+void Board::removeStone(groupId gid, coord idx)
+{
+	Stone color = static_cast<Stone>(at(idx));
+	at(idx) = Stone::NONE;
+	groups.groupIds[idx] = 0;
+
+	// Increase liberties of surrounding groups
+	coord stoneIdx = idx;
+	foreachNeighbor(idx, [&](int idx, int type)
+	{
+		neighbors[idx].decrement(color);
+		groupId g = groups.groupIds[idx];
+
+		if (g && g != gid)
+			groupAddLibs(g, stoneIdx);
+	});
+
+	// TODO: Update board hash
+
+	// Add free spot
+	free.emplace_back(idx);
+}
+
+int Board::groupCapture(groupId gid)
+{
+	int stoneCount = 0;
+
+	foreachInGroup(gid, [&](int idx)
+	{
+		++stoneCount;
+		removeStone(gid, idx);
+		++captures[flipColor(at(idx))];
+	});
+
+	Group& g = groups.groupInfoById(gid);
+
+	if (g.libs != 0)
+		std::cout << "Non zero libs group caputure! " << g.libs << "\n";
+
+	std::memset(&g, 0, sizeof(Group));
+
+	return stoneCount;
 }
 
 groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
@@ -267,17 +375,25 @@ groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
 	// Remove move idx liberty from group
 	groupRemoveLibs(ngroup, m.idx);
 
+	// Is the moving piece the same color as this neighbor?
 	if (m.color == ncolor && ngroup != moveGroup)
 	{
+		// Not part of a group? Lets create one
 		if (!moveGroup)
 		{
 			moveGroup = ngroup;
 			addToGroup(moveGroup, nidx, m.idx);
 		}
-		//else
-			//mergeGroup(ngroup, nidx, m.idx);
+		else
+			mergeGroups(moveGroup, ngroup);
 	}
-
+	// Piece is opposite color, 
+	// Check for captures
+	else if (ncolor == flipColor(m.color))
+	{
+		if (groups.isGroupCaptured(ngroup))
+			groupCapture(ngroup);
+	}
 	return moveGroup;
 }
 
@@ -290,7 +406,10 @@ void Board::moveNonEye(const Move & m)
 		g = updateNeighbor(idx, m, g);
 	});
 
-	// TODO: New group if applicable
+	//points[m.idx] = m.color;
+
+	if (!g)
+		g = newGroup(m.idx);
 
 	// TODO: Update hash
 

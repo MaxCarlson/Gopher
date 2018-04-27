@@ -65,6 +65,8 @@ struct Group
 	int libs;
 	// Exact liberty locations
 	coord lib[GroupLibCount];
+
+	void addLib(const coord idx) { lib[libs++] = idx; }
 };
 
 struct GroupManager
@@ -80,8 +82,10 @@ struct GroupManager
 	Group groups[BoardMaxIdx];
 
 	Group& groupInfo(const coord idx) { return groups[groupIds[idx]]; }
-	Group& groupInfoById(const groupId id) { return groupInfo(id); }
+	Group& groupInfoById(const groupId id) { return groups[id]; }
 	coord& groupNextStone(const coord idx) { return nextStone[idx]; }
+
+	bool isGroupCaptured(const groupId id) const { return groups[id].libs == 0; }
 };
 
 struct Neighbors
@@ -89,6 +93,7 @@ struct Neighbors
 	int n[Stone::MAX];
 
 	void increment(Stone type) { ++n[type]; }
+	void decrement(Stone type) { --n[type]; }
 };
 
 struct Board
@@ -131,13 +136,17 @@ public:
 	void groupFindLibs(Group& group, groupId groupid, coord idx);
 	void groupRemoveLibs(groupId group, coord idx);
 	groupId updateNeighbor(coord idx, const Move& m, groupId group);
+	void removeStone(groupId gid, coord idx);
 
 	// Move functions
 	void moveNonEye(const Move& m);
 	void makeMove(const Move& m);
 
 	// Group functions
+	groupId newGroup(coord idx);
 	void addToGroup(groupId group, coord neighbor, coord newStone);
+	void mergeGroups(groupId groupTo, groupId groupFrom);
+	int groupCapture(groupId gid);
 	inline groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
 	inline groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
 
