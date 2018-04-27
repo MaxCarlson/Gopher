@@ -132,7 +132,7 @@ public:
 
 	// Move functions
 	groupId moveNonEye(const Move& m);
-	void moveInEye(const Move& m);
+	bool moveInEye(const Move& m);
 	void makeMove(const Move& m);
 
 	// Group functions

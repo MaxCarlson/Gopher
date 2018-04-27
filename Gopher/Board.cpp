@@ -419,9 +419,60 @@ groupId Board::moveNonEye(const Move & m)
 	return g;
 }
 
-void Board::moveInEye(const Move & m)
+bool Board::moveInEye(const Move & m)
 {
+	if (m == ko)
+		return false;
 
+	// Count groups with 0 liberties after move is made
+	int capturedGroups = 0;
+	foreachNeighbor(m.idx, [&](int idx, int type)
+	{
+		groupId g = groupAt(idx);
+		capturedGroups += (groups.groupInfoById(g).libs == 1);
+	});
+
+	// This is a suicide!
+	if (capturedGroups == 0)
+		return false;
+
+	//free.erase(m.idx);
+
+	int koCaps = 0;
+	coord capAt = Pass;
+
+	foreachNeighbor(m.idx, [&](int idx, int type)
+	{
+		neighbors[idx].increment(m.color);
+
+		groupId gid = groupAt(m.idx);
+		if (!gid)
+			return;
+
+		groupRemoveLibs(gid, m.idx);
+
+		if (groups.isGroupCaptured(gid))
+		{
+			koCaps += groupCapture(gid);
+			capAt = idx;
+		}
+	});
+
+	Move newKo = { Pass, Stone::NONE };
+
+	if (koCaps == 1)
+		newKo = { capAt, flipColor(m.color) };
+
+	at(m.idx) = m.color;
+	groupId newGid = newGroup(m.idx);
+	
+	ko = std::move(newKo);
+	++moveCount;
+
+	// TODO: Update board hash
+	// TODO: Cache move history for undo's
+
+	return newGid;
 }
 
 void Board::makeMove(const Move & m)
@@ -429,7 +480,7 @@ void Board::makeMove(const Move & m)
 	if (at(m.idx) != Stone::NONE) // Remove when done debugging
 		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
 
-	if (m.idx == 75)
+	if (m.idx == 75) // Issue with playing in eye not being detected
 		int a = 5;
 
 	// We're not playing into an opponents eye
