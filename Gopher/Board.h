@@ -2,7 +2,7 @@
 #include "Stone.h"
 #include "Move.h"
 
-constexpr int BoardSize = 19;
+constexpr int BoardSize = 9;
 constexpr int BoardRealSize = BoardSize + 2;
 constexpr int BoardRealSize2 = BoardRealSize * BoardRealSize;
 constexpr int BoardOffset = 2;
@@ -139,7 +139,8 @@ public:
 	void removeStone(groupId gid, coord idx);
 
 	// Move functions
-	void moveNonEye(const Move& m);
+	groupId moveNonEye(const Move& m);
+	void moveInEye(const Move& m);
 	void makeMove(const Move& m);
 
 	// Group functions
@@ -165,7 +166,7 @@ public:
 	void eachDiagonalNeighbor(int idx, F&& f);
 
 	template<class F>
-	void eachDiagonalNeighbor(int idx, F&& f) const { eachDiagonalNeighbor(idx, f); };
+	void eachDiagonalNeighbor(int idx, F&& f) const;
 
 	// Loop through the each member in group, 
 	// llambda syntax should be [](int idx) { func }
@@ -195,6 +196,15 @@ inline void Board::foreachNeighbor(int idx, F&& f)
 // Llambda syntax is: [](int idx, int type){}
 template<class F>
 inline void Board::eachDiagonalNeighbor(int idx, F&& f)
+{
+	f(idx + BoardRealSize + 1, points[idx + BoardRealSize + 1]);
+	f(idx + BoardRealSize - 1, points[idx + BoardRealSize - 1]);
+	f(idx - BoardRealSize + 1, points[idx - BoardRealSize + 1]);
+	f(idx - BoardRealSize - 1, points[idx - BoardRealSize - 1]);
+}
+
+template<class F>
+inline void Board::eachDiagonalNeighbor(int idx, F&& f) const
 {
 	f(idx + BoardRealSize + 1, points[idx + BoardRealSize + 1]);
 	f(idx + BoardRealSize - 1, points[idx + BoardRealSize - 1]);

@@ -128,39 +128,6 @@ bool Board::isValid(const Move & m) const
 	*/
 }
 
-bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a playout policy instead of just looking at move validity
-{
-	idx = free[rng];
-
-	Move m = { idx, color };
-
-	if (isOnePointEye(m.idx, m.color) || !isValid(m))
-		return false;
-
-	makeMove(m);
-	return true;
-}
-
-coord Board::playRandom(Stone color) 
-{
-	coord idx;
-	if (!free.size())
-	{
-		// Handle no moves left
-	}
-
-	int rng = fastRandom(free.size());
-	for (int i = rng; i < free.size(); ++i)
-		if (tryRandomMove(color, idx, rng))
-			return idx;
-	
-	for(int i = 0; i < rng; ++i)
-		if (tryRandomMove(color, idx, rng))
-			return idx;
-
-	return 0;
-}
-
 // Pass this the idx of the first group stone
 // (also the group id)
 bool Board::isGroupOneStone(const groupId id)
@@ -190,7 +157,7 @@ void Board::groupFindLibs(Group & group, groupId groupid, coord idx) // TODO: If
 	// Taken from pachii
 	// Hash the indexes of our liberties so we can quickly
 	// check and make sure we're not double counting a liberty
-	unsigned char htable[BoardRealSize / 8];
+	unsigned char htable[BoardMaxIdx / 8];
 	auto gethashLib = [&](int lib) -> unsigned char { return (htable[lib >> 3] & (1 << (lib & 7))); } ;
 	auto sethashLib = [&](int lib) { htable[lib >> 3] |= (1 << (lib & 7)); };
 
@@ -347,8 +314,8 @@ int Board::groupCapture(groupId gid)
 	foreachInGroup(gid, [&](int idx)
 	{
 		++stoneCount;
-		removeStone(gid, idx);
 		++captures[flipColor(at(idx))];
+		removeStone(gid, idx);
 	});
 
 	Group& g = groups.groupInfoById(gid);
@@ -397,7 +364,7 @@ groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
 	return moveGroup;
 }
 
-void Board::moveNonEye(const Move & m)
+groupId Board::moveNonEye(const Move & m)
 {
 	groupId g = 0;
 
@@ -416,21 +383,67 @@ void Board::moveNonEye(const Move & m)
 	ko = { Pass, Stone::NONE };
 
 	++moveCount;
+	return g;
+}
+
+void Board::moveInEye(const Move & m)
+{
 }
 
 void Board::makeMove(const Move & m)
 {
+	if (at(m.idx) != Stone::NONE) // Remove when done debugging
+		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
+
 	// We're not playing into an opponents eye
 	if (!isEyeLike(m.idx, flipColor(m.color)))
 	{
-		moveNonEye(m);
 		// TODO: Handle group suicides by looking at our recent groups liberties
+		groupId group = moveNonEye(m);	 
+		if (groups.isGroupCaptured(group))
+		{
+			// TODO: Undo this
+			std::cout << "Self Suicide!";
+			groupCapture(group);
+		}
 	}
 	else
 	{
-
+		moveInEye(m);
 	}
 
 	points[m.idx] = m.color;
 }
 
+bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a playout policy instead of just looking at move validity
+{
+	idx = free[rng];
+
+	Move m = { idx, color };
+
+	if (isOnePointEye(m.idx, m.color) || !isValid(m))
+		return false;
+
+	makeMove(m);
+	return true;
+}
+
+coord Board::playRandom(Stone color)
+{
+	coord idx;
+	if (!free.size())
+	{
+		// Handle no moves left
+	}
+
+	int rng = fastRandom(free.size());
+	for (int i = rng; i < free.size(); ++i)
+		if (tryRandomMove(color, idx, rng))
+			return idx;
+
+	for (int i = 0; i < rng; ++i)
+		if (tryRandomMove(color, idx, rng))
+			return idx;
+
+	return 0;
+}
