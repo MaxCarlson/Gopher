@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "Random.h"
 #include <iostream>
+#include <iomanip>
 
 inline int getIdx(int x, int y)
 {
@@ -30,25 +31,45 @@ void printPos(const int i)
 
 void printRow(const Board& board, int row)
 {
-	std::cout << row;
-	std::cout << "| ";
+	std::cout << row << "|";
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printPos(board.points[getIdx(i, row)]);
 	std::cout << " | \n";
 }
 
-void printBoard(const Board & board)
+void printBoardTop(int spaces)
 {
-	std::cout << '\n' << "   ";
 	const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
 
 	for (int i = 1; i < BoardRealSize - 1; ++i)
-		std::cout << ' ' << letters[i - 1];
+	{
+		for (int j = 0; j < spaces; ++j)
+			std::cout << ' ';
 
+		std::cout << letters[i - 1];
+	}
 	std::cout << '\n';
+}
+
+void printBoard(const Board & board)
+{
+	std::cout << '\n' << "  ";
+	printBoardTop(1);
+	for (int i = 1; i < BoardRealSize - 1; ++i)
+		printRow(board, i);
+	
+	std::cout << '\n';
+}
+
+void printBoardAsGroups(const Board& board)
+{
+	printBoardTop(3);
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 	{
-		printRow(board, i);
+		std::cout << i << "|";
+		for (int j = 1; j < BoardRealSize - 1; ++j)
+			std::cout << " " << std::setw(3) << std::left << board.groups.groupIds[getIdx(i, j)];
+		std::cout << " | \n";
 	}
 	std::cout << '\n';
 }
@@ -228,6 +249,9 @@ groupId Board::newGroup(coord idx)
 	groupAt(idx) = gid;
 	groups.groupNextStone(idx) = 0;
 
+	printBoardAsGroups(*this);
+
+
 	return gid;
 }
 
@@ -349,7 +373,8 @@ groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
 	// Remove move idx liberty from group
 	groupRemoveLibs(ngroup, m.idx);
 
-	// Is the moving piece the same color as this neighbor?
+	// Is the moving piece the same color as this neighbor 
+	// and not in our group?
 	if (m.color == ncolor && ngroup != moveGroup)
 	{
 		// Not part of a group? Lets create one
@@ -395,6 +420,7 @@ groupId Board::moveNonEye(const Move & m)
 
 void Board::moveInEye(const Move & m)
 {
+
 }
 
 void Board::makeMove(const Move & m)
@@ -409,8 +435,10 @@ void Board::makeMove(const Move & m)
 		groupId group = moveNonEye(m);	 
 		if (groups.isGroupCaptured(group))
 		{
+			printMove({ group, m.color });
+
 			// TODO: Undo this
-			std::cout << "Self Suicide!";
+			std::cout << "Self Suicide!"; // TODO: THIS IS BEING CALLED WHEN GROUP SHOULD STILL have liberties left!!!!
 			groupCapture(group);
 		}
 	}
@@ -433,6 +461,8 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a pla
 
 	makeMove(m);
 	printMove(m);
+	printBoard(*this);
+	printBoardAsGroups(*this);
 
 	return true;
 }

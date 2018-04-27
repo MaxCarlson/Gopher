@@ -32,6 +32,16 @@ inline bool isResign(const Move& m)
 	return m.idx == Resign;
 }
 
+inline std::pair<coord, coord> idxToXY(int idx)
+{
+	return { idx / BoardRealSize, idx % BoardRealSize };
+}
+
+inline std::pair<coord, coord> moveToXY(const Move& m)
+{
+	return idxToXY(m.idx);
+}
+
 inline void printMove(const Move& m)
 {
 	const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
