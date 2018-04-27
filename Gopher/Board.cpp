@@ -60,10 +60,11 @@ void Board::init()
 
 	// Set neighbor values for all points that aren't offboard
 	// And create list of free positions
-	foreachPoint([&](coord idx)
+	foreachPoint([&](int idx, int point)
 	{
-		if (points[idx] == Stone::OFFBOARD)
+		if (point == Stone::OFFBOARD)
 			return;
+
 		neighbors[idx].increment(static_cast<Stone>(points[idx]));
 
 		free.emplace_back(idx);
@@ -86,7 +87,7 @@ bool Board::isFalseEyelike(coord idx, Stone color) const
 {
 	int numNeighbors[Stone::MAX] = { 0, 0, 0, 0 };
 
-	eachDiagonalNeighbor(idx, [](auto n)
+	eachDiagonalNeighbor(idx, [&](auto n)
 	{
 		++numNeighbors(at(idx));
 	});
@@ -136,6 +137,7 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a pla
 	if (isOnePointEye(m.idx, m.color) || !isValid(m))
 		return false;
 
+	makeMove(m);
 	return true;
 }
 
@@ -155,26 +157,61 @@ coord Board::playRandom(Stone color)
 	for(int i = 0; i < rng; ++i)
 		if (tryRandomMove(color, idx, rng))
 			return idx;
+
+	return 0;
 }
 
-void Board::updateNeighbor(coord idx, const Move& m)
+void Board::groupAddLibs(groupId group, coord idx)
 {
-	auto& nebr = neighbors[idx];
+}
 
-	nebr.increment(m.color);
+void Board::groupRemoveLibs(coord idx, const Move & m)
+{
 
-	return;
-	// Handle groups here later
+}
+
+void Board::addToGroup(groupId group, coord neighbor, coord newStone)
+{
+	groupAt(newStone) = group;
+
+}
+
+groupId Board::updateNeighbor(coord nidx, const Move& m, groupId moveGroup)
+{
+	auto& neighbor = neighbors[nidx];
+	neighbor.increment(m.color);
+
+	const int ncolor = at(nidx);
+	const groupId ngroup = groupAt(nidx);
+
+	if (!ngroup)
+		return moveGroup;
+
+	// Remove move idx liberty from group
+	groupRemoveLibs(m.idx, m);
+
+	if (m.color == ncolor && ngroup != moveGroup)
+	{
+		if (!moveGroup)
+		{
+			moveGroup = ngroup;
+			addToGroup(moveGroup, nidx, m.idx);
+		}
+		//else
+			//mergeGroup(ngroup, nidx, m.idx);
+	}
+
+	return moveGroup;
 }
 
 void Board::moveNonEye(const Move & m)
 {
-	foreachNeighbor(m.idx, [](auto idx)
+	groupId g = 0;
+
+	foreachNeighbor(m.idx, [&](auto idx)
 	{
-		updateNeighbor(idx, m);
+		g = updateNeighbor(idx, m, g);
 	});
-
-
 
 	// TODO: New group if applicable
 
@@ -187,10 +224,10 @@ void Board::moveNonEye(const Move & m)
 
 void Board::makeMove(const Move & m)
 {
+	// We're not playing into an opponents eye
 	if (!isEyeLike(m.idx, flipColor(m.color)))
 	{
 		moveNonEye(m);
-
 		// TODO: Handle group suicides by looking at our recent groups liberties
 	}
 	else
@@ -198,4 +235,6 @@ void Board::makeMove(const Move & m)
 
 	}
 
+	points[m.idx] = m.color;
 }
+

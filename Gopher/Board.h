@@ -72,7 +72,7 @@ struct GroupManager
 	// Group id of stone at index idx
 	groupId groupIds[BoardMaxIdx];
 
-	// Next stone in group, Initial index by group id
+	// Next stone in group
 	groupId nextStone[BoardMaxIdx];
 
 	// Info about groups, indexed by group id
@@ -118,17 +118,23 @@ public:
 	bool isValid(const Move& m) const;
 
 	bool tryRandomMove(Stone color, coord& idx, int rng);
+
+	// Returns 0 if can't play
 	coord playRandom(Stone color);
 
 	// Update functions for things that happen with moves
-	void updateNeighbor(coord idx, const Move& m);
+	void groupAddLibs(groupId group, coord idx);
+	void groupRemoveLibs(coord idx, const Move& m);
+	groupId updateNeighbor(coord idx, const Move& m, groupId group);
 
 	// Move functions
 	void moveNonEye(const Move& m);
 	void makeMove(const Move& m);
 
 	// Group functions
+	void addToGroup(groupId group, coord neighbor, coord newStone);
 	inline groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
+	inline groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
 
 	friend void printBoard(const Board& board);
 
@@ -151,7 +157,7 @@ template<class F>
 inline void Board::foreachPoint(F&& f)
 {
 	for (int i = 0; i < BoardMaxIdx; ++i)
-		f(points[i]);
+		f(i, points[i]);
 }
 
 // Don't call of points that are offboard
