@@ -9,7 +9,7 @@ class MonteCarlo
 public:
 	MonteCarlo(const Board& board) : board(board) {}
 
-	int playRandomGame(int length, double deathRatio);
+	int playRandomGame(Board& board, int color, int length, double deathRatio);
 
 	coord genMove(int color);
 

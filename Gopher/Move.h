@@ -38,6 +38,11 @@ inline bool isPass(const Move& m)
 	return m.idx == Pass;
 }
 
+inline bool isPass(coord idx)
+{
+	return idx == Pass;
+}
+
 inline bool isResign(const Move& m) 
 {
 	return m.idx == Resign;

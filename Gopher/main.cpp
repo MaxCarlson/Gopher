@@ -13,10 +13,13 @@ int main()
 
 	MonteCarlo monte(board);
 
+	Stone color = Stone::BLACK;
+
 	for (int i = 0; i < 20000; ++i)
 	{
-		Stone c = i % 2 == 0 ? Stone::BLACK : Stone::WHITE;
-		board.playRandom(c);
+		monte.genMove(color);
+		
+		color = flipColor(color);
 	}
 
 	return 0;

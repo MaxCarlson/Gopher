@@ -35,3 +35,5 @@ inline std::string printStone(Stone stone)
 	}
 	return "Stone out of bounds!";
 }
+
+inline std::string printStone(int stone) { return printStone(static_cast<Stone>(stone)); }
