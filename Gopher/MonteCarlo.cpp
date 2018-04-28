@@ -10,16 +10,17 @@ struct MoveStats
 
 constexpr double SearchTime = 5.0;
 constexpr int MaxGameLen = 600;
-constexpr int GameSearchCount = 10000;
+constexpr int GameSearchCount = 2000;
 
 int MonteCarlo::playRandomGame(Board& board, int color, int length, double deathRatio)
 {
 	const int ourColor = color;
+	color = flipColor(color);
 	int pass = isPass(board.lastMove);
 
 	while (pass < 2 && --length > 0)
 	{
-		coord idx = board.playRandom(static_cast<Stone>(color));
+		coord idx = board.playRandom(static_cast<Stone>(color)); // TODO: This sometimes fails, It should not fail here (or should pass)
 
 		if (isPass(idx))
 			++pass;
@@ -30,13 +31,15 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 			break;
 
 		color = flipColor(color);
+
+		//board.printBoard();
 	}
 
 	const double score = board.scoreFast();
 	const int result = ourColor == Stone::WHITE ? score * 2 : -(score * 2);
 
 
-	std::cout << "Random playout result for color " << printStone(ourColor) << " " << score << '\n';
+	//std::cout << "Random playout result for color " << printStone(ourColor) << " " << score << '\n';
 
 	return result;
 }
@@ -44,7 +47,8 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 coord MonteCarlo::genMove(int color)
 {
 	int losses = 0;
-	MoveStats moves[BoardRealSize] = { 0 };
+	int superKo = 0;
+	MoveStats moves[BoardMaxIdx] = { 0 };
 
 	for (int i = 0; i < GameSearchCount; ++i)
 	{
@@ -56,12 +60,17 @@ coord MonteCarlo::genMove(int color)
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;
 		
-		const int result = playRandomGame(boardCopy, color, MaxGameLen, 0.1);
+		if (i == 5)
+			int aa = 5;
+
+		const int result = playRandomGame(boardCopy, color, MaxGameLen, 10.0);
 
 		if (result == 0)
 		{
-			// Superko
-			int a = 5;
+			if (superKo > 2)
+				break;
+			--i;
+			++superKo;
 		}
 
 		// Using 0 as pass index
@@ -77,12 +86,20 @@ coord MonteCarlo::genMove(int color)
 	double bestRatio = -1000.0;
 	board.foreachPoint([&](int idx, int type)
 	{
-		const double ratio = moves[idx].wins / moves[idx].games;
+		// TODO: Play with this number. 
+		// Don't want to take scores from very small sample sizes
+		if (moves[idx].games < 4) 
+			return;
+
+		const double ratio = static_cast<double>(moves[idx].wins) 
+					       / static_cast<double>(moves[idx].games);
 
 		if (ratio > bestRatio)
 		{
 			bestRatio = ratio;
-			bestIdx = idx == 0 ? Pass : 0; // We use 0 as the pass idx
+			bestIdx = idx == 0 ? Pass : idx; // We use 0 as the pass idx
 		}
 	});
+
+	return bestIdx;
 }

@@ -51,12 +51,12 @@ void printBoardTop(int spaces)
 	std::cout << '\n';
 }
 
-void printBoard(const Board & board)
+void Board::printBoard() const
 {
 	std::cout << '\n' << "  ";
 	printBoardTop(1);
 	for (int i = 1; i < BoardRealSize - 1; ++i)
-		printRow(board, i);
+		printRow(*this, i);
 	
 	std::cout << '\n';
 }
@@ -119,9 +119,8 @@ double Board::scoreFast() const
 				type = Stone::WHITE;
 			else
 				type = Stone::NONE;
-
-			++scores[type];
 		}	
+		++scores[type];
 	});
 
 	return scores[Stone::WHITE] - scores[Stone::BLACK];
@@ -502,25 +501,21 @@ bool Board::makeMove(const Move & m)
 		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
 
 	//if (m.idx == BoardRealSize * 9 + 1) // C9 Debugging!
-	//	int a = 5;
 
 	// We're not playing into an opponents eye
 	if (!isEyeLike(m.idx, flipColor(m.color)))
 	{
-		// TODO: Handle group suicides by looking at our recent groups liberties
 		groupId group = moveNonEye(m);	 
 		if (groups.isGroupCaptured(group))
 		{
-			// TODO: Undo this
-			std::cout << "Self Suicide! \n"; 
+			// TODO: Undo this and return false?
+			//std::cout << "Self Suicide! \n"; 
 			groupCapture(group);
 		}
 		return true;
 	}
 	else
-	{
 		return moveInEye(m);
-	}
 }
 
 bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a playout policy instead of just looking at move validity

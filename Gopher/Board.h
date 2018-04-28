@@ -113,6 +113,7 @@ struct Board
 public:
 	void init();
 
+	void printBoard() const;
 	double scoreFast() const;
 	int neighborCount(coord idx, Stone color) const;
 	bool isEyeLike(coord idx, Stone color) const;

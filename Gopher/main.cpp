@@ -17,7 +17,10 @@ int main()
 
 	for (int i = 0; i < 20000; ++i)
 	{
-		monte.genMove(color);
+		coord idx = monte.genMove(color);
+
+		board.makeMove({ idx, color });
+		board.printBoard();
 		
 		color = flipColor(color);
 	}
