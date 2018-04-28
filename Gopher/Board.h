@@ -105,7 +105,7 @@ struct Board
 
 	GroupManager groups;
 
-	// Figure out what exactly needs to be stored here
+	// Store any ko move
 	Move ko;
 
 public:

@@ -175,7 +175,7 @@ void Board::groupAddLibs(groupId groupid, coord idx)
 	if (g.libs < GroupLibCount)
 	{
 		// Don't add a liberty if we already have it
-		for (int i = 0; i < GroupLibCount; ++i)
+		for (int i = 0; i < g.libs; ++i)
 		{
 			if (g.lib[i] == idx) 
 				return;
@@ -481,6 +481,9 @@ void Board::makeMove(const Move & m)
 		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
 
 	if (m.idx == 75) // Issue with playing in eye not being detected
+		int a = 5; // Look at move I 7 and not returning idx 75's liberty count onm capturing a piece!!
+
+	if (m.idx == 86)
 		int a = 5;
 
 	// We're not playing into an opponents eye

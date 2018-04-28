@@ -16,6 +16,16 @@ struct Move
 	coord idx;
 	Stone color;
 
+	Move() = default;
+	Move(coord idx, Stone color) : idx(idx), color(color)// Just for debugging
+	{
+		static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+		x = letters[(idx / BoardRealSize) - 1];
+		y = (idx % BoardRealSize) - 1;
+	}
+	// Just for debugging
+	char x = 0, y = 0;
+
 	bool operator==(const Move& other) const 
 	{
 		return (idx == other.idx) && (color == other.color);
@@ -34,7 +44,7 @@ inline bool isResign(const Move& m)
 
 inline std::pair<coord, coord> idxToXY(int idx)
 {
-	return { idx / BoardRealSize, idx % BoardRealSize };
+	return { idx % BoardRealSize, idx / BoardRealSize };
 }
 
 inline std::pair<coord, coord> moveToXY(const Move& m)
@@ -44,7 +54,7 @@ inline std::pair<coord, coord> moveToXY(const Move& m)
 
 inline void printMove(const Move& m)
 {
-	const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+	static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
 	const std::string pass = "Pass";
 	const std::string resign = "Resign";
 	const auto printIdx = [&](int idx) {
