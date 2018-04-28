@@ -105,6 +105,28 @@ void Board::init()
 	// TODO: Generate zobrist hash stuff
 }
 
+double Board::scoreFast() const
+{
+	int scores[Stone::MAX] = { 0 };
+
+	foreachPoint([&](int idx, int type)
+	{
+		if (type == Stone::NONE)
+		{
+			if (isOnePointEye(idx, Stone::BLACK))
+				type = Stone::BLACK;
+			else if (isOnePointEye(idx, Stone::WHITE))
+				type = Stone::WHITE;
+			else
+				type = Stone::NONE;
+
+			++scores[type];
+		}	
+	});
+
+	return scores[Stone::WHITE] - scores[Stone::BLACK];
+}
+
 int Board::neighborCount(coord idx, Stone color) const
 {
 	return neighbors[idx].n[color];
@@ -219,7 +241,7 @@ void Board::groupRemoveLibs(groupId groupid, coord idx)
 	Group& g = groups.groupInfoById(groupid);
 	//bool isSingleStone = isGroupOneStone(groupid);
 
-	for (int i = 0; i < GroupLibCount; ++i)
+	for (int i = 0; i < g.libs; ++i)
 	{
 		if (g.lib[i] != idx)
 			continue;
@@ -406,7 +428,7 @@ groupId Board::moveNonEye(const Move & m)
 		g = updateNeighbor(idx, m, g);
 	});
 
-	//points[m.idx] = m.color;
+	at(m.idx) = m.color;
 
 	if (!g)
 		g = newGroup(m.idx);
@@ -432,20 +454,19 @@ bool Board::moveInEye(const Move & m)
 		capturedGroups += (groups.groupInfoById(g).libs == 1);
 	});
 
-	// This is a suicide!
+	// This is a suicide, let's not do this!
 	if (capturedGroups == 0)
 		return false;
 
-	//free.erase(m.idx);
+	// From here on we can't fail
 
 	int koCaps = 0;
 	coord capAt = Pass;
-
 	foreachNeighbor(m.idx, [&](int idx, int type)
 	{
 		neighbors[idx].increment(m.color);
 
-		groupId gid = groupAt(m.idx);
+		groupId gid = groupAt(idx);
 		if (!gid)
 			return;
 
@@ -475,16 +496,13 @@ bool Board::moveInEye(const Move & m)
 	return newGid;
 }
 
-void Board::makeMove(const Move & m)
+bool Board::makeMove(const Move & m)
 {
 	if (at(m.idx) != Stone::NONE) // Remove when done debugging
 		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
 
-	if (m.idx == 75) // Issue with playing in eye not being detected
-		int a = 5; // Look at move I 7 and not returning idx 75's liberty count onm capturing a piece!!
-
-	if (m.idx == 86)
-		int a = 5;
+	//if (m.idx == BoardRealSize * 9 + 1) // C9 Debugging!
+	//	int a = 5;
 
 	// We're not playing into an opponents eye
 	if (!isEyeLike(m.idx, flipColor(m.color)))
@@ -493,19 +511,16 @@ void Board::makeMove(const Move & m)
 		groupId group = moveNonEye(m);	 
 		if (groups.isGroupCaptured(group))
 		{
-			printMove({ group, m.color });
-
 			// TODO: Undo this
-			std::cout << "Self Suicide!"; // TODO: THIS IS BEING CALLED WHEN GROUP SHOULD STILL have liberties left!!!!
+			std::cout << "Self Suicide! \n"; 
 			groupCapture(group);
 		}
+		return true;
 	}
 	else
 	{
-		moveInEye(m);
+		return moveInEye(m);
 	}
-
-	points[m.idx] = m.color;
 }
 
 bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a playout policy instead of just looking at move validity
@@ -517,12 +532,20 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a pla
 	if (isOnePointEye(m.idx, m.color) || !isValid(m))
 		return false;
 
-	makeMove(m);
-	printMove(m);
-	printBoard(*this);
-	printBoardAsGroups(*this);
+	bool made = makeMove(m);
 
-	return true;
+	/*
+	if (made)
+	{	// JUST FOR DEBUGGING!
+		printMove(m);
+		printBoard(*this);
+		printBoardAsGroups(*this);
+	}
+	*/
+
+	lastMove = m;
+
+	return made;
 }
 
 coord Board::playRandom(Stone color)
@@ -531,15 +554,16 @@ coord Board::playRandom(Stone color)
 	if (!free.size())
 	{
 		// Handle no moves left
+		return Pass;
 	}
 
 	int rng = fastRandom(free.size());
 	for (int i = rng; i < free.size(); ++i)
-		if (tryRandomMove(color, idx, rng))
+		if (tryRandomMove(color, idx, i))
 			return idx;
 
 	for (int i = 0; i < rng; ++i)
-		if (tryRandomMove(color, idx, rng))
+		if (tryRandomMove(color, idx, i))
 			return idx;
 
 	return 0;

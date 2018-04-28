@@ -17,6 +17,7 @@ struct Move
 	Stone color;
 
 	Move() = default;
+	Move(coord idx, int color) : idx(idx), color(static_cast<Stone>(color)) {}
 	Move(coord idx, Stone color) : idx(idx), color(color)// Just for debugging
 	{
 		static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };

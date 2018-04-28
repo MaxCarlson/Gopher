@@ -108,9 +108,12 @@ struct Board
 	// Store any ko move
 	Move ko;
 
+	Move lastMove;
+
 public:
 	void init();
 
+	double scoreFast() const;
 	int neighborCount(coord idx, Stone color) const;
 	bool isEyeLike(coord idx, Stone color) const;
 	bool isFalseEyelike(coord idx, Stone color) const;
@@ -119,7 +122,6 @@ public:
 
 	bool tryRandomMove(Stone color, coord& idx, int rng);
 
-	// Returns 0 if can't play
 	coord playRandom(Stone color);
 
 	// Update functions for things that happen with moves
@@ -133,7 +135,7 @@ public:
 	// Move functions
 	groupId moveNonEye(const Move& m);
 	bool moveInEye(const Move& m);
-	void makeMove(const Move& m);
+	bool makeMove(const Move& m);
 
 	// Group functions
 	groupId newGroup(coord idx);
@@ -150,6 +152,9 @@ public:
 
 	template<class F>
 	void foreachPoint(F&& f);
+
+	template<class F>
+	void foreachPoint(F&& f) const;
 
 	template<class F>
 	void foreachNeighbor(int idx, F&& f);
@@ -169,6 +174,13 @@ public:
 // Llambda syntax is: [](int idx, int type){}
 template<class F>
 inline void Board::foreachPoint(F&& f)
+{
+	for (int i = 0; i < BoardMaxIdx; ++i)
+		f(i, points[i]);
+}
+
+template<class F>
+inline void Board::foreachPoint(F&& f) const
 {
 	for (int i = 0; i < BoardMaxIdx; ++i)
 		f(i, points[i]);
