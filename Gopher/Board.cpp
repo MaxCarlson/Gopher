@@ -123,7 +123,7 @@ double Board::scoreFast() const
 		++scores[type];
 	});
 
-	return scores[Stone::WHITE] - scores[Stone::BLACK];
+	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
 }
 
 int Board::neighborCount(coord idx, Stone color) const

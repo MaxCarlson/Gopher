@@ -49,9 +49,19 @@ inline bool isResign(const Move& m)
 	return m.idx == Resign;
 }
 
+inline int getX(coord idx)
+{
+	return idx % BoardRealSize;
+}
+
+inline int getY(coord idx)
+{
+	return idx / BoardRealSize;
+}
+
 inline std::pair<coord, coord> idxToXY(int idx)
 {
-	return { idx % BoardRealSize, idx / BoardRealSize };
+	return { getX(idx), getY(idx) };
 }
 
 inline std::pair<coord, coord> moveToXY(const Move& m)

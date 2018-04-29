@@ -27,7 +27,7 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 		else
 			pass = 0;
 
-		if (deathRatio && std::abs(board.captures[Stone::BLACK] - board.captures[Stone::WHITE]) > deathRatio)
+		if (deathRatio && std::abs(board.captures[Stone::BLACK] - board.captures[Stone::WHITE]) > deathRatio) // TODO: Take komi into account?
 			break;
 
 		color = flipColor(color);
@@ -85,7 +85,11 @@ coord MonteCarlo::genMove(int color)
 	{
 		// TODO: Play with this number. 
 		// Don't want to take scores from very small sample sizes
-		if (moves[idx].games < 4) 
+		if (moves[idx].games < 4)
+			return;
+
+		else if (getX(idx) > BoardSize - 2 || getX(idx) < 3
+			  || getY(idx) > BoardSize - 2 || getY(idx) < 3)
 			return;
 
 		const double ratio = static_cast<double>(moves[idx].wins) 
