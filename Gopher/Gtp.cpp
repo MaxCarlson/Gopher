@@ -1,4 +1,6 @@
 #include "Gtp.h"
+#include "MonteCarlo.h"
+
 #include <cctype>
 #include <sstream>
 #include <iostream>
@@ -30,7 +32,9 @@ static const std::string ENGINE_NAME = "Gopher";
 
 namespace Gtp
 {
-
+	Board board;
+	//Stone color = Stone::BLACK;
+	std::map<std::string, std::function<int(std::istringstream&, int)>> options;
 
 template<class... Arg>
 void gtpPrint(Arg&& ...arg)
@@ -81,8 +85,6 @@ void gtpPanic()
 	gtpEndReply();
 }
 
-Board board;
-std::map<std::string, std::function<int(std::istringstream&, int)>> options;
 
 template<class Map>
 void buildCommandsMap(Map& options)
@@ -188,16 +190,17 @@ int knownCommand(std::istringstream& is, int id)
 
 int setKomi(std::istringstream& is, int id)
 {
-	float newKomi = std::stof(is.str()); 
+	std::string kom;
+	is >> kom;
+	float newKomi = std::stof(kom); 
 	printId(id, GTP_OKAY);
 	board.setKomi(newKomi);
 
-	return gtpSuccess(id, "");
+	return gtpSuccess(id);
 }
 
 int getIdxFromGtp(const std::string& s)
 {
-	constexpr int aa = 'a';
 	int x = (std::tolower(s[0]) - 97) + 1; 
 
 	std::stringstream ss;
@@ -209,14 +212,18 @@ int getIdxFromGtp(const std::string& s)
 	return xyToIdx(x, y);
 }
 
+Stone gtpWOrB(const std::string& s)
+{
+	static constexpr auto npos = std::string::npos;
+	return (s.find('w') != npos || s.find('W') != npos)
+		? Stone::WHITE : Stone::BLACK;
+}
+
 int play(std::istringstream& is, int id)
 {
-	auto npos = std::string::npos;
-
 	std::string tmp;
 	is >> tmp;
-	Stone color = (tmp.find('w') != npos || tmp.find('W') != npos) 
-				? Stone::WHITE : Stone::BLACK;
+	Stone color = gtpWOrB(tmp);
 
 	// TODO: Add pass and resign
 
@@ -229,28 +236,55 @@ int play(std::istringstream& is, int id)
 		return gtpFailure(id, "invalid coordinates for move");
 
 	board.makeMove(m);
+	color = flipColor(color);
+
+	// TODO: Store stack of made moves!
 
 	return gtpSuccess(id, "");
 }
 
-int setBoardSize(std::istringstream& is, int id)
+std::pair<char, int> gtpIdxToXY(coord idx)
 {
-	return 0;
-}
+	auto xy = idxToXY(idx);
 
-int clearBoard(std::istringstream& is, int id)
-{
-	return 0;
+	char x = (xy.first + 65) - 1;
+	int y = xy.second;
+
+	return { x, y };
 }
 
 int generateMove(std::istringstream& is, int id)
 {
-	return 0;
+	MonteCarlo monte{ board };
+
+	std::string colorStr;
+	is >> std::skipws >> colorStr;
+
+	Stone color = gtpWOrB(colorStr);
+
+	coord idx = monte.genMove(color);
+
+	// TODO: Handle Pass/Resign
+
+	auto xy = gtpIdxToXY(idx);
+
+	return gtpSuccess(id, xy.first, xy.second);
+}
+
+int setBoardSize(std::istringstream& is, int id)
+{
+	return gtpSuccess(id, "No resize possible yet!");
+}
+
+int clearBoard(std::istringstream& is, int id)
+{
+	board.init();
+	return gtpSuccess(id, "");
 }
 
 int quitGtp(std::istringstream& is, int id)
 {
-	return 0;
+	return gtpFailure(id, "Quitting");
 }
 
-}
+} // End Gtp::
