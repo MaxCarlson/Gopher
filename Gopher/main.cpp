@@ -1,13 +1,12 @@
-
-
-
 #include "MonteCarlo.h"
 #include "Board.h"
+#include "Gtp.h"
 
 
 
 int main()
 {
+	/*
 	Board board;
 	board.init();
 
@@ -24,6 +23,9 @@ int main()
 		
 		color = flipColor(color);
 	}
+	*/
+
+	mainLoop();
 
 	return 0;
 }

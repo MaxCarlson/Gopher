@@ -136,6 +136,8 @@ public:
 	// Move functions
 	groupId moveNonEye(const Move& m);
 	bool moveInEye(const Move& m);
+
+	// This can fail, but not if it's passed a valid move
 	bool makeMove(const Move& m);
 
 	// Group functions
