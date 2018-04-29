@@ -1,5 +1,4 @@
 #include "MonteCarlo.h"
-#include "Board.h"
 #include "Gtp.h"
 
 
@@ -25,7 +24,7 @@ int main()
 	}
 	*/
 
-	mainLoop();
+	Gtp::mainLoop();
 
 	return 0;
 }

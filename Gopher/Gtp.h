@@ -1,4 +1,7 @@
 #pragma once
+#include "Board.h"
 
-
-void mainLoop();
+namespace Gtp
+{
+	void mainLoop();
+}

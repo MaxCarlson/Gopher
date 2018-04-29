@@ -11,6 +11,8 @@ constexpr int Resign = -2;
 
 struct Board;
 
+static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+
 struct Move
 {
 	coord idx;
@@ -20,7 +22,6 @@ struct Move
 	Move(coord idx, int color) : idx(idx), color(static_cast<Stone>(color)) {}
 	Move(coord idx, Stone color) : idx(idx), color(color)// Just for debugging
 	{
-		static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
 		x = letters[(idx / BoardRealSize) - 1];
 		y = (idx % BoardRealSize) - 1;
 	}
@@ -58,9 +59,13 @@ inline std::pair<coord, coord> moveToXY(const Move& m)
 	return idxToXY(m.idx);
 }
 
+inline int xyToIdx(int x, int y)
+{
+	return y * BoardRealSize + x;
+}
+
 inline void printMove(const Move& m)
 {
-	static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
 	const std::string pass = "Pass";
 	const std::string resign = "Resign";
 	const auto printIdx = [&](int idx) {

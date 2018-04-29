@@ -107,8 +107,9 @@ struct Board
 
 	// Store any ko move
 	Move ko;
-
 	Move lastMove;
+
+	float komi;
 
 public:
 	void init();
@@ -172,6 +173,8 @@ public:
 	// llambda syntax should be [](int idx) { func }
 	template<class F>
 	void foreachInGroup(groupId id, F&& f);
+
+	void setKomi(float num) { komi = num; }
 };
 
 // Llambda syntax is: [](int idx, int type){}
