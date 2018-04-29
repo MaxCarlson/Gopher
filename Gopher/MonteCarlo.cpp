@@ -8,9 +8,9 @@ struct MoveStats
 	int wins = 0;
 };
 
-constexpr double SearchTime = 5.0;
+constexpr double HopelessRatio = 25.0;
 constexpr int MaxGameLen = 600;
-constexpr int GameSearchCount = 2000;
+constexpr int GameSearchCount = 3000;
 
 int MonteCarlo::playRandomGame(Board& board, int color, int length, double deathRatio)
 {
@@ -60,7 +60,7 @@ coord MonteCarlo::genMove(int color)
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;
 
-		const int result = playRandomGame(boardCopy, color, MaxGameLen, 10.0);
+		const int result = playRandomGame(boardCopy, color, MaxGameLen, HopelessRatio);
 
 		if (result == 0)
 		{

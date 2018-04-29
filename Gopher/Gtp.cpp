@@ -9,7 +9,7 @@
 #include <map>
 #include <array>
 
-std::array<std::string, 11> Commands =
+std::array<std::string, 12> Commands =
 {
 	"name",
 	"version",
@@ -21,7 +21,8 @@ std::array<std::string, 11> Commands =
 	"boardsize",
 	"clear_board",
 	"genmove",
-	"quit"
+	"quit",
+	"print"
 };
 
 constexpr int GTP_VERSION = 2;
@@ -100,6 +101,7 @@ void buildCommandsMap(Map& options)
 	options.emplace(Commands[8], clearBoard);
 	options.emplace(Commands[9], generateMove);
 	options.emplace(Commands[10], quitGtp);
+	options.emplace(Commands[11], gtpPrintBoard);
 }
 
 void mainLoop()
@@ -239,10 +241,8 @@ int play(std::istringstream& is, int id)
 
 	board.makeMove(m);
 
-	printMove(m);
-	board.printBoard();
-
-	color = flipColor(color);
+	//printMove(m);
+	//board.printBoard();
 
 	// TODO: Store stack of made moves!
 
@@ -254,9 +254,8 @@ std::pair<char, int> gtpIdxToXY(coord idx)
 	auto xy = idxToXY(idx);
 
 	char x = (xy.first + 65) - 1;
-	int y = xy.second;
 
-	return { x, y };
+	return { x, gtpFlipY(xy.second) };
 }
 
 int generateMove(std::istringstream& is, int id)
@@ -296,6 +295,15 @@ int clearBoard(std::istringstream& is, int id)
 int quitGtp(std::istringstream& is, int id)
 {
 	return gtpFailure(id, "Quitting");
+}
+
+int gtpPrintBoard(std::istringstream& is, int id)
+{
+	std::cout << "\n # \n";
+	board.printBoard();
+	std::cout << "\n # \n";
+
+	return gtpSuccess(id);
 }
 
 } // End Gtp::

@@ -53,12 +53,12 @@ void printBoardTop(int spaces)
 
 void Board::printBoard() const
 {
-	std::cout << "\n # ";
+	std::cout << "\n   ";
 	printBoardTop(1);
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printRow(*this, i);
 	
-	std::cout << "\n # \n";
+	std::cout << "\n";
 }
 
 void printBoardAsGroups(const Board& board)
