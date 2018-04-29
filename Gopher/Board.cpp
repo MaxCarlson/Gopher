@@ -13,7 +13,7 @@ void printPos(const int i)
 	switch (i)
 	{
 	case Stone::NONE:
-		std::cout << "  ";
+		std::cout << " .";
 		break;
 	case Stone::BLACK:
 		std::cout << " b";
@@ -31,7 +31,7 @@ void printPos(const int i)
 
 void printRow(const Board& board, int row)
 {
-	std::cout << row << "|";
+	std::cout << std::setw(2) << gtpFlipY(row) << "|";
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printPos(board.points[getIdx(i, row)]);
 	std::cout << " | \n";
@@ -53,12 +53,12 @@ void printBoardTop(int spaces)
 
 void Board::printBoard() const
 {
-	std::cout << '\n' << "  ";
+	std::cout << "\n # ";
 	printBoardTop(1);
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printRow(*this, i);
 	
-	std::cout << '\n';
+	std::cout << "\n # \n";
 }
 
 void printBoardAsGroups(const Board& board)
@@ -563,3 +563,4 @@ coord Board::playRandom(Stone color)
 
 	return 0;
 }
+

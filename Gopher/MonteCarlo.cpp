@@ -59,9 +59,6 @@ coord MonteCarlo::genMove(int color)
 		// Don't do multi stone suicides!
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;
-		
-		if (i == 5)
-			int aa = 5;
 
 		const int result = playRandomGame(boardCopy, color, MaxGameLen, 10.0);
 

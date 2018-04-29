@@ -207,7 +207,9 @@ int getIdxFromGtp(const std::string& s)
 	for (int i = 1; i < s.size(); ++i)
 		ss << s[i];
 
-	int y = std::stoi(ss.str()) + 1;
+	// TODO: Need to flip y coord along BoardRealSize, ie 1 becomes 19, 18 becomes 2
+
+	int y = gtpFlipY( std::stoi(ss.str()));
 
 	return xyToIdx(x, y);
 }
@@ -236,6 +238,10 @@ int play(std::istringstream& is, int id)
 		return gtpFailure(id, "invalid coordinates for move");
 
 	board.makeMove(m);
+
+	printMove(m);
+	board.printBoard();
+
 	color = flipColor(color);
 
 	// TODO: Store stack of made moves!
@@ -263,8 +269,13 @@ int generateMove(std::istringstream& is, int id)
 	Stone color = gtpWOrB(colorStr);
 
 	coord idx = monte.genMove(color);
+	Move m = { idx, color };
+	board.makeMove(m);
 
 	// TODO: Handle Pass/Resign
+
+	//printMove(m);
+	//board.printBoard();
 
 	auto xy = gtpIdxToXY(idx);
 

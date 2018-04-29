@@ -25,8 +25,7 @@ public:
 	template<class... Args>
 	void emplace_back(Args&& ...args)
 	{
-		new (&items[mySize]) Type(std::forward<Args>(args)...);
-		++mySize;
+		new (&items[mySize++]) Type(std::forward<Args>(args)...);
 	}
 
 	void erase(int idx)
@@ -47,7 +46,11 @@ public:
 	}
 };
 
+// Total liberty positions we keep track of
 static constexpr int GroupLibCount = 10;
+
+// If a groups liberties dip below this number 
+// we'll try to refill them
 static constexpr int GroupLibRefill = 5;
 using groupId = int;
 
@@ -73,7 +76,6 @@ struct GroupManager
 	// (which is idx of first group stone)
 	Group groups[BoardMaxIdx];
 
-	Group& groupInfo(const coord idx) { return groups[groupIds[idx]]; }
 	Group& groupInfoById(const groupId id) { return groups[id]; }
 	coord& groupNextStone(const coord idx) { return nextStone[idx]; }
 
@@ -87,6 +89,7 @@ struct Neighbors
 	void increment(Stone type) { ++n[type]; }
 	void decrement(Stone type) { --n[type]; }
 };
+
 
 struct Board
 {
@@ -114,6 +117,7 @@ struct Board
 public:
 	void init();
 
+	// Helper functions
 	void printBoard() const;
 	double scoreFast() const;
 	int neighborCount(coord idx, Stone color) const;
@@ -122,9 +126,10 @@ public:
 	bool isOnePointEye(coord idx, Stone color) const;
 	bool isValid(const Move& m) const;
 
-	bool tryRandomMove(Stone color, coord& idx, int rng);
-
+	// Plays a random move if it can
+	// TODO: Pass or use some heuristics so random moves are less "bad"
 	coord playRandom(Stone color);
+	bool tryRandomMove(Stone color, coord& idx, int rng);
 
 	// Update functions for things that happen with moves
 	bool isGroupOneStone(const groupId id);
@@ -137,7 +142,6 @@ public:
 	// Move functions
 	groupId moveNonEye(const Move& m);
 	bool moveInEye(const Move& m);
-
 	// This can fail, but not if it's passed a valid move
 	bool makeMove(const Move& m);
 
@@ -146,17 +150,14 @@ public:
 	void addToGroup(groupId group, coord neighbor, coord newStone);
 	void mergeGroups(groupId groupTo, groupId groupFrom);
 	int groupCapture(groupId gid);
-	inline groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
-	inline groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
+	groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
+	groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
 
-	friend void printBoard(const Board& board);
-
-	inline int at(int idx) const { return points[idx]; }
-	inline int& at(int idx) { return points[idx]; }
+	int at(int idx) const { return points[idx]; }
+	int& at(int idx) { return points[idx]; }
 
 	template<class F>
 	void foreachPoint(F&& f);
-
 	template<class F>
 	void foreachPoint(F&& f) const;
 
@@ -165,7 +166,6 @@ public:
 
 	template<class F>
 	void eachDiagonalNeighbor(int idx, F&& f);
-
 	template<class F>
 	void eachDiagonalNeighbor(int idx, F&& f) const;
 
