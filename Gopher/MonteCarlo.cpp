@@ -57,9 +57,11 @@ coord MonteCarlo::genMove(int color)
 		const Move m = { boardCopy.playRandom(static_cast<Stone>(color)), color };
 
 		// Don't do multi stone suicides!
+
+		groupId& gg = boardCopy.groupAt(m.idx);
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;
-
+		
 		const int result = playRandomGame(boardCopy, color, MaxGameLen, HopelessRatio);
 
 		if (result == 0)
@@ -88,7 +90,8 @@ coord MonteCarlo::genMove(int color)
 		if (moves[idx].games < 4)
 			return;
 
-		else if (getX(idx) > BoardSize - 2 || getX(idx) < 3
+		else if (board.moveCount < 3 
+			  && getX(idx) > BoardSize - 2 || getX(idx) < 3
 			  || getY(idx) > BoardSize - 2 || getY(idx) < 3)
 			return;
 

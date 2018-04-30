@@ -202,9 +202,18 @@ int setKomi(std::istringstream& is, int id)
 	return gtpSuccess(id);
 }
 
+// Convert gtp coordinates to our index
 int getIdxFromGtp(const std::string& s)
 {
-	int x = (std::tolower(s[0]) - 97) + 1; 
+	char tx = (std::tolower(s[0])); 
+
+	// Fix any index at our greater than i
+	if (tx >= 'i')
+		tx -= 1;
+
+	// Convert char to x axis coord (- 97).
+	// our index is offset by a boundry of one offboard tile
+	int x = tx - 97 + 1;
 
 	std::stringstream ss;
 	for (int i = 1; i < s.size(); ++i)
@@ -217,24 +226,25 @@ int getIdxFromGtp(const std::string& s)
 	return xyToIdx(x, y);
 }
 
+// Get x and y for gtp from an idx
+std::pair<char, int> gtpIdxToXY(coord idx)
+{
+	auto xy = idxToXY(idx);
+
+	char x = (xy.first + 65) - 1;
+
+	// No 'I' coordinate in go
+	if (x >= 'I')
+		x += 1;
+
+	return { x, gtpFlipY(xy.second) };
+}
+
 Stone gtpWOrB(const std::string& s)
 {
 	static constexpr auto npos = std::string::npos;
 	return (s.find('w') != npos || s.find('W') != npos)
 		? Stone::WHITE : Stone::BLACK;
-}
-
-void searchForDupliMove() // For debugging!
-{
-	for(int i = 0; i < moveStack.size(); ++i)
-		for (int j = 0; j < moveStack.size(); ++j)
-		{
-			if (j == i)
-				continue;
-
-			if (moveStack[i] == moveStack[j])
-				std::cout << "Duplicate move made! \n";
-		}
 }
 
 int play(std::istringstream& is, int id)
@@ -255,24 +265,10 @@ int play(std::istringstream& is, int id)
 
 	board.makeMove(m);
 
+	// Rudimentry move stack
 	moveStack.emplace_back(m);
-	searchForDupliMove();
-
-	//printMove(m);
-	//board.printBoard();
-
-	// TODO: Store stack of made moves!
 
 	return gtpSuccess(id, "");
-}
-
-std::pair<char, int> gtpIdxToXY(coord idx)
-{
-	auto xy = idxToXY(idx);
-
-	char x = (xy.first + 65) - 1;
-
-	return { x, gtpFlipY(xy.second) };
 }
 
 int generateMove(std::istringstream& is, int id)
@@ -288,9 +284,8 @@ int generateMove(std::istringstream& is, int id)
 	Move m = { idx, color };
 	board.makeMove(m);
 
+	// Rudimentry move stack
 	moveStack.emplace_back(m);
-	searchForDupliMove();
-
 
 	// TODO: Handle Pass/Resign
 
