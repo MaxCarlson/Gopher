@@ -35,7 +35,7 @@ static const std::string ENGINE_NAME = "Gopher";
 namespace Gtp
 {
 	Board board;
-	std::vector<Move> moveStack;
+	MoveStack moveStack;
 	//Stone color = Stone::BLACK;
 	std::map<std::string, std::function<int(std::istringstream&, int)>> options;
 

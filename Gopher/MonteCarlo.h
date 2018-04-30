@@ -1,7 +1,7 @@
 #pragma once
 #include "Move.h"
 
-struct Board;
+class Board;
 
 class MonteCarlo
 {

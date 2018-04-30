@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "Random.h"
+#include "Gtp.h"
 #include <iostream>
 #include <iomanip>
 
@@ -33,7 +34,7 @@ void printRow(const Board& board, int row)
 {
 	std::cout << std::setw(2) << gtpFlipY(row) << "|";
 	for (int i = 1; i < BoardRealSize - 1; ++i)
-		printPos(board.points[getIdx(i, row)]);
+		printPos(board.at(getIdx(i, row)));
 	std::cout << " | \n";
 }
 
@@ -66,7 +67,7 @@ void printBoardAsGroups(const Board& board)
 	{
 		std::cout << i << "|";
 		for (int j = 1; j < BoardRealSize - 1; ++j)
-			std::cout << " " << std::setw(3) << std::left << board.groups.groupIds[getIdx(j, i)];
+			std::cout << " " << std::setw(3) << std::left << board.groupAt(getIdx(j, i));
 		std::cout << " | \n";
 	}
 	std::cout << '\n';
@@ -123,6 +124,32 @@ double Board::scoreFast() const
 	});
 
 	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
+}
+
+double Board::scoreReal(const MoveStack &moves) const
+{
+	int ownedBy[BoardMaxIdx] = { 0 };
+
+	int scores[Stone::MAX] = { 0 };
+	const int zeroOut[] = { 0, 1, 2, 0 };
+
+	// Add up current points
+	foreachPoint([&](int idx, int color)
+	{
+		ownedBy[idx] = zeroOut[color];
+		++scores[color];
+	});
+
+	// Look at dead groups
+	for (int i = 0; i < moves.size(); ++i)
+	{
+		foreachInGroup(moves[i].idx, [&](groupId id)
+		{
+
+		});
+	}
+
+	return 0.0;
 }
 
 int Board::neighborCount(coord idx, Stone color) const

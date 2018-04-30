@@ -2,10 +2,13 @@
 #include "Stone.h"
 #include "Move.h"
 
+struct MoveStack;
+class MonteCarlo;
+
 // As is don't pass in any type needing memory 
 // management
 template<class Type, int size>
-class FastArray
+class FastList
 {
 
 	int mySize = 0;
@@ -102,8 +105,10 @@ struct Neighbors
 };
 
 
-struct Board
+class Board
 {
+	friend MonteCarlo;
+
 	int moveCount;
 
 	// Capture info for all ston types
@@ -112,7 +117,7 @@ struct Board
 	// Info about squares (points) on the board
 	int points[BoardMaxIdx];
 
-	FastArray<coord, BoardMaxIdx> free;
+	FastList<coord, BoardMaxIdx> free;
 
 	// Number of neighbors a stone at idx has of each type
 	Neighbors neighbors[BoardMaxIdx];
@@ -131,6 +136,7 @@ public:
 	// Helper functions
 	void printBoard() const;
 	double scoreFast() const;
+	double scoreReal(const MoveStack &moves) const;
 	int neighborCount(coord idx, Stone color) const;
 	bool isEyeLike(coord idx, Stone color) const;
 	bool isFalseEyelike(coord idx, Stone color) const;
@@ -187,6 +193,8 @@ public:
 	// llambda syntax should be [](int idx) { func }
 	template<class F>
 	void foreachInGroup(groupId id, F&& f);
+	template<class F>
+	void foreachInGroup(groupId id, F&& f) const;
 
 	void setKomi(float num) { komi = num; }
 };
@@ -245,5 +253,13 @@ inline void Board::foreachInGroup(groupId id, F && f)
 		id = groups.groupNextStone(id);
 	}
 }
-
+template<class F>
+inline void Board::foreachInGroup(groupId id, F && f) const
+{
+	while (id != 0)
+	{
+		f(id);
+		id = groups.groupNextStone(id);
+	}
+}
 
