@@ -2,6 +2,7 @@
 #include "Board.h"
 
 
+
 struct MoveStats
 {
 	int games = 0;
@@ -10,7 +11,7 @@ struct MoveStats
 
 constexpr double HopelessRatio = 25.0;
 constexpr int MaxGameLen = 600;
-constexpr int GameSearchCount = 3000;
+constexpr int GameSearchCount = 33000;
 
 int MonteCarlo::playRandomGame(Board& board, int color, int length, double deathRatio)
 {
@@ -49,6 +50,8 @@ coord MonteCarlo::genMove(int color)
 	int losses = 0;
 	int superKo = 0;
 	MoveStats moves[BoardMaxIdx] = { 0 };
+
+	testDistribution();
 
 	for (int i = 0; i < GameSearchCount; ++i)
 	{

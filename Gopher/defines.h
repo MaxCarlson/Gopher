@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-
+#include <chrono>
+#include <iostream>
 
 constexpr int BoardSize = 19;
 constexpr int BoardRealSize = BoardSize + 2;
@@ -29,4 +30,20 @@ inline int gtpFlipY(int y)
 	static const auto flipper = createFlipper();;
 
 	return flipper[y];
+}
+
+// Just a simple timer for quick benchmarking
+inline void timer(bool startNow)
+{
+	using namespace std::chrono;
+
+	static std::chrono::time_point<std::chrono::steady_clock> start;
+
+	if (startNow)
+	{
+		start = high_resolution_clock::now();
+		return;
+	}
+
+	std::cout << duration_cast<duration<double>>(high_resolution_clock::now() - start).count() << "\n";
 }
