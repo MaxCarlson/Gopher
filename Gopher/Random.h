@@ -51,16 +51,13 @@
 
 
 #include "emmintrin.h"
+//#include <random>
 
-//#define COMPATABILITY 0
+namespace Random
+{
 
 //define this if you wish to return values similar to the standard rand();
-
-
-
-void srand_sse(unsigned int seed);
-
-void rand_sse(unsigned int*);
+#define COMPATABILITY 0
 
 __declspec(align(16)) static __m128i cur_seed;
 
@@ -71,7 +68,6 @@ inline void srand_sse(unsigned int seed)
 
 
 inline void rand_sse(unsigned int* result)
-
 {
 
 	__declspec(align(16)) __m128i cur_seed_split;
@@ -150,28 +146,32 @@ inline void rand_sse(unsigned int* result)
 
 inline unsigned int fastRandom(unsigned int max)
 {
-	unsigned int num;
+	///*
+	unsigned int num[4];
 
-	// Rand sse with this function to floor it to max seems to be
-	// evenly distributed within the range we're using it now, 0-500
-	rand_sse(&num);
+	// Rand sse with this function to floor it to max is very
+	// evenly distributed within the range we're using it now, and between 0 65500
+	rand_sse(num);
 
-	return ((num & 0xffff) * max) >> 16;
+	return ((num[0] & 0xffff) * max) >> 16;
+	//*/
+	//return rand() % max;
 }
 
 /*
 // Used for testing distributions of different random funcitons
-#include "Random.h"
 #include <map>
+#include <iostream>
+#include "Random.h"
 void testDistribution()
 {
-	const int range = 65500;
+	const int range = 500;
 	const int count = 10000000;
 	std::map<int, int> distri;
 
 	for (int i = 0; i < count; ++i)
 	{
-		unsigned int rr = fastRandom(range);
+		unsigned int rr = Random::fastRandom(range);
 
 		auto find = distri.find(rr);
 
@@ -187,4 +187,6 @@ void testDistribution()
 	}
 	std::cout << "\n\n";
 }
-*/
+//*/
+
+} // End Random::

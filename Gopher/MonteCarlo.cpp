@@ -10,8 +10,8 @@ struct MoveStats
 };
 
 constexpr double HopelessRatio = 25.0;
-constexpr int MaxGameLen = 600;
-constexpr int GameSearchCount = 33000;
+constexpr int MaxGameLen = 400;
+constexpr int GameSearchCount = 45000;
 
 int MonteCarlo::playRandomGame(Board& board, int color, int length, double deathRatio)
 {
@@ -39,7 +39,6 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 	const double score = board.scoreFast();
 	const int result = ourColor == Stone::WHITE ? score * 2 : -(score * 2);
 
-
 	//std::cout << "Random playout result for color " << printStone(ourColor) << " " << score << '\n';
 
 	return result;
@@ -51,7 +50,7 @@ coord MonteCarlo::genMove(int color)
 	int superKo = 0;
 	MoveStats moves[BoardMaxIdx] = { 0 };
 
-	testDistribution();
+	timer(true);
 
 	for (int i = 0; i < GameSearchCount; ++i)
 	{
@@ -70,7 +69,10 @@ coord MonteCarlo::genMove(int color)
 		if (result == 0)
 		{
 			if (superKo > 2)
+			{
+				//std::cout << "Breaking due to superKo after " << i << " games tried \n";
 				break;
+			}
 			--i;
 			++superKo;
 		}
@@ -107,6 +109,8 @@ coord MonteCarlo::genMove(int color)
 			bestIdx = idx == 0 ? Pass : idx; // We use 0 as the pass idx
 		}
 	});
+
+	timer(false);
 
 	return bestIdx;
 }

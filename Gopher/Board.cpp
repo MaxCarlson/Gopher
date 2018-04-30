@@ -100,6 +100,7 @@ void Board::init()
 		free.emplace_back(idx);
 	});
 
+	komi = 6.5; // TODO: Change this based on board size!
 	// TODO: Generate zobrist hash stuff
 }
 
@@ -550,7 +551,7 @@ coord Board::playRandom(Stone color)
 		return Pass;
 	}
 
-	int rng = fastRandom(free.size());
+	auto rng = Random::fastRandom(free.size());
 	for (int i = rng; i < free.size(); ++i)
 		if (tryRandomMove(color, idx, i))
 			return idx;
