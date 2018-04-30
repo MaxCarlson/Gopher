@@ -39,8 +39,6 @@ void printRow(const Board& board, int row)
 
 void printBoardTop(int spaces)
 {
-	const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
-
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 	{
 		for (int j = 0; j < spaces; ++j)

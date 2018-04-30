@@ -34,6 +34,7 @@ static const std::string ENGINE_NAME = "Gopher";
 namespace Gtp
 {
 	Board board;
+	std::vector<Move> moveStack;
 	//Stone color = Stone::BLACK;
 	std::map<std::string, std::function<int(std::istringstream&, int)>> options;
 
@@ -223,6 +224,19 @@ Stone gtpWOrB(const std::string& s)
 		? Stone::WHITE : Stone::BLACK;
 }
 
+void searchForDupliMove() // For debugging!
+{
+	for(int i = 0; i < moveStack.size(); ++i)
+		for (int j = 0; j < moveStack.size(); ++j)
+		{
+			if (j == i)
+				continue;
+
+			if (moveStack[i] == moveStack[j])
+				std::cout << "Duplicate move made! \n";
+		}
+}
+
 int play(std::istringstream& is, int id)
 {
 	std::string tmp;
@@ -240,6 +254,9 @@ int play(std::istringstream& is, int id)
 		return gtpFailure(id, "invalid coordinates for move");
 
 	board.makeMove(m);
+
+	moveStack.emplace_back(m);
+	searchForDupliMove();
 
 	//printMove(m);
 	//board.printBoard();
@@ -270,6 +287,10 @@ int generateMove(std::istringstream& is, int id)
 	coord idx = monte.genMove(color);
 	Move m = { idx, color };
 	board.makeMove(m);
+
+	moveStack.emplace_back(m);
+	searchForDupliMove();
+
 
 	// TODO: Handle Pass/Resign
 

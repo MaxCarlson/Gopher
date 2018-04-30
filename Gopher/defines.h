@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 
 constexpr int BoardSize = 19;
 constexpr int BoardRealSize = BoardSize + 2;
@@ -7,7 +9,8 @@ constexpr int BoardOffset = 2;
 constexpr int BoardMaxIdx = (BoardSize + BoardOffset) * (BoardSize + BoardOffset);
 constexpr int BoardMaxGroups = BoardSize * BoardSize * 2 / 3;
 
-#include <vector>
+// No letter I in go coordinates
+static const char* letters = { "ABCDEFGHJKLMNOPQRSTUVWXYZ" };
 
 // We need to reverse the y axis numbers
 // e.g. on a 19x19 board 1 becomes 19, 2 becomes 18

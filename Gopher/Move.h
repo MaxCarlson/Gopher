@@ -11,8 +11,6 @@ constexpr int Resign = -2;
 
 struct Board;
 
-static const char* letters = { "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
-
 struct Move
 {
 	coord idx;
