@@ -33,6 +33,8 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 
 		color = flipColor(color);
 
+		//if(length == 196)
+		//	std::cout << length << '\n';
 		//board.printBoard();
 	}
 
@@ -59,7 +61,6 @@ coord MonteCarlo::genMove(int color)
 		const Move m = { boardCopy.playRandom(static_cast<Stone>(color)), color };
 
 		// Don't do multi stone suicides!
-
 		groupId& gg = boardCopy.groupAt(m.idx);
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;

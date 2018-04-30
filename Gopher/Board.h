@@ -129,7 +129,7 @@ public:
 	// Plays a random move if it can
 	// TODO: Pass or use some heuristics so random moves are less "bad"
 	coord playRandom(Stone color);
-	bool tryRandomMove(Stone color, coord idx);
+	bool tryRandomMove(Stone color, coord& idx, int freeIdx);
 
 	// Update functions for things that happen with moves
 	bool isGroupOneStone(const groupId id);

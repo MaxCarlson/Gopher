@@ -427,7 +427,6 @@ groupId Board::moveNonEye(const Move & m)
 	});
 
 	at(m.idx) = m.color;
-	free.erase(m.idx);
 
 	if (!g)
 		g = newGroup(m.idx);
@@ -484,10 +483,8 @@ bool Board::moveInEye(const Move & m)
 		newKo = { capAt, flipColor(m.color) };
 
 	at(m.idx) = m.color;
-	free.erase(m.idx);
-
 	groupId newGid = newGroup(m.idx);
-	
+
 	ko = std::move(newKo);
 	++moveCount;
 
@@ -531,11 +528,18 @@ bool Board::makeMoveGtp(const Move& m)
 		return false;
 	}
 
-	return makeMove(m);
+	bool made = makeMove(m);
+
+	// Remove the move from our free list!
+	if (made)
+		free.erase(m.idx);
+
+	return made;
 }
 
-bool Board::tryRandomMove(Stone color, coord idx)  // TODO: Pass a playout policy instead of just looking at move validity
+bool Board::tryRandomMove(Stone color, coord& idx, int freeIdx)  // TODO: Pass a playout policy instead of just looking at move validity
 {
+	idx = free[freeIdx];
 	Move m = { idx, color };
 
 	if (isOnePointEye(m.idx, m.color) || !isValid(m))
@@ -543,13 +547,19 @@ bool Board::tryRandomMove(Stone color, coord idx)  // TODO: Pass a playout polic
 
 	bool made = makeMove(m);
 
-	lastMove = m;
+	// Remove the move we made from the list of free moves
+	if (made)
+	{
+		free.erase(freeIdx);
+		lastMove = m;
+	}
 
 	return made;
 }
 
 coord Board::playRandom(Stone color)
 {
+	coord idx;
 	if (!free.size())
 	{
 		// Handle no moves left
@@ -558,13 +568,14 @@ coord Board::playRandom(Stone color)
 
 	auto rng = Random::fastRandom(free.size());
 	for (int i = rng; i < free.size(); ++i)
-		if (tryRandomMove(color, free[i]))
-			return free[i];
+		if (tryRandomMove(color, idx, i))
+			return idx;
 
 	for (int i = 0; i < rng; ++i)
-		if (tryRandomMove(color, free[i]))
-			return free[i];
+		if (tryRandomMove(color, idx, i))
+			return idx;
 
-	return 0;
+	// No valid moves left
+	return Pass;
 }
 
