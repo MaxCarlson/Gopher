@@ -427,6 +427,7 @@ groupId Board::moveNonEye(const Move & m)
 	});
 
 	at(m.idx) = m.color;
+	free.erase(m.idx);
 
 	if (!g)
 		g = newGroup(m.idx);
@@ -483,6 +484,8 @@ bool Board::moveInEye(const Move & m)
 		newKo = { capAt, flipColor(m.color) };
 
 	at(m.idx) = m.color;
+	free.erase(m.idx);
+
 	groupId newGid = newGroup(m.idx);
 	
 	ko = std::move(newKo);
@@ -517,25 +520,28 @@ bool Board::makeMove(const Move & m)
 		return moveInEye(m);
 }
 
-bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a playout policy instead of just looking at move validity
+bool Board::makeMoveGtp(const Move& m)
 {
-	idx = free[rng];
+	if (isPass(m) || isResign(m))
+	{
+		++captures[flipColor(m.color)];
 
+		ko = { Pass, Stone::NONE };
+		lastMove = m;
+		return false;
+	}
+
+	return makeMove(m);
+}
+
+bool Board::tryRandomMove(Stone color, coord idx)  // TODO: Pass a playout policy instead of just looking at move validity
+{
 	Move m = { idx, color };
 
 	if (isOnePointEye(m.idx, m.color) || !isValid(m))
 		return false;
 
 	bool made = makeMove(m);
-
-	/*
-	if (made)
-	{	// JUST FOR DEBUGGING!
-		printMove(m);
-		printBoard(*this);
-		printBoardAsGroups(*this);
-	}
-	*/
 
 	lastMove = m;
 
@@ -544,7 +550,6 @@ bool Board::tryRandomMove(Stone color, coord& idx, int rng)  // TODO: Pass a pla
 
 coord Board::playRandom(Stone color)
 {
-	coord idx;
 	if (!free.size())
 	{
 		// Handle no moves left
@@ -553,12 +558,12 @@ coord Board::playRandom(Stone color)
 
 	auto rng = Random::fastRandom(free.size());
 	for (int i = rng; i < free.size(); ++i)
-		if (tryRandomMove(color, idx, i))
-			return idx;
+		if (tryRandomMove(color, free[i]))
+			return free[i];
 
 	for (int i = 0; i < rng; ++i)
-		if (tryRandomMove(color, idx, i))
-			return idx;
+		if (tryRandomMove(color, free[i]))
+			return free[i];
 
 	return 0;
 }

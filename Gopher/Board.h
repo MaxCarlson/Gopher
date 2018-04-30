@@ -129,7 +129,7 @@ public:
 	// Plays a random move if it can
 	// TODO: Pass or use some heuristics so random moves are less "bad"
 	coord playRandom(Stone color);
-	bool tryRandomMove(Stone color, coord& idx, int rng);
+	bool tryRandomMove(Stone color, coord idx);
 
 	// Update functions for things that happen with moves
 	bool isGroupOneStone(const groupId id);
@@ -144,6 +144,9 @@ public:
 	bool moveInEye(const Move& m);
 	// This can fail, but not if it's passed a valid move
 	bool makeMove(const Move& m);
+
+	// Make the move from Gtp and test for pass/resigns
+	bool makeMoveGtp(const Move& m);
 
 	// Group functions
 	groupId newGroup(coord idx);

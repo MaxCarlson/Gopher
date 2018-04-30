@@ -9,7 +9,7 @@
 #include <map>
 #include <array>
 
-std::array<std::string, 12> Commands =
+std::array<std::string, 13> Commands =
 {
 	"name",
 	"version",
@@ -22,7 +22,8 @@ std::array<std::string, 12> Commands =
 	"clear_board",
 	"genmove",
 	"quit",
-	"print"
+	"print",
+	"play_self"
 };
 
 constexpr int GTP_VERSION = 2;
@@ -103,6 +104,7 @@ void buildCommandsMap(Map& options)
 	options.emplace(Commands[9], generateMove);
 	options.emplace(Commands[10], quitGtp);
 	options.emplace(Commands[11], gtpPrintBoard);
+	options.emplace(Commands[12], playSelf);
 }
 
 void mainLoop()
@@ -260,10 +262,13 @@ int play(std::istringstream& is, int id)
 
 	Move m = { idx, color };
 
+	board.makeMoveGtp(m);
+
+	if (isPass(m) || isResign(m))
+		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
+
 	if (!board.isValid(m))
 		return gtpFailure(id, "invalid coordinates for move");
-
-	board.makeMove(m);
 
 	// Rudimentry move stack
 	moveStack.emplace_back(m);
@@ -282,15 +287,14 @@ int generateMove(std::istringstream& is, int id)
 
 	coord idx = monte.genMove(color);
 	Move m = { idx, color };
-	board.makeMove(m);
+
+	board.makeMoveGtp(m);
 
 	// Rudimentry move stack
 	moveStack.emplace_back(m);
 
-	// TODO: Handle Pass/Resign
-
-	//printMove(m);
-	//board.printBoard();
+	if (isPass(m) || isResign(m))
+		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
 
 	auto xy = gtpIdxToXY(idx);
 
@@ -318,6 +322,25 @@ int gtpPrintBoard(std::istringstream& is, int id)
 	std::cout << "\n # \n";
 	board.printBoard();
 	std::cout << "\n # \n";
+
+	return gtpSuccess(id);
+}
+
+// Mainly just for quick testing
+int playSelf(std::istringstream& is, int id)
+{
+	const std::string playBlack = " b";
+	const std::string playWhite = " w";
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		std::istringstream sb(playBlack);
+		std::istringstream sw(playWhite);
+
+		generateMove(i % 2 == 0 ? sb : sw, 0);
+
+		board.printBoard();
+	}
 
 	return gtpSuccess(id);
 }
