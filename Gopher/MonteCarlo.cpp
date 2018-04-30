@@ -9,9 +9,11 @@ struct MoveStats
 	int wins = 0;
 };
 
-constexpr double HopelessRatio = 15.0;
-constexpr int MaxGameLen = 300; // 400 Normally
-constexpr int GameSearchCount = 5000;
+constexpr double HopelessRatio = BoardRealSize2 / 6.0;
+constexpr int MaxGameLen = 400; // 400 Normally
+constexpr int GameSearchCount = 55000;
+// Resign when we're only winning this *100 % of games
+constexpr double ResignRatio = 0.1;
 
 int MonteCarlo::playRandomGame(Board& board, int color, int length, double deathRatio)
 {
@@ -86,6 +88,7 @@ coord MonteCarlo::genMove(int color)
 	}
 
 	coord bestIdx = Resign;
+	double bestRatio = ResignRatio;
 
 	if (!goodGames)
 	{
@@ -93,7 +96,6 @@ coord MonteCarlo::genMove(int color)
 	}
 	else
 	{
-		double bestRatio = -1000.0;
 		board.foreachPoint([&](int idx, int type)
 		{
 			// TODO: Play with this number. 

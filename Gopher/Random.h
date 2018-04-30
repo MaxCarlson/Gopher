@@ -51,7 +51,7 @@
 
 
 #include "emmintrin.h"
-//#include <random>
+#include <random>
 
 namespace Random
 {
@@ -146,7 +146,7 @@ inline void rand_sse(unsigned int* result)
 
 inline unsigned int fastRandom(unsigned int max)
 {
-	///*
+	/*
 	unsigned int num[4];
 
 	// Rand sse with this function to floor it to max is very
@@ -154,8 +154,8 @@ inline unsigned int fastRandom(unsigned int max)
 	rand_sse(num);
 
 	return ((num[0] & 0xffff) * max) >> 16;
-	//*/
-	//return rand() % max;
+	*/
+	return rand() % max;
 }
 
 /*
