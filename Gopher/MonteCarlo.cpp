@@ -9,9 +9,9 @@ struct MoveStats
 	int wins = 0;
 };
 
-constexpr double HopelessRatio = BoardRealSize2 / 6.0;
+constexpr double HopelessRatio = 25.0;// *(BoardSize / 9.0);
 constexpr int MaxGameLen = 400; // 400 Normally
-constexpr int GameSearchCount = 55000;
+constexpr int GameSearchCount = 55000 * (9.0 / BoardSize) / 2;
 // Resign when we're only winning this *100 % of games
 constexpr double ResignRatio = 0.1;
 
@@ -54,7 +54,8 @@ coord MonteCarlo::genMove(int color)
 	int superKo = 0;
 	MoveStats moves[BoardMaxIdx] = { 0 };
 
-	//timer(true);
+	timer(true);
+	
 	int goodGames = 0;
 	for (int i = 0; i < GameSearchCount; ++i)
 	{
@@ -87,6 +88,8 @@ coord MonteCarlo::genMove(int color)
 		// TODO: Winning a lot early quit
 	}
 
+	// Resign if ratio of matches we win is below ResignRatio
+	// TODO: Doesn't seem to be working?
 	coord bestIdx = Resign;
 	double bestRatio = ResignRatio;
 
@@ -119,7 +122,7 @@ coord MonteCarlo::genMove(int color)
 		});
 	}
 
-	//timer(false);
+	timer(false);
 
 	return bestIdx;
 }

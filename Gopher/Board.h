@@ -33,6 +33,17 @@ public:
 		std::swap(items[idx], items[--mySize]);
 	}
 
+	// Find the first instance of val and erase it
+	void findErase(int val)
+	{
+		for(int i = 0; i < mySize; ++i)
+			if (val == items[i])
+			{
+				erase(i);
+				return;
+			}
+	}
+
 	template<class Func>
 	void foreach(Func&& func)
 	{

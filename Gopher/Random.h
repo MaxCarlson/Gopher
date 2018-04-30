@@ -146,16 +146,16 @@ inline void rand_sse(unsigned int* result)
 
 inline unsigned int fastRandom(unsigned int max)
 {
-	/*
-	unsigned int num[4];
+	static int i = 0;
+	static unsigned int num[4];
 
 	// Rand sse with this function to floor it to max is very
 	// evenly distributed within the range we're using it now, and between 0 65500
-	rand_sse(num);
+	// TODO: Benchmark, is branch worth it?
+	if(i < 1)
+		rand_sse(num);
 
-	return ((num[0] & 0xffff) * max) >> 16;
-	*/
-	return rand() % max;
+	return num[i < 3 ? ++i : i = 0] % max;
 }
 
 /*

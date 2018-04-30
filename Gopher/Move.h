@@ -18,13 +18,6 @@ struct Move
 
 	Move() = default;
 	Move(coord idx, int color) : idx(idx), color(static_cast<Stone>(color)) {}
-	Move(coord idx, Stone color) : idx(idx), color(color)// Just for debugging
-	{
-		x = letters[(idx / BoardRealSize) - 1];
-		y = (idx % BoardRealSize) - 1;
-	}
-	// Just for debugging
-	char x = 0, y = 0;
 
 	bool operator==(const Move& other) const 
 	{

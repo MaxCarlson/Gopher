@@ -262,13 +262,13 @@ int play(std::istringstream& is, int id)
 
 	Move m = { idx, color };
 
+	if (!board.isValid(m))
+		return gtpFailure(id, "invalid coordinates for move");
+
 	board.makeMoveGtp(m);
 
 	if (isPass(m) || isResign(m))
 		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
-
-	if (!board.isValid(m))
-		return gtpFailure(id, "invalid coordinates for move");
 
 	// Rudimentry move stack
 	moveStack.emplace_back(m);

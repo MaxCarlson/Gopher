@@ -532,7 +532,7 @@ bool Board::makeMoveGtp(const Move& m)
 
 	// Remove the move from our free list!
 	if (made)
-		free.erase(m.idx);
+		free.findErase(m.idx);
 
 	return made;
 }
