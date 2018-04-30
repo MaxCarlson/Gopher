@@ -102,8 +102,8 @@ coord MonteCarlo::genMove(int color)
 				return;
 
 			else if (board.moveCount < 3
-				&& getX(idx) > BoardSize - 2 || getX(idx) < 3
-				|| getY(idx) > BoardSize - 2 || getY(idx) < 3)
+				&& (getX(idx) > BoardSize - 2 || getX(idx) < 3
+				|| getY(idx) > BoardSize - 2 || getY(idx) < 3))
 				return;
 
 			const double ratio = static_cast<double>(moves[idx].wins)
