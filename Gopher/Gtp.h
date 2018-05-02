@@ -6,7 +6,7 @@ struct MoveStack
 {
 	std::vector<Move> moves;
 
-	Move& operator[](int idx) const
+	const Move& operator[](int idx) const
 	{
 		return moves[idx];
 	}

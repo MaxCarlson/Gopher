@@ -3,6 +3,7 @@
 #include "Move.h"
 
 struct MoveStack;
+struct MovePicker;
 class MonteCarlo;
 
 // As is don't pass in any type needing memory 
@@ -92,6 +93,8 @@ struct GroupManager
 
 	Group& groupInfoById(const groupId id) { return groups[id]; }
 	coord& groupNextStone(const coord idx) { return nextStone[idx]; }
+	const coord& groupNextStone(const coord idx) const { return nextStone[idx]; }
+
 
 	bool isGroupCaptured(const groupId id) const { return groups[id].libs == 0; }
 };
@@ -108,6 +111,7 @@ struct Neighbors
 class Board
 {
 	friend MonteCarlo;
+	friend MovePicker;
 
 	int moveCount;
 
@@ -137,11 +141,14 @@ public:
 	void printBoard() const;
 	double scoreFast() const;
 	double scoreReal(const MoveStack &moves) const;
+
+	// Board state status functions
 	int neighborCount(coord idx, Stone color) const;
 	bool isEyeLike(coord idx, Stone color) const;
 	bool isFalseEyelike(coord idx, Stone color) const;
 	bool isOnePointEye(coord idx, Stone color) const;
 	bool isValid(const Move& m) const;
+	int immediateLibCount(coord idx) const;
 
 	// Plays a random move if it can
 	// TODO: Pass or use some heuristics so random moves are less "bad"

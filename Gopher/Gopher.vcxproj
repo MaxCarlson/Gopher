@@ -125,11 +125,13 @@
     <ClCompile Include="Gtp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MonteCarlo.cpp" />
+    <ClCompile Include="MovePicker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="Gtp.h" />
+    <ClInclude Include="MovePicker.h" />
     <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="Random.h" />

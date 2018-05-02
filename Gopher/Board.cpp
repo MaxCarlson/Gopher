@@ -126,11 +126,13 @@ double Board::scoreFast() const
 	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
 }
 
-double Board::scoreReal(const MoveStack &moves) const
+double Board::scoreReal(const MoveStack &moves) const // NOT DONE
 {
 	int ownedBy[BoardMaxIdx] = { 0 };
 
 	int scores[Stone::MAX] = { 0 };
+
+	// Only look at Black and White
 	const int zeroOut[] = { 0, 1, 2, 0 };
 
 	// Add up current points
@@ -205,6 +207,13 @@ bool Board::isValid(const Move & m) const
 	});
 	return !!groups_in_atari;
 	*/
+}
+
+int Board::immediateLibCount(coord idx) const
+{
+	return 4 - neighborCount(idx, Stone::BLACK) 
+		+ neighborCount(idx, Stone::WHITE) 
+		+ neighborCount(idx, Stone::OFFBOARD);
 }
 
 // Pass this the idx of the first group stone
@@ -590,6 +599,7 @@ coord Board::playRandom(Stone color)
 	if (!free.size())
 	{
 		// Handle no moves left
+		makeMoveGtp({ Pass, Stone::NONE });
 		return Pass;
 	}
 
@@ -603,6 +613,7 @@ coord Board::playRandom(Stone color)
 			return idx;
 
 	// No valid moves left
+	makeMoveGtp({ Pass, Stone::NONE });
 	return Pass;
 }
 

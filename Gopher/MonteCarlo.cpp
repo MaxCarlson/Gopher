@@ -48,6 +48,8 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 	return result;
 }
 
+// TODO: If oponnent passes and we're winning by official score, pass as well!
+
 coord MonteCarlo::genMove(int color)
 {
 	int losses = 0;

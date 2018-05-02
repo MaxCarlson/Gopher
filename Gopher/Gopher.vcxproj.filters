@@ -27,6 +27,9 @@
     <ClCompile Include="Gtp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MovePicker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Gtp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MovePicker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
