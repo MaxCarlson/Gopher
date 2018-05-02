@@ -50,15 +50,8 @@ bool MovePicker::tryHeuristics(Board & board, Move & move)
 	return false;
 }
 
-bool nakadeSizeCheck(const Board& board, const Move& move)
-{
-	board.foreachNeighbor()
-}
-
 bool MovePicker::nakadeCheck(const Board& board, Move &move)
 {
-	coord nakadeArea[6];
-
 	// This seems like it wouldn't work well for nakade,
 	// TODO: Figure out how is8adjacent makes sense
 	coord adj = Pass;
@@ -77,6 +70,47 @@ bool MovePicker::nakadeCheck(const Board& board, Move &move)
 
 	if (isPass(adj) || isResign(adj))
 		return false;
-	
+
+	static constexpr int MAX_NAKADE_SIZE = 6;
+	Stone ourColor = flipColor(move.color);
+
+	int nSize = 0;
+	bool impossible = false;
+	coord nakadeArea[MAX_NAKADE_SIZE];
+	nakadeArea[nSize++] = adj;
+
+	// Create an array of the inside points of the Nakade shape
+	// if it's too big it isn't Nakade
+	for (int i = 0; i < nSize; ++i)
+	{
+		board.foreachNeighbor(nakadeArea[i], [&](int idx, int color)
+		{
+			if (color == ourColor)
+				impossible = true;
+
+			if (color == Stone::NONE)
+			{
+				// Don't count duplicates
+				for (int j = 0; j < nSize; ++j)
+					if (nakadeArea[j] == idx)
+						return;
+
+				if (++nSize >= MAX_NAKADE_SIZE)
+				{
+					impossible = true;
+					return;
+				}
+
+				nakadeArea[nSize] = idx;
+			}
+		});
+
+		if (impossible)
+			return false;
+	}
+
+	// Now build a list of which neighbors have other 
+	// empty neighbors and how many
+	int neighCount[MAX_NAKADE_SIZE];
 }
 

@@ -285,3 +285,8 @@ inline bool is8Adjacent(coord idx, coord other)
 	return std::abs(idx - other) == 1 || std::abs(std::abs(idx - other) - BoardRealSize < 2);
 }
 
+inline bool isAdjacent(coord idx, coord other)
+{
+	return std::abs(idx - other) == 1 || std::abs(idx - other) == BoardRealSize;
+}
+
