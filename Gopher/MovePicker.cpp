@@ -100,17 +100,71 @@ bool MovePicker::nakadeCheck(const Board& board, Move &move)
 					impossible = true;
 					return;
 				}
-
 				nakadeArea[nSize] = idx;
 			}
 		});
-
 		if (impossible)
 			return false;
 	}
 
-	// Now build a list of which neighbors have other 
-	// empty neighbors and how many
-	int neighCount[MAX_NAKADE_SIZE];
+	// Holds neighbor count of nakadeArea[i]
+	int neighbors[MAX_NAKADE_SIZE] = { 0 };
+
+	// Holds a count of how many neighbors have [idx] number points
+	int neighCount[MAX_NAKADE_SIZE] = { nSize, 0 };
+
+	for(int i = 0; i < nSize; ++i)
+		for (int j = i + 1; j < nSize; ++j)
+			if (isAdjacent(nakadeArea[i], nakadeArea[j]))
+			{
+				--neighCount[neighbors[i]];
+				++neighbors[i];
+				++neighCount[neighbors[i]];
+				--neighCount[neighbors[j]];
+				++neighbors[j];
+				++neighCount[neighbors[j]];
+			}
+
+	// Build a list of points indexed by their neighbor count
+	int idxByCount[MAX_NAKADE_SIZE];
+	for (int i = 0; i < nSize; ++i)
+		idxByCount[neighbors[i]] = std::move(nakadeArea[i]);
+		
+	switch (nSize)
+	{
+	case 1:
+	case 2:
+		return false;
+	case 3:
+		if (neighCount[2] != 1) // JUST FOR DEBUGGING, REMOVE LATER
+			std::cout << "Nakade Issue!! \n";
+
+		move.idx = idxByCount[2]; // Middle of the three
+		return true;
+	case 4:
+		if (neighCount[3] != 1)
+			return false;
+		move.idx = idxByCount[3]; // Pyramid four
+		return true;
+	case 5:
+		if (neighCount[3] == 1 && neighCount[1] == 1)
+			move.idx = idxByCount[3]; // Bulky five
+		else if (neighCount[4] == 1)
+			move.idx = idxByCount[4]; // Crossed five
+		else
+			return false;
+		return true;
+	case 6:
+		if (neighCount[4] == 1 && neighCount[2] == 3)
+			move.idx = idxByCount[4]; // Rabbity six
+		else
+			return false;
+		return true;
+
+	default:
+		std::cout << "Nakade error! This should be unreachable! \n";
+	}
+
+	return false;
 }
 
