@@ -1,6 +1,6 @@
 #include "MonteCarlo.h"
 #include "Board.h"
-
+#include "MovePicker.h"
 
 
 struct MoveStats
@@ -23,9 +23,10 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 
 	while (pass < 2 && --length > 0)
 	{
-		coord idx = board.playRandom(static_cast<Stone>(color)); // TODO: This sometimes fails, It should not fail here (or should pass)
+		//coord idx = board.playRandom(static_cast<Stone>(color)); // TODO: This sometimes fails, It should not fail here (or should pass)
+		const Move m = movePicker.pickMove(board, static_cast<Stone>(color));
 
-		if (isPass(idx))
+		if (isPass(m.idx))
 			++pass;
 		else
 			pass = 0;
@@ -56,14 +57,15 @@ coord MonteCarlo::genMove(int color)
 	int superKo = 0;
 	MoveStats moves[BoardMaxIdx] = { 0 };
 
-	timer(true);
+	//timer(true);
 	
 	int goodGames = 0;
 	for (int i = 0; i < GameSearchCount; ++i)
 	{
 		Board boardCopy = board;
 
-		const Move m = { boardCopy.playRandom(static_cast<Stone>(color)), color };
+		//const Move m = { boardCopy.playRandom(static_cast<Stone>(color)), color };
+		const Move m = movePicker.pickMove(boardCopy, static_cast<Stone>(color));
 
 		// Don't do multi stone suicides!
 		groupId& gg = boardCopy.groupAt(m.idx);
@@ -124,7 +126,7 @@ coord MonteCarlo::genMove(int color)
 		});
 	}
 
-	timer(false);
+	//timer(false);
 
 	return bestIdx;
 }

@@ -37,12 +37,15 @@ Move MovePicker::pickMove(Board & board, Stone color)
 	return { Pass, color };
 }
 
-bool MovePicker::tryHeuristics(Board & board, Move & move)
+bool MovePicker::tryHeuristics(Board & board, Move& ourMove)
 {
+	if (isPass(board.lastMove))
+		return false;
+
 	// Nakade check
 	if (TryValues::nakade > Random::fastRandom(MAX_ROLL)
 		&& board.immediateLibCount(board.lastMove.idx) > 0
-		&& nakadeCheck(board, move))
+		&& nakadeCheck(board, ourMove, board.lastMove))
 	{
 		return true;
 	}
@@ -50,12 +53,12 @@ bool MovePicker::tryHeuristics(Board & board, Move & move)
 	return false;
 }
 
-bool MovePicker::nakadeCheck(const Board& board, Move &move)
+bool MovePicker::nakadeCheck(const Board& board, Move &move, const Move& theirMove)
 {
 	// This seems like it wouldn't work well for nakade,
 	// TODO: Figure out how is8adjacent makes sense
 	coord adj = Pass;
-	board.foreachNeighbor(move.idx, [&](coord idx, int color)
+	board.foreachNeighbor(theirMove.idx, [&](coord idx, int color)
 	{
 		if (color != Stone::NONE)
 			return;
@@ -72,7 +75,7 @@ bool MovePicker::nakadeCheck(const Board& board, Move &move)
 		return false;
 
 	static constexpr int MAX_NAKADE_SIZE = 6;
-	Stone ourColor = flipColor(move.color);
+	Stone ourColor = flipColor(theirMove.color);
 
 	int nSize = 0;
 	bool impossible = false;
@@ -95,17 +98,19 @@ bool MovePicker::nakadeCheck(const Board& board, Move &move)
 					if (nakadeArea[j] == idx)
 						return;
 
-				if (++nSize >= MAX_NAKADE_SIZE)
+				if (nSize >= MAX_NAKADE_SIZE)
 				{
 					impossible = true;
 					return;
 				}
-				nakadeArea[nSize] = idx;
+				nakadeArea[nSize++] = idx;
 			}
 		});
 		if (impossible)
 			return false;
 	}
+
+//board.printBoard();
 
 	// Holds neighbor count of nakadeArea[i]
 	int neighbors[MAX_NAKADE_SIZE] = { 0 };

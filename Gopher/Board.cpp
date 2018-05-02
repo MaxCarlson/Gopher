@@ -102,6 +102,8 @@ void Board::init()
 	});
 
 	komi = 6.5; // TODO: Change this based on board size!
+	lastMove = { Pass, Stone::NONE };
+
 	// TODO: Generate zobrist hash stuff
 }
 
