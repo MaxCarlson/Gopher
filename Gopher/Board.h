@@ -190,6 +190,8 @@ public:
 
 	template<class F>
 	void foreachNeighbor(int idx, F&& f);
+	template<class F>
+	void foreachNeighbor(int idx, F&& f) const;
 
 	template<class F>
 	void eachDiagonalNeighbor(int idx, F&& f);
@@ -226,10 +228,18 @@ inline void Board::foreachPoint(F&& f) const
 template<class F>
 inline void Board::foreachNeighbor(int idx, F&& f)
 {
-	f(idx - 1, points[idx - 1]);
-	f(idx + 1, points[idx + 1]);
 	f(idx - BoardRealSize, points[idx - BoardRealSize]);
+	f(idx + 1, points[idx + 1]);
 	f(idx + BoardRealSize, points[idx + BoardRealSize]);
+	f(idx - 1, points[idx - 1]);
+}
+template<class F>
+inline void Board::foreachNeighbor(int idx, F&& f) const
+{
+	f(idx - BoardRealSize, points[idx - BoardRealSize]);
+	f(idx + 1, points[idx + 1]);
+	f(idx + BoardRealSize, points[idx + BoardRealSize]);
+	f(idx - 1, points[idx - 1]);
 }
 
 // Llambda syntax is: [](int idx, int type){}
@@ -268,5 +278,10 @@ inline void Board::foreachInGroup(groupId id, F && f) const
 		f(id);
 		id = groups.groupNextStone(id);
 	}
+}
+
+inline bool is8Adjacent(coord idx, coord other)
+{
+	return std::abs(idx - other) == 1 || std::abs(std::abs(idx - other) - BoardRealSize < 2);
 }
 

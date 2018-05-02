@@ -42,7 +42,7 @@ bool MovePicker::tryHeuristics(Board & board, Move & move)
 	// Nakade check
 	if (TryValues::nakade > Random::fastRandom(MAX_ROLL)
 		&& board.immediateLibCount(board.lastMove.idx) > 0
-		&& nakadeCheck(board, move.idx))
+		&& nakadeCheck(board, move))
 	{
 		return true;
 	}
@@ -50,8 +50,33 @@ bool MovePicker::tryHeuristics(Board & board, Move & move)
 	return false;
 }
 
-bool MovePicker::nakadeCheck(const Board& board, coord& moveIdx)
+bool nakadeSizeCheck(const Board& board, const Move& move)
 {
+	board.foreachNeighbor()
+}
 
+bool MovePicker::nakadeCheck(const Board& board, Move &move)
+{
+	coord nakadeArea[6];
+
+	// This seems like it wouldn't work well for nakade,
+	// TODO: Figure out how is8adjacent makes sense
+	coord adj = Pass;
+	board.foreachNeighbor(move.idx, [&](coord idx, int color)
+	{
+		if (color != Stone::NONE)
+			return;
+		if (adj == Pass)
+		{
+			adj = idx;
+			return;
+		}
+		if (!is8Adjacent(adj, idx))
+			adj = Resign;
+	});
+
+	if (isPass(adj) || isResign(adj))
+		return false;
+	
 }
 

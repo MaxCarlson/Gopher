@@ -40,6 +40,11 @@ inline bool isResign(const Move& m)
 	return m.idx == Resign;
 }
 
+inline bool isResign(coord idx)
+{
+	return idx == Resign;
+}
+
 inline int getX(coord idx)
 {
 	return idx % BoardRealSize;
