@@ -23,16 +23,17 @@ struct UctNodeBase
 	UctTreeNodes* children;
 
 	size_t size() const { return children ? children->nodes.size() : 0; }
+	//bool visited() const { return visits; }
 };
 
 class SearchTree
 {
+	 
 	void allocateChildren(UctNodeBase& node);
 
 public:
 	
 	UctNodeBase root;
-
 
 	void expandNode(const Board& board, UctNodeBase& node, int color);
 };
