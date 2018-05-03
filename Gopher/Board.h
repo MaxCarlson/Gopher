@@ -2,16 +2,11 @@
 #include "Stone.h"
 #include "Move.h"
 
-struct MoveStack;
-struct MovePicker;
-class MonteCarlo;
-
 // As is don't pass in any type needing memory 
 // management
 template<class Type, int size>
 class FastList
 {
-
 	int mySize = 0;
 	Type items[size]; // TODO: use aligned storage!
 public:
@@ -92,6 +87,8 @@ struct GroupManager
 	Group groups[BoardMaxIdx];
 
 	Group& groupInfoById(const groupId id) { return groups[id]; }
+	const Group& groupInfoById(const groupId id) const { return groups[id]; }
+
 	coord& groupNextStone(const coord idx) { return nextStone[idx]; }
 	const coord& groupNextStone(const coord idx) const { return nextStone[idx]; }
 
@@ -107,11 +104,18 @@ struct Neighbors
 	void decrement(Stone type) { --n[type]; }
 };
 
+struct MoveStack;
+struct MovePicker;
+class MonteCarlo;
+class Uct;
+class SearchTree;
 
 class Board
 {
 	friend MonteCarlo;
 	friend MovePicker;
+	friend Uct;
+	friend SearchTree;
 
 	int moveCount;
 
@@ -148,6 +152,7 @@ public:
 	bool isFalseEyelike(coord idx, Stone color) const;
 	bool isOnePointEye(coord idx, Stone color) const;
 	bool isValid(const Move& m) const;
+	bool isValidNoSuicide(const Move& m) const;
 	int immediateLibCount(coord idx) const;
 
 	// Plays a random move if it can
@@ -183,6 +188,8 @@ public:
 	int at(int idx) const { return points[idx]; }
 	int& at(int idx) { return points[idx]; }
 
+	void setKomi(float num) { komi = num; }
+
 	template<class F>
 	void foreachPoint(F&& f);
 	template<class F>
@@ -205,7 +212,8 @@ public:
 	template<class F>
 	void foreachInGroup(groupId id, F&& f) const;
 
-	void setKomi(float num) { komi = num; }
+	template<class F>
+	void foreachFreePoint(F&& f) const;
 };
 
 // Llambda syntax is: [](int idx, int type){}
@@ -278,6 +286,13 @@ inline void Board::foreachInGroup(groupId id, F && f) const
 		f(id);
 		id = groups.groupNextStone(id);
 	}
+}
+
+template<class F>
+inline void Board::foreachFreePoint(F && f) const
+{
+	for (int i = 0; i < free.size(); ++i)
+		f(free[i]);
 }
 
 inline bool is8Adjacent(coord idx, coord other)

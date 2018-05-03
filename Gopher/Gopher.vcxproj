@@ -85,6 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\C-60\Desktop\cppPrograms\Containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -111,6 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
+      <AdditionalIncludeDirectories>C:\Users\C-60\Desktop\cppPrograms\Containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -126,6 +128,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MonteCarlo.cpp" />
     <ClCompile Include="MovePicker.cpp" />
+    <ClCompile Include="SearchTree.cpp" />
+    <ClCompile Include="Uct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
@@ -135,7 +139,9 @@
     <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="SearchTree.h" />
     <ClInclude Include="Stone.h" />
+    <ClInclude Include="Uct.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

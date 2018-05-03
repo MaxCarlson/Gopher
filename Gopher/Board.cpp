@@ -211,6 +211,30 @@ bool Board::isValid(const Move & m) const
 	*/
 }
 
+bool Board::isValidNoSuicide(const Move & m) const
+{
+	if (at(m.idx) != Stone::NONE)
+		return false;
+	if (immediateLibCount(m.idx) >= 1)
+		return true;
+	if (isEyeLike(m.idx, flipColor(m.color)) && ko == m)
+		return false;
+
+	bool res = false;
+	foreachNeighbor(m.idx, [&](int idx, int color)
+	{
+		if (at(idx) == flipColor(m.color)
+			&& groups.groupInfoById(groupAt(idx)).libs == 1)
+			res = true;
+
+		else if (at(idx) == m.color
+			&& groups.groupInfoById(groupAt(idx)).libs > 1)
+			res = true;
+	});
+
+	return res;
+}
+
 int Board::immediateLibCount(coord idx) const
 {
 	return 4 - neighborCount(idx, Stone::BLACK) 

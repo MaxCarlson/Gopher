@@ -1,5 +1,6 @@
 #include "Gtp.h"
 #include "MonteCarlo.h"
+#include "Uct.h"
 
 #include <cctype>
 #include <sstream>
@@ -285,7 +286,10 @@ int generateMove(std::istringstream& is, int id)
 
 	Stone color = gtpWOrB(colorStr);
 
-	coord idx = monte.genMove(color);
+	//coord idx = monte.genMove(color);
+	coord idx = uct.search(board, color);
+
+
 	Move m = { idx, color };
 
 	board.makeMoveGtp(m);

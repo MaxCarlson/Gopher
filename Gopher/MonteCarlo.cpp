@@ -51,6 +51,7 @@ int MonteCarlo::playRandomGame(Board& board, int color, int length, double death
 
 // TODO: If oponnent passes and we're winning by official score, pass as well!
 
+// Tree-less Monte carlo search. Very weak without heuristics
 coord MonteCarlo::genMove(int color)
 {
 	int losses = 0;
@@ -58,7 +59,8 @@ coord MonteCarlo::genMove(int color)
 	MoveStats moves[BoardMaxIdx] = { 0 };
 
 	//timer(true);
-	
+
+
 	int goodGames = 0;
 	for (int i = 0; i < GameSearchCount; ++i)
 	{
@@ -87,7 +89,7 @@ coord MonteCarlo::genMove(int color)
 		++goodGames;
 
 		losses += result > 0;
-		moves[pos].wins += 1 - (result > 0);
+		moves[pos].wins += (result > 0);
 
 		// TODO: Winning a lot early quit
 	}
