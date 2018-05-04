@@ -45,15 +45,22 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 
 void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool isWin)
 {
-	UctNodeBase& node = root;
-	node.wins += isWin;
+	if (!isWin)
+		return;
+
+	UctNodeBase* node = &root;
+	node->wins += isWin;
 
 	// Loop through all nodes we moved through 
 	// and score them relative to side to move
+	int depth = 0;
 	for (const auto it : moves)
 	{
-		node = node.children->nodes[it];
-		node.wins += isWin;
+		node = &node->children->nodes[it];
+		node->wins += isWin;
+
+		std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
 	}
+	std::cout << '\n';
 }
 

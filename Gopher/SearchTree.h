@@ -18,7 +18,7 @@ struct UctNodeBase
 	int visits = 0;
 	coord idx;
 
-	UctTreeNodes* children;
+	UctTreeNodes* children = nullptr;
 
 	size_t size() const;
 	bool expanded() const { return visits; }

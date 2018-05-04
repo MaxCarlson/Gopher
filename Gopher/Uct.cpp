@@ -16,7 +16,7 @@ inline bool isWin(int result, int toPlay, int currentColor)
 coord Uct::search(const Board & board, int color)
 {
 	toPlay = color;
-	static constexpr int playouts = 40000;
+	static constexpr int playouts = 15000;
 
 	// TODO: Clear tree before search or after!
 	// Best time would be during opponents move
@@ -40,9 +40,8 @@ void Uct::playout(Board & board)
 
 	// Start walk from root
 	int color = toPlay;
-	auto& node = tree.root;
 
-	walkTree(board, node, moves, color);
+	walkTree(board, tree.root, moves, color);
 
 
 	const int result = Playouts::playRandomGame(board, color, MaxGameLen, HopelessRatio);
@@ -54,23 +53,23 @@ void Uct::playout(Board & board)
 // Walk the tree from root using UCT
 void Uct::walkTree(Board & board, UctNodeBase& node, SmallVec<int, 100>& moves, int& color)
 {
-	while (node.expanded() && !node.isLeaf())
+	UctNodeBase* path = &node;
+	while (path->expanded() && !path->isLeaf())
 	{
 		int bestIdx = 0;
-		node = chooseChild(node, bestIdx);
+		path = &chooseChild(*path, bestIdx);
 		moves.emplace_back(bestIdx);
 
 		color = flipColor(color);
 	}
+	color = flipColor(color);
 
-	tree.expandNode(board, node, color);
 
-	const Move m = MovePicker::pickMove(board, color);
+	++path->visits;
+	tree.expandNode(board, *path, color);
 
-	// TODO: Should this move be recorded ?
-	//moves.emplace_back(m.idx);
-	
-	board.makeMove(m);
+	moves.emplace_back(path->idx);
+	board.makeMove({ path->idx, color });
 }
 
 // Do not call this on a node with no children
@@ -78,7 +77,8 @@ void Uct::walkTree(Board & board, UctNodeBase& node, SmallVec<int, 100>& moves, 
 UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 {
 	int idx = 0;
-	double best = -100000.0;
+	double best = std::numeric_limits<double>::min();
+
 	for (const auto& n : node.children->nodes)
 	{
 		double uct = n.wins + std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
@@ -93,7 +93,6 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 
 	// Increment visit counts
 	++node.visits;
-	++node.children->nodes[bestIdx].visits;
 
 	return node.children->nodes[bestIdx];
 }
