@@ -1,6 +1,6 @@
 #pragma once
 
-class Board;
+struct Board;
 struct Move;
 enum Stone;
 

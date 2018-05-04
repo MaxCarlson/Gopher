@@ -2,8 +2,16 @@
 #include "Board.h"
 
 
+size_t UctNodeBase::size() const
+{
+	return children ? children->nodes.size() : 0;
+}
 
-
+void SearchTree::init(const Board& board, int color) 
+{
+	baseColor = color;
+	expandNode(board, root, color);
+}
 
 void SearchTree::allocateChildren(UctNodeBase & node)
 {
@@ -15,7 +23,11 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 	if (!board.free.size())
 		return;
 
-	int children = 0;
+	if (!node.children)
+		allocateChildren(node);
+
+
+	//int children = 0;
 	board.foreachFreePoint([&](coord idx)
 	{
 		if (!board.isValidNoSuicide({ idx, color }))
@@ -24,3 +36,4 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 		node.children->nodes.emplace_back(idx); // Likely optimization point
 	});
 }
+

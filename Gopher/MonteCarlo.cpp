@@ -1,7 +1,7 @@
 #include "MonteCarlo.h"
 #include "Board.h"
 #include "MovePicker.h"
-
+#include "Playout.h"
 
 struct MoveStats
 {
@@ -15,39 +15,6 @@ constexpr int GameSearchCount = 55000 * (9.0 / BoardSize) / 2;
 // Resign when we're only winning this *100 % of games
 constexpr double ResignRatio = 0.1;
 
-int MonteCarlo::playRandomGame(Board& board, int color, int length, double deathRatio)
-{
-	const int ourColor = color;
-	color = flipColor(color);
-	int pass = isPass(board.lastMove);
-
-	while (pass < 2 && --length > 0)
-	{
-		//coord idx = board.playRandom(static_cast<Stone>(color)); // TODO: This sometimes fails, It should not fail here (or should pass)
-		const Move m = movePicker.pickMove(board, static_cast<Stone>(color));
-
-		if (isPass(m.idx))
-			++pass;
-		else
-			pass = 0;
-
-		if (deathRatio && std::abs(board.captures[Stone::BLACK] - board.captures[Stone::WHITE]) > deathRatio) // TODO: Take komi into account?
-			break;
-
-		color = flipColor(color);
-
-		//if(length == 196)
-		//	std::cout << length << '\n';
-		//board.printBoard();
-	}
-
-	const double score = board.scoreFast();
-	const int result = ourColor == Stone::WHITE ? score * 2 : -(score * 2);
-
-	//std::cout << "Random playout result for color " << printStone(ourColor) << " " << score << '\n';
-
-	return result;
-}
 
 // TODO: If oponnent passes and we're winning by official score, pass as well!
 
@@ -59,7 +26,6 @@ coord MonteCarlo::genMove(int color)
 	MoveStats moves[BoardMaxIdx] = { 0 };
 
 	//timer(true);
-
 
 	int goodGames = 0;
 	for (int i = 0; i < GameSearchCount; ++i)
@@ -74,7 +40,7 @@ coord MonteCarlo::genMove(int color)
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;
 		
-		const int result = playRandomGame(boardCopy, color, MaxGameLen, HopelessRatio);
+		const int result = Playouts::playRandomGame(boardCopy, color, MaxGameLen, HopelessRatio);
 
 		if (result == 0)
 		{	// Superko, ignore this playout and try again

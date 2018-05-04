@@ -24,7 +24,7 @@ Move MovePicker::pickMove(Board & board, Stone color)
 	if (tryHeuristics(board, m))
 		return m;
 	
-	auto rng = Random::fastRandom(board.free.size());
+	int rng = Random::fastRandom(board.free.size());
 	for (int i = rng; i < board.free.size(); ++i)
 		if (board.tryRandomMove(color, m.idx, i))
 			return m;

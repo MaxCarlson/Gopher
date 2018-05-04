@@ -1,15 +1,13 @@
 #pragma once
 #include <Containers\SmallVec.h>
-class Board;
 
-struct UctNodeBase;
-constexpr int AVG_CHILDREN = 1;
-using ChildStorage = SmallVec<UctNodeBase, AVG_CHILDREN>;
+struct Board;
 
-struct UctTreeNodes
-{
-	ChildStorage nodes;
-};
+
+constexpr int AVG_CHILDREN = 5;
+
+using coord = int;
+struct UctTreeNodes;
 
 struct UctNodeBase
 {
@@ -22,19 +20,29 @@ struct UctNodeBase
 
 	UctTreeNodes* children;
 
-	size_t size() const { return children ? children->nodes.size() : 0; }
-	//bool visited() const { return visits; }
+	size_t size() const;
+	bool expanded() const { return visits; }
+};
+
+struct UctTreeNodes
+{
+	SmallVec<UctNodeBase, AVG_CHILDREN> nodes;
 };
 
 class SearchTree
 {
-	 
 	void allocateChildren(UctNodeBase& node);
 
 public:
-	
+
+	int baseColor;
 	UctNodeBase root;
 
+	void init(const Board& board, int color);
+
 	void expandNode(const Board& board, UctNodeBase& node, int color);
+
+
 };
+
 

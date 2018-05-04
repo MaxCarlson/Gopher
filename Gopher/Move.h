@@ -9,7 +9,7 @@ using coord = int;
 constexpr int Pass = -1;
 constexpr int Resign = -2;
 
-class Board;
+struct Board;
 
 struct Move
 {

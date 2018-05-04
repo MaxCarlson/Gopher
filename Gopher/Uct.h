@@ -1,7 +1,7 @@
 #pragma once
+#include "SearchTree.h"
 
-
-class Board;
+struct Board;
 using coord = int;
 struct UctNodeBase;
 
@@ -13,8 +13,13 @@ public:
 
 private:
 
+	SearchTree tree;
+
+	void playout(Board& board);
+	void walkTree(Board& board);
+
 	// Find the best child of the node based on UCT's algo
-	UctNodeBase& chooseChild(const UctNodeBase& node) const;
+	UctNodeBase& chooseChild(UctNodeBase& node) const;
 
 };
 

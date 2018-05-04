@@ -105,18 +105,9 @@ struct Neighbors
 };
 
 struct MoveStack;
-struct MovePicker;
-class MonteCarlo;
-class Uct;
-class SearchTree;
 
-class Board
+struct Board
 {
-	friend MonteCarlo;
-	friend MovePicker;
-	friend Uct;
-	friend SearchTree;
-
 	int moveCount;
 
 	// Capture info for all ston types
