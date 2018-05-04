@@ -40,6 +40,8 @@ public:
 	UctNodeBase root;
 
 	void init(const Board& board, int color);
+	coord getBestMove() const;
+
 
 	void expandNode(const Board& board, UctNodeBase& node, int color);
 

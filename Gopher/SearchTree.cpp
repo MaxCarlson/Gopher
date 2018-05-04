@@ -19,6 +19,37 @@ void SearchTree::init(const Board& board, int color)
 	++root.visits;
 }
 
+coord SearchTree::getBestMove() const
+{
+	// This should be the best move as UCT 
+	// should be searching it exponentially more
+	// than the worst
+	int idx = 0;
+	int bestIdx = 0;
+	int bestVisits = 0;
+	//double bestWinRate = std::numeric_limits<double>::min();
+	for (const auto& it : root.children->nodes)
+	{
+		/*
+		double wr = static_cast<double>(it.wins) / static_cast<double>(it.visits);
+		if (wr > bestWinRate)
+		{
+			bestWinRate = wr;
+			bestIdx = idx;
+		}
+		*/
+		if (it.visits > bestVisits)
+		{
+			bestVisits = it.visits;
+			bestIdx = idx;
+		}
+
+		++idx;
+	}
+
+	return root.children->nodes[bestIdx].idx;
+}
+
 void SearchTree::allocateChildren(UctNodeBase & node)
 {
 	node.children = new UctTreeNodes;

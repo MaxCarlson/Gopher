@@ -16,7 +16,7 @@ inline bool isWin(int result, int toPlay, int currentColor)
 coord Uct::search(const Board & board, int color)
 {
 	toPlay = color;
-	static constexpr int playouts = 15000;
+	static constexpr int playouts = 2000;
 
 	// TODO: Clear tree before search or after!
 	// Best time would be during opponents move
@@ -28,7 +28,7 @@ coord Uct::search(const Board & board, int color)
 		playout(bb);
 	}
 
-	return 0;
+	return tree.getBestMove();
 }
 
 void Uct::playout(Board & board)
@@ -81,7 +81,15 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 
 	for (const auto& n : node.children->nodes)
 	{
-		double uct = n.wins + std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
+		if (n.visits == 0)
+		{
+			bestIdx = idx;
+			break;
+		}
+
+		double uct = (static_cast<double>(n.wins) 
+					/ static_cast<double>(n.visits)) 
+			+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
 
 		if (uct > best)
 		{
