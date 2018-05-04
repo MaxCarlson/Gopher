@@ -43,6 +43,11 @@ public:
 			}
 	}
 
+	Type pop_back()
+	{
+		return items[--mySize];
+	}
+
 	template<class Func>
 	void foreach(Func&& func)
 	{

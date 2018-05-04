@@ -4,13 +4,10 @@ struct Board;
 struct Move;
 enum Stone;
 
-struct MovePicker
+namespace MovePicker
 {
-	Move pickMove(Board& board, Stone color);
+	Move pickMove(Board& board, int color);
 	bool tryHeuristics(Board& board, Move& ourMove);
 
 	bool nakadeCheck(const Board& board, Move &move, const Move& theirMove);
-
-};
-
-inline MovePicker movePicker;
+}

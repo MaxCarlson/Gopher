@@ -9,8 +9,8 @@ struct MoveStats
 	int wins = 0;
 };
 
-constexpr double HopelessRatio = 25.0;// *(BoardSize / 9.0);
-constexpr int MaxGameLen = 400; // 400 Normally
+constexpr double HopelessRatio = 25.0;
+constexpr int MaxGameLen = 400; 
 constexpr int GameSearchCount = 55000 * (9.0 / BoardSize) / 2;
 // Resign when we're only winning this *100 % of games
 constexpr double ResignRatio = 0.1;
@@ -33,7 +33,7 @@ coord MonteCarlo::genMove(int color)
 		Board boardCopy = board;
 
 		//const Move m = { boardCopy.playRandom(static_cast<Stone>(color)), color };
-		const Move m = movePicker.pickMove(boardCopy, static_cast<Stone>(color));
+		const Move m = MovePicker::pickMove(boardCopy, static_cast<Stone>(color));
 
 		// Don't do multi stone suicides!
 		groupId& gg = boardCopy.groupAt(m.idx);

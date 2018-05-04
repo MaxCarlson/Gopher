@@ -8,10 +8,14 @@ namespace TryValues
 	int nakade = 80;
 };
 
+namespace MovePicker
+{
+
+
 
 // Goes through a list of heuristics to find a possible move
 // if no heuristic hit we'll just generate a random one
-Move MovePicker::pickMove(Board & board, Stone color)
+Move pickMove(Board & board, int color)
 {
 	Move m = { Pass, color };
 	if (!board.free.size())
@@ -26,18 +30,18 @@ Move MovePicker::pickMove(Board & board, Stone color)
 	
 	int rng = Random::fastRandom(board.free.size());
 	for (int i = rng; i < board.free.size(); ++i)
-		if (board.tryRandomMove(color, m.idx, i))
+		if (board.tryRandomMove(static_cast<Stone>(color), m.idx, i))
 			return m;
 
 	for (int i = 0; i < rng; ++i)
-		if (board.tryRandomMove(color, m.idx, i))
+		if (board.tryRandomMove(static_cast<Stone>(color), m.idx, i))
 			return m;
 
 
 	return { Pass, color };
 }
 
-bool MovePicker::tryHeuristics(Board & board, Move& ourMove)
+bool tryHeuristics(Board & board, Move& ourMove)
 {
 	if (isPass(board.lastMove))
 		return false;
@@ -53,7 +57,7 @@ bool MovePicker::tryHeuristics(Board & board, Move& ourMove)
 	return false;
 }
 
-bool MovePicker::nakadeCheck(const Board& board, Move &move, const Move& theirMove)
+bool nakadeCheck(const Board& board, Move &move, const Move& theirMove)
 {
 	// This seems like it wouldn't work well for nakade,
 	// TODO: Figure out how is8adjacent makes sense
@@ -173,3 +177,4 @@ bool MovePicker::nakadeCheck(const Board& board, Move &move, const Move& theirMo
 	return false;
 }
 
+}// End MovePicker::

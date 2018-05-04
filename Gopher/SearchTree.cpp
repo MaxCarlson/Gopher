@@ -7,10 +7,16 @@ size_t UctNodeBase::size() const
 	return children ? children->nodes.size() : 0;
 }
 
+bool UctNodeBase::isLeaf() const
+{
+	return !children;
+}
+
 void SearchTree::init(const Board& board, int color) 
 {
 	baseColor = color;
 	expandNode(board, root, color);
+	++root.visits;
 }
 
 void SearchTree::allocateChildren(UctNodeBase & node)
@@ -35,5 +41,19 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 
 		node.children->nodes.emplace_back(idx); // Likely optimization point
 	});
+}
+
+void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool isWin)
+{
+	UctNodeBase& node = root;
+	node.wins += isWin;
+
+	// Loop through all nodes we moved through 
+	// and score them relative to side to move
+	for (const auto it : moves)
+	{
+		node = node.children->nodes[it];
+		node.wins += isWin;
+	}
 }
 

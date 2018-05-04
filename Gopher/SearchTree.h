@@ -22,6 +22,7 @@ struct UctNodeBase
 
 	size_t size() const;
 	bool expanded() const { return visits; }
+	bool isLeaf() const;
 };
 
 struct UctTreeNodes
@@ -42,7 +43,9 @@ public:
 
 	void expandNode(const Board& board, UctNodeBase& node, int color);
 
-
+	// Walk the tree from the root and record the results of the playout
+	// visits have already been incremeneted
+	void recordSearchResults(SmallVec<int, 100>& moves, int color, bool isWin);
 };
 
 
