@@ -65,9 +65,12 @@ public:
 	UctNodeBase root;
 
 	void init(const Board& board, int color);
+	void afterSearch();
+
 	coord getBestMove() const;
 
-	void writeOverTree();
+	void writeOverBranch(UctNodeBase& root);
+
 
 	void expandNode(const Board& board, UctNodeBase& node, int color);
 

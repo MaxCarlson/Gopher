@@ -3,6 +3,7 @@
 #include "MovePicker.h"
 #include "Playout.h"
 #include <math.h>
+#include "Random.h"
 
 static constexpr double EXPLORE_RATE = 5.0;
 
@@ -29,8 +30,8 @@ coord Uct::search(const Board & board, int color)
 	}
 
 	const coord bestMove = tree.getBestMove();
-	tree.writeOverTree();
-
+	
+	tree.afterSearch();
 	return bestMove;
 }
 
@@ -39,7 +40,8 @@ void Uct::playout(Board & board)
 	static constexpr double HopelessRatio = 25.0;
 	static constexpr int MaxGameLen = 400;
 
-	SmallVec<int, 100> moves;
+	static SmallVec<int, 100> moves;
+	moves.clear();
 
 	// Start walk from root
 	int color = toPlay;
@@ -54,13 +56,15 @@ void Uct::playout(Board & board)
 }
 
 // Walk the tree from root using UCT
-void Uct::walkTree(Board & board, UctNodeBase& node, SmallVec<int, 100>& moves, int& color)
+void Uct::walkTree(Board & board, UctNodeBase& root, SmallVec<int, 100>& moves, int& color)
 {
-	UctNodeBase* path = &node;
-	while (path->expanded() && !path->isLeaf())
+	UctNodeBase* path = &root;
+	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{
 		int bestIdx = 0;
 		path = &chooseChild(*path, bestIdx);
+		// Record the index of the move, we'll use it later to walk
+		// the tree and record the results of this search
 		moves.emplace_back(bestIdx);
 
 		color = flipColor(color);
@@ -71,7 +75,6 @@ void Uct::walkTree(Board & board, UctNodeBase& node, SmallVec<int, 100>& moves, 
 	++path->visits;
 	tree.expandNode(board, *path, color);
 
-	moves.emplace_back(path->idx);
 	board.makeMove({ path->idx, color });
 }
 
@@ -82,18 +85,17 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 	int idx = 0;
 	double best = std::numeric_limits<double>::min();
 
-	node.children->foreachChildBreak(node.size, [&](UctNodeBase& n, bool& stop)
+	node.children->foreachChild(node.size, [&](UctNodeBase& n)
 	{
-		if (n.visits == 0) // TODO: Need to randomize picking unexplored node instead of picking first TOP PRIORITY
-		{
-			bestIdx = idx;
-			stop = true;
-			return;
-		}
+		double uct;
 
-		double uct = (static_cast<double>(n.wins)
-			/ static_cast<double>(n.visits))
-			+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
+		// Give preference to unvisited nodes randomly
+		if (n.visits == 0) 
+			uct = 10000.0 + static_cast<double>(Random::fastRandom(10000));
+		else
+			uct = (static_cast<double>(n.wins)
+				/ static_cast<double>(n.visits))
+				+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
 
 		if (uct > best)
 		{

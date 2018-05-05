@@ -14,6 +14,11 @@ void SearchTree::init(const Board& board, int color)
 	++root.visits;
 }
 
+void SearchTree::afterSearch()
+{
+	writeOverBranch(root);
+}
+
 coord SearchTree::getBestMove() const
 {
 	int idx = 0;
@@ -62,25 +67,20 @@ void deallocateNode(UctNodeBase& root)
 	delete root.children;
 }
 
-inline void writeOverBranch(UctNodeBase& root)
+// It seems prudent not to write over the branch we end 
+// up choosing (and the oponents reply) 
+// TODO: 
+// Integrate this idea
+void SearchTree::writeOverBranch(UctNodeBase& root)
 {
-	root.visits = root.wins = root.idx = root.size = 0;
+	root.visits = root.wins = root.idx = 0;
 	
 	if(root.children)
 		root.children->foreachChild(root.size, [&](UctNodeBase& n)
 		{
 			writeOverBranch(n);
 		});
-}
-
-// It seems prudent not to write over the branch we end 
-// up choosing (and the oponents reply) 
-// TODO: 
-// Integrate this idea
-void SearchTree::writeOverTree()
-{
-	for (auto& n : root.children->nodes)
-		writeOverBranch(root);
+	root.size = 0;
 }
 
 void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
@@ -117,13 +117,15 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 	// Loop through all nodes we moved through 
 	// and score them relative to side to move
 	int depth = 0;
+	std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
+
 	for (const auto it : moves)
 	{
 		node = &node->children->nodes[it];
 		node->wins += isWin;
-
-		//std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
+		std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
 	}
-	//std::cout << '\n';
+
+	std::cout << '\n';
 }
 

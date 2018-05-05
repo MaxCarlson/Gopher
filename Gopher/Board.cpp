@@ -559,7 +559,11 @@ bool Board::moveInEye(const Move & m)
 bool Board::makeMove(const Move & m)
 {
 	if (at(m.idx) != Stone::NONE) // Remove when done debugging
+	{
+		std::cout << '\n';
+		printBoard();
 		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
+	}
 
 	//if (m.idx == BoardRealSize * 9 + 1) // C9 Debugging!
 
