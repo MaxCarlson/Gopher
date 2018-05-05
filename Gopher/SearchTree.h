@@ -18,9 +18,12 @@ struct UctNodeBase
 	int visits = 0;
 	coord idx;
 
+	// Keep track of how many children
+	// we actually have as the small vec in children
+	// likely has more spaces filled that we haven't deallocated
+	short size = 0;
 	UctTreeNodes* children = nullptr;
 
-	size_t size() const;
 	bool expanded() const { return visits; }
 	bool isLeaf() const;
 };
@@ -28,6 +31,28 @@ struct UctNodeBase
 struct UctTreeNodes
 {
 	SmallVec<UctNodeBase, AVG_CHILDREN> nodes;
+
+	template<class F>
+	void foreachChild(int size, F&& f)
+	{
+		for (int i = 0; i < size; ++i)
+			f(nodes[i]);
+	}
+
+	// Takes a size to iterate through
+	// a llambda [&](UctNodeBase&, bool&)
+	// set stop to false to bool iterating
+	template<class F>
+	void foreachChildBreak(int size, F&& f)
+	{
+		bool stop = false;
+		for (int i = 0; i < size; ++i)
+		{
+			f(nodes[i], stop);
+			if (stop)
+				return;
+		}
+	}
 };
 
 class SearchTree

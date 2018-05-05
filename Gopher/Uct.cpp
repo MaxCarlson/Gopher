@@ -82,16 +82,17 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 	int idx = 0;
 	double best = std::numeric_limits<double>::min();
 
-	for (const auto& n : node.children->nodes)
+	node.children->foreachChildBreak(node.size, [&](UctNodeBase& n, bool& stop)
 	{
 		if (n.visits == 0) // TODO: Need to randomize picking unexplored node instead of picking first TOP PRIORITY
 		{
 			bestIdx = idx;
-			break;
+			stop = true;
+			return;
 		}
 
-		double uct = (static_cast<double>(n.wins) 
-					/ static_cast<double>(n.visits)) 
+		double uct = (static_cast<double>(n.wins)
+			/ static_cast<double>(n.visits))
 			+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
 
 		if (uct > best)
@@ -100,7 +101,7 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 			best = uct;
 		}
 		++idx;
-	}
+	});
 
 	// Increment visit counts
 	++node.visits;

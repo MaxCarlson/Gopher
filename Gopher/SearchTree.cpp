@@ -2,11 +2,6 @@
 #include "Board.h"
 
 
-size_t UctNodeBase::size() const
-{
-	return children ? children->nodes.size() : 0;
-}
-
 bool UctNodeBase::isLeaf() const
 {
 	return !children;
@@ -69,11 +64,13 @@ void deallocateNode(UctNodeBase& root)
 
 inline void writeOverBranch(UctNodeBase& root)
 {
-	root.visits = root.wins = root.idx = 0;
+	root.visits = root.wins = root.idx = root.size = 0;
 	
 	if(root.children)
-		for (auto& n : root.children->nodes)
+		root.children->foreachChild(root.size, [&](UctNodeBase& n)
+		{
 			writeOverBranch(n);
+		});
 }
 
 // It seems prudent not to write over the branch we end 
@@ -94,14 +91,18 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 	if (!node.children)
 		allocateChildren(node);
 
-
+	int i = 0;
 	board.foreachFreePoint([&](coord idx)
 	{
 		if (!board.isValidNoSuicide({ idx, color }))
 			return;
 
-		node.children->nodes.emplace_back(idx); // Likely optimization point
-		// TODO: Possibly count children, resize vector to that then add them?
+		if (node.size >= node.children->nodes.size())
+			node.children->nodes.emplace_back(idx); // Likely optimization point
+		else
+			node.children->nodes[i].idx = std::move(idx);
+		++i;
+		++node.size;
 	});
 }
 
@@ -121,8 +122,8 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 		node = &node->children->nodes[it];
 		node->wins += isWin;
 
-		std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
+		//std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
 	}
-	std::cout << '\n';
+	//std::cout << '\n';
 }
 
