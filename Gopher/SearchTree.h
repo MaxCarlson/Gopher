@@ -23,8 +23,6 @@ struct UctNodeBase
 	size_t size() const;
 	bool expanded() const { return visits; }
 	bool isLeaf() const;
-
-	~UctNodeBase();
 };
 
 struct UctTreeNodes
@@ -44,8 +42,7 @@ public:
 	void init(const Board& board, int color);
 	coord getBestMove() const;
 
-	// Walk the tree and delete nodes
-	void deallocateTree();
+	void writeOverTree();
 
 	void expandNode(const Board& board, UctNodeBase& node, int color);
 

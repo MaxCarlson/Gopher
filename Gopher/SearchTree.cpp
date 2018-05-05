@@ -12,12 +12,6 @@ bool UctNodeBase::isLeaf() const
 	return !children;
 }
 
-UctNodeBase::~UctNodeBase()
-{
-	if (children)
-		delete children;
-}
-
 void SearchTree::init(const Board& board, int color) 
 {
 	baseColor = color;
@@ -69,20 +63,27 @@ void deallocateNode(UctNodeBase& root)
 	
 	for (auto& n : root.children->nodes)
 		deallocateNode(n);
-
+	
 	delete root.children;
 }
 
-// It seems prudent not to deallocate the branch we end 
+inline void writeOverBranch(UctNodeBase& root)
+{
+	root.visits = root.wins = root.idx = 0;
+	
+	if(root.children)
+		for (auto& n : root.children->nodes)
+			writeOverBranch(n);
+}
+
+// It seems prudent not to write over the branch we end 
 // up choosing (and the oponents reply) 
 // TODO: 
-// Integrate this (deallocate on move start or partially during opponents move?)
-void SearchTree::deallocateTree()
+// Integrate this idea
+void SearchTree::writeOverTree()
 {
-	//for (auto& n : root.children->nodes)
-		//deallocateNode(n);
-	if (root.children)
-		delete root.children;
+	for (auto& n : root.children->nodes)
+		writeOverBranch(root);
 }
 
 void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)

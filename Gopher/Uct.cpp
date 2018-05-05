@@ -29,7 +29,7 @@ coord Uct::search(const Board & board, int color)
 	}
 
 	const coord bestMove = tree.getBestMove();
-	tree.deallocateTree();
+	tree.writeOverTree();
 
 	return bestMove;
 }
