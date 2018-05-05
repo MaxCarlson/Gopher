@@ -28,7 +28,10 @@ coord Uct::search(const Board & board, int color)
 		playout(bb);
 	}
 
-	return tree.getBestMove();
+	const coord bestMove = tree.getBestMove();
+	tree.deallocateTree();
+
+	return bestMove;
 }
 
 void Uct::playout(Board & board)
@@ -81,7 +84,7 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 
 	for (const auto& n : node.children->nodes)
 	{
-		if (n.visits == 0)
+		if (n.visits == 0) // TODO: Need to randomize picking unexplored node instead of picking first TOP PRIORITY
 		{
 			bestIdx = idx;
 			break;

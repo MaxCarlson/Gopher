@@ -12,6 +12,12 @@ bool UctNodeBase::isLeaf() const
 	return !children;
 }
 
+UctNodeBase::~UctNodeBase()
+{
+	if (children)
+		delete children;
+}
+
 void SearchTree::init(const Board& board, int color) 
 {
 	baseColor = color;
@@ -21,9 +27,6 @@ void SearchTree::init(const Board& board, int color)
 
 coord SearchTree::getBestMove() const
 {
-	// This should be the best move as UCT 
-	// should be searching it exponentially more
-	// than the worst
 	int idx = 0;
 	int bestIdx = 0;
 	int bestVisits = 0;
@@ -38,6 +41,10 @@ coord SearchTree::getBestMove() const
 			bestIdx = idx;
 		}
 		*/
+
+		// This should be the best move as UCT 
+		// should be searching it exponentially more
+		// than the worst
 		if (it.visits > bestVisits)
 		{
 			bestVisits = it.visits;
@@ -55,6 +62,29 @@ void SearchTree::allocateChildren(UctNodeBase & node)
 	node.children = new UctTreeNodes;
 }
 
+void deallocateNode(UctNodeBase& root)
+{
+	if (!root.children)
+		return;
+	
+	for (auto& n : root.children->nodes)
+		deallocateNode(n);
+
+	delete root.children;
+}
+
+// It seems prudent not to deallocate the branch we end 
+// up choosing (and the oponents reply) 
+// TODO: 
+// Integrate this (deallocate on move start or partially during opponents move?)
+void SearchTree::deallocateTree()
+{
+	//for (auto& n : root.children->nodes)
+		//deallocateNode(n);
+	if (root.children)
+		delete root.children;
+}
+
 void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 {
 	if (!board.free.size())
@@ -64,13 +94,13 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 		allocateChildren(node);
 
 
-	//int children = 0;
 	board.foreachFreePoint([&](coord idx)
 	{
 		if (!board.isValidNoSuicide({ idx, color }))
 			return;
 
 		node.children->nodes.emplace_back(idx); // Likely optimization point
+		// TODO: Possibly count children, resize vector to that then add them?
 	});
 }
 
