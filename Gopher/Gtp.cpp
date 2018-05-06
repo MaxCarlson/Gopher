@@ -289,7 +289,6 @@ int generateMove(std::istringstream& is, int id)
 	//coord idx = monte.genMove(color);
 	coord idx = uct.search(board, color);
 
-
 	Move m = { idx, color };
 
 	board.makeMoveGtp(m);
@@ -333,18 +332,29 @@ int gtpPrintBoard(std::istringstream& is, int id)
 // Mainly just for quick testing
 int playSelf(std::istringstream& is, int id)
 {
-	const std::string playBlack = " b";
-	const std::string playWhite = " w";
 
+	int passes = 0;
 	for (int i = 0; i < 10000; ++i)
 	{
-		std::istringstream sb(playBlack);
-		std::istringstream sw(playWhite);
+		int color = Stone::WHITE;
+		if (i % 2 == 0)
+			color = Stone::BLACK;
 
-		if (!generateMove(i % 2 == 0 ? sb : sw, 0))
-			break;
+		coord idx = uct.search(board, color);
+		Move m = { idx, color };
+
+		board.makeMoveGtp(m);
+		//moveStack.emplace_back(m);
 
 		board.printBoard();
+
+		if (isPass(m))
+			++passes;
+		else if (passes)
+			passes = 0;
+
+		if (passes > 1 || isResign(m))
+			break;
 	}
 
 	return gtpSuccess(id);

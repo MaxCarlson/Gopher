@@ -46,6 +46,7 @@ coord MonteCarlo::genMove(int color)
 		{	// Superko, ignore this playout and try again
 			--i;
 			++superKo;
+			continue;
 		}
 
 		// Using 0 as pass index

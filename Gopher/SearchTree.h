@@ -4,7 +4,7 @@
 struct Board;
 
 
-constexpr int AVG_CHILDREN = 5;
+constexpr int AVG_CHILDREN = 1;
 
 using coord = int;
 struct UctTreeNodes;

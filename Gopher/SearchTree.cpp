@@ -24,17 +24,13 @@ coord SearchTree::getBestMove() const
 	int idx = 0;
 	int bestIdx = 0;
 	int bestVisits = 0;
-	//double bestWinRate = std::numeric_limits<double>::min();
+	double bestWinRate = std::numeric_limits<double>::min();
+
 	for (const auto& it : root.children->nodes)
 	{
-		/*
-		double wr = static_cast<double>(it.wins) / static_cast<double>(it.visits);
-		if (wr > bestWinRate)
-		{
-			bestWinRate = wr;
-			bestIdx = idx;
-		}
-		*/
+		///*
+
+		//*/
 
 		// This should be the best move as UCT 
 		// should be searching it exponentially more
@@ -43,12 +39,23 @@ coord SearchTree::getBestMove() const
 		{
 			bestVisits = it.visits;
 			bestIdx = idx;
+
+			double wr = static_cast<double>(it.wins) / static_cast<double>(it.visits);
+			if (wr > bestWinRate)
+				bestWinRate = wr;		
 		}
 
 		++idx;
 	}
 
-	return root.children->nodes[bestIdx].idx;
+	coord bestMove = root.children->nodes[bestIdx].idx;
+
+	static constexpr double ResignThreshold = 0.1;
+
+	if (bestWinRate < ResignThreshold)
+		bestMove = Resign;
+
+	return bestMove;
 }
 
 void SearchTree::allocateChildren(UctNodeBase & node)
