@@ -17,7 +17,7 @@ inline bool isWin(int result, int toPlay, int currentColor)
 coord Uct::search(const Board & board, int color)
 {
 	toPlay = color;
-	static constexpr int playouts = 2000;
+	static constexpr int playouts = 8000;
 
 	// TODO: Clear tree before search or after!
 	// Best time would be during opponents move
