@@ -341,7 +341,8 @@ int playSelf(std::istringstream& is, int id)
 		std::istringstream sb(playBlack);
 		std::istringstream sw(playWhite);
 
-		generateMove(i % 2 == 0 ? sb : sw, 0);
+		if (!generateMove(i % 2 == 0 ? sb : sw, 0))
+			break;
 
 		board.printBoard();
 	}
