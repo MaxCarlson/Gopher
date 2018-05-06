@@ -17,11 +17,15 @@ inline bool isWin(int result, int toPlay, int currentColor)
 coord Uct::search(const Board & board, int color)
 {
 	toPlay = color;
-	static constexpr int playouts = 8000;
+	static constexpr int playouts = 18000;
 
 	// TODO: Clear tree before search or after!
 	// Best time would be during opponents move
 	tree.init(board, color);
+
+	int a = sizeof(UctNodeBase);
+
+//	timer(true);
 
 	for (int i = 0; i < playouts; ++i)
 	{
@@ -32,9 +36,11 @@ coord Uct::search(const Board & board, int color)
 	const coord bestMove = tree.getBestMove();
 
 	// TODO: Need to add in heuristic for when it is best to pass!!!
-	// TODO: and when to resign
 	
 	tree.afterSearch();
+
+//	timer(false);
+
 	return bestMove;
 }
 

@@ -15,13 +15,14 @@ struct UctNodeBase
 	UctNodeBase(coord idx) : idx(idx) {}
 
 	int wins = 0;
-	int visits = 0;
+	int visits = 0;		// TODO: enable_if stuff based on MAX_VISITS possible to reduce size of this ?
 	coord idx;
 
 	// Keep track of how many children
 	// we actually have as the small vec in children
 	// likely has more spaces filled that we haven't deallocated
-	short size = 0;
+	int size = 0; // TODO: Right now due to aligment this doesn't make a difference in size if it and idx are both shorts or not, revisit
+
 	UctTreeNodes* children = nullptr;
 
 	bool expanded() const { return visits; }

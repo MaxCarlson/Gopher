@@ -22,40 +22,36 @@ void SearchTree::afterSearch()
 coord SearchTree::getBestMove() const
 {
 	int idx = 0;
-	int bestIdx = 0;
+	coord bestIdx = 0;
 	int bestVisits = 0;
-	double bestWinRate = std::numeric_limits<double>::min();
 
+	// The most searched move should be the best  
+	// move as UCT should be searching it 
+	// exponentially more than the worst
 	for (const auto& it : root.children->nodes)
 	{
-		///*
-
-		//*/
-
-		// This should be the best move as UCT 
-		// should be searching it exponentially more
-		// than the worst
 		if (it.visits > bestVisits)
 		{
 			bestVisits = it.visits;
-			bestIdx = idx;
-
-			double wr = static_cast<double>(it.wins) / static_cast<double>(it.visits);
-			if (wr > bestWinRate)
-				bestWinRate = wr;		
+			bestIdx = idx;	
 		}
-
 		++idx;
 	}
 
-	coord bestMove = root.children->nodes[bestIdx].idx;
+	static constexpr double ResignThreshold = 0.05;
 
-	static constexpr double ResignThreshold = 0.1;
+	const auto& bestNode = root.children->nodes[bestIdx];
+	bestIdx = bestNode.idx;
 
-	if (bestWinRate < ResignThreshold)
-		bestMove = Resign;
+	double winRate = static_cast<double>(bestNode.wins)
+				   / static_cast<double>(bestNode.visits);
 
-	return bestMove;
+	// Resign if the best move candidates winrate is less
+	// than ResignThreshold
+	if (winRate < ResignThreshold)
+		bestIdx = Resign;
+
+	return bestIdx;
 }
 
 void SearchTree::allocateChildren(UctNodeBase & node)
@@ -78,6 +74,9 @@ void deallocateNode(UctNodeBase& root)
 // up choosing (and the oponents reply) 
 // TODO: 
 // Integrate this idea
+//
+// Actually this might slow things down, lot's of work 
+// moving nodes down the tree
 void SearchTree::writeOverBranch(UctNodeBase& root)
 {
 	root.visits = root.wins = root.idx = 0;
@@ -107,7 +106,7 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 		if (node.size >= node.children->nodes.size())
 			node.children->nodes.emplace_back(idx); // Likely optimization point
 		else
-			node.children->nodes[i].idx = std::move(idx);
+			node.children->nodes[i].idx = std::move(idx); // TODO: Customize a SmallVec like data structure
 		++i;
 		++node.size;
 	});

@@ -111,6 +111,8 @@ struct Neighbors
 
 struct MoveStack;
 
+
+// TODO: Move stuff around and check sizeof to find good alignment
 struct Board
 {
 	int moveCount;
