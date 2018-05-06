@@ -237,9 +237,9 @@ bool Board::isValidNoSuicide(const Move & m) const
 
 int Board::immediateLibCount(coord idx) const
 {
-	return 4 - neighborCount(idx, Stone::BLACK) 
+	return 4 - (neighborCount(idx, Stone::BLACK) 
 		+ neighborCount(idx, Stone::WHITE) 
-		+ neighborCount(idx, Stone::OFFBOARD);
+		+ neighborCount(idx, Stone::OFFBOARD));
 }
 
 // Pass this the idx of the first group stone
