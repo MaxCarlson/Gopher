@@ -66,8 +66,7 @@ void SearchTree::printStatistics() const
 	Move move = { stats.bestIdx, baseColor };
 	auto xy = moveToXY(move);
 
-	//std::cout << moveToString(move) << " with " << stats.winRate << " winrate \n";
-
+	std::cerr << moveToString(move) << " with " << stats.winRate << " winrate \n";
 }
 
 void SearchTree::allocateChildren(UctNodeBase & node)
