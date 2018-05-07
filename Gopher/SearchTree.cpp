@@ -1,7 +1,16 @@
 #include "SearchTree.h"
 #include "Board.h"
 #include "Threads.h"
+#include <iomanip>
 
+inline void printNode(const UctNodeBase& it, int color)
+{
+	std::cout << moveToString({ it.idx, color })
+		<< " Visits: "   << std::setw(5) << it.visits << " | "
+		<< " Wins: "     << std::setw(5) << it.wins   << " | "
+		<< " Children: " << std::setw(3) << it.size   << " | "
+		<< " WinRate: "  << static_cast<double>(it.wins) / static_cast<double>(it.visits) << '\n';
+}
 
 bool UctNodeBase::isLeaf() const
 {
@@ -31,6 +40,8 @@ SearchStatistics SearchTree::getStatistics() const
 	// exponentially more than the worst
 	for (const auto& it : root.children->nodes)
 	{
+		//printNode(it, baseColor);
+
 		if (it.visits > bestVisits)
 		{
 			bestVisits = it.visits;
@@ -39,16 +50,15 @@ SearchStatistics SearchTree::getStatistics() const
 		++idx;
 	}
 
+	// Resign when we're winning less than this many games in play
 	static constexpr double ResignThreshold = 0.05;
 
 	const auto& bestNode = root.children->nodes[bestIdx];
 	bestIdx = bestNode.idx;
 
 	double winRate = static_cast<double>(bestNode.wins)
-		/ static_cast<double>(bestNode.visits);
+				   / static_cast<double>(bestNode.visits);
 
-	// Resign if the best move candidates winrate is less
-	// than ResignThreshold
 	if (winRate < ResignThreshold)
 		bestIdx = Resign;
 
