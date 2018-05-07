@@ -70,10 +70,21 @@ inline int xyToIdx(int x, int y)
 	return y * BoardRealSize + x;
 }
 
+inline std::vector<int> fillFlipY()
+{
+	std::vector<int> flips;
+
+	for (int i = BoardSize + 1; i > 0; --i)
+		flips.emplace_back(i);
+	return flips;
+}
+
 inline std::string moveToString(const Move& m)
 {
 	static const std::string pass = "Pass";
 	static const std::string resign = "Resign";
+
+	static const std::vector<int> flipY = fillFlipY();
 
 	std::stringstream ss;
 
@@ -88,7 +99,7 @@ inline std::string moveToString(const Move& m)
 		int y = m.idx / BoardRealSize;
 
 		ss << printStone(m.color) << " ";
-		ss << letters[x - 1] << " " << y;
+		ss << letters[x - 1] << " " << flipY[y];
 	}
 
 	return ss.str();

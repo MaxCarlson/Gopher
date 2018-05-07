@@ -28,7 +28,7 @@ coord Uct::search(const Board & board, int color)
 		Board bb = board;
 		playout(bb);
 
-		if (i % (playouts / 15) == 0)
+		if (i % (playouts / 15) == 0 && i != 0)
 			tree.printStatistics();
 	}
 
@@ -37,7 +37,6 @@ coord Uct::search(const Board & board, int color)
 	// TODO: Need to add in heuristic for when it is best to pass!!!
 	
 	tree.afterSearch();
-
 
 	return bestMove;
 }

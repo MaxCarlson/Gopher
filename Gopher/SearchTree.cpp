@@ -1,5 +1,6 @@
 #include "SearchTree.h"
 #include "Board.h"
+#include "Threads.h"
 
 
 bool UctNodeBase::isLeaf() const
@@ -19,15 +20,11 @@ void SearchTree::afterSearch()
 	writeOverBranch(root);
 }
 
-#include "Threads.h"
-
 SearchStatistics SearchTree::getStatistics() const
 {
 	int idx = 0;
 	coord bestIdx = 0;
 	int bestVisits = 0;
-
-	sync_out << "happy" << "last";
 
 	// The most searched move should be the best  
 	// move as UCT should be searching it 
@@ -69,7 +66,8 @@ void SearchTree::printStatistics() const
 	Move move = { stats.bestIdx, baseColor };
 	auto xy = moveToXY(move);
 
-	std::cout << moveToString(move) << " with " << stats.winRate << " winrate \n";
+	//std::cout << moveToString(move) << " with " << stats.winRate << " winrate \n";
+
 }
 
 void SearchTree::allocateChildren(UctNodeBase & node)

@@ -55,7 +55,7 @@ int gtpEndReply()
 void printId(int id, int status)
 {
 	if (status == GTP_OKAY)
-		gtpPrint("=");
+		gtpPrint("= ");
 	else
 		gtpPrint("?");
 	
@@ -132,7 +132,6 @@ void mainLoop()
 
 		if (id != 0)
 			is >> inputString;
-		
 			
 		auto findCommand = options.find(inputString);
 
@@ -279,7 +278,7 @@ int play(std::istringstream& is, int id)
 
 int generateMove(std::istringstream& is, int id)
 {
-	MonteCarlo monte{ board };
+	std::cout << "(IN: genmove b\n";
 
 	std::string colorStr;
 	is >> std::skipws >> colorStr;
@@ -301,6 +300,7 @@ int generateMove(std::istringstream& is, int id)
 
 	auto xy = gtpIdxToXY(idx);
 
+	std::cout << '\n';
 	return gtpSuccess(id, xy.first, xy.second);
 }
 

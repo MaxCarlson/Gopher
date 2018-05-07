@@ -35,4 +35,4 @@ enum SyncOut { OUT_LOCK, OUT_UNLOCK };
 std::ostream& operator<<(std::ostream&, SyncOut);
 
 #define sync_out  std::cout << OUT_LOCK
-#define sync_endl std::cout << OUT_UNLOCK << '\n';
+#define sync_endl std::endl << OUT_UNLOCK; // TODO: Figure out how to do this without endl 
