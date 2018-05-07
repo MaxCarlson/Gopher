@@ -70,26 +70,31 @@ inline int xyToIdx(int x, int y)
 	return y * BoardRealSize + x;
 }
 
+inline std::string moveToString(const Move& m)
+{
+	static const std::string pass = "Pass";
+	static const std::string resign = "Resign";
+
+	std::stringstream ss;
+
+	switch (m.idx)
+	{
+	case Resign:
+		return resign;
+	case Pass:
+		return pass;
+	default:
+		int x = m.idx % BoardRealSize;
+		int y = m.idx / BoardRealSize;
+
+		ss << printStone(m.color) << " ";
+		ss << letters[x - 1] << " " << y;
+	}
+
+	return ss.str();
+}
+
 inline void printMove(const Move& m)
 {
-	const std::string pass = "Pass";
-	const std::string resign = "Resign";
-	const auto printIdx = [&](int idx) {
-		switch (idx)
-		{
-		case Resign:
-			return resign;
-		case Pass:
-			return pass;
-		default:
-			int x = m.idx % BoardRealSize;
-			int y = m.idx / BoardRealSize;
-
-			std::stringstream ss;
-			ss << letters[x - 1] << " " << y;
-			return ss.str();
-		}
-	};
-
-	std::cout << "Move idx: " << printIdx(m.idx) << ", Color: " << printStone(m.color) << '\n';
+	std::cout << moveToString(m) << '\n';
 }

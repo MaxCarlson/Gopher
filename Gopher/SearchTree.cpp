@@ -19,11 +19,15 @@ void SearchTree::afterSearch()
 	writeOverBranch(root);
 }
 
-coord SearchTree::getBestMove() const
+#include "Threads.h"
+
+SearchStatistics SearchTree::getStatistics() const
 {
 	int idx = 0;
 	coord bestIdx = 0;
 	int bestVisits = 0;
+
+	sync_out << "happy" << "last";
 
 	// The most searched move should be the best  
 	// move as UCT should be searching it 
@@ -33,7 +37,7 @@ coord SearchTree::getBestMove() const
 		if (it.visits > bestVisits)
 		{
 			bestVisits = it.visits;
-			bestIdx = idx;	
+			bestIdx = idx;
 		}
 		++idx;
 	}
@@ -44,14 +48,28 @@ coord SearchTree::getBestMove() const
 	bestIdx = bestNode.idx;
 
 	double winRate = static_cast<double>(bestNode.wins)
-				   / static_cast<double>(bestNode.visits);
+		/ static_cast<double>(bestNode.visits);
 
 	// Resign if the best move candidates winrate is less
 	// than ResignThreshold
 	if (winRate < ResignThreshold)
 		bestIdx = Resign;
 
-	return bestIdx;
+	return { bestIdx, winRate };
+}
+
+coord SearchTree::getBestMove() const
+{
+	return getStatistics().bestIdx;
+}
+
+void SearchTree::printStatistics() const
+{
+	const auto stats = getStatistics();
+	Move move = { stats.bestIdx, baseColor };
+	auto xy = moveToXY(move);
+
+	std::cout << moveToString(move) << " with " << stats.winRate << " winrate \n";
 }
 
 void SearchTree::allocateChildren(UctNodeBase & node)

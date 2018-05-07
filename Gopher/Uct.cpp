@@ -23,14 +23,13 @@ coord Uct::search(const Board & board, int color)
 	// Best time would be during opponents move
 	tree.init(board, color);
 
-	int a = sizeof(UctNodeBase);
-
-//	timer(true);
-
 	for (int i = 0; i < playouts; ++i)
 	{
 		Board bb = board;
 		playout(bb);
+
+		if (i % (playouts / 15) == 0)
+			tree.printStatistics();
 	}
 
 	const coord bestMove = tree.getBestMove();
@@ -39,7 +38,6 @@ coord Uct::search(const Board & board, int color)
 	
 	tree.afterSearch();
 
-//	timer(false);
 
 	return bestMove;
 }

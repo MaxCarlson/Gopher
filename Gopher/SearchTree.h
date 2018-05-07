@@ -56,6 +56,12 @@ struct UctTreeNodes
 	}
 };
 
+struct SearchStatistics
+{
+	coord bestIdx;
+	double winRate;
+};
+
 class SearchTree
 {
 	void allocateChildren(UctNodeBase& node);
@@ -68,7 +74,9 @@ public:
 	void init(const Board& board, int color);
 	void afterSearch();
 
+	SearchStatistics getStatistics() const;
 	coord getBestMove() const;
+	void printStatistics() const;
 
 	void writeOverBranch(UctNodeBase& root);
 
