@@ -5,6 +5,12 @@
 #include <math.h>
 #include "Random.h"
 
+static constexpr int TOTAL_PLAYOUTS = 18000;
+
+// Expand a leaf node when it's been 
+// visited this # of times
+//static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
+
 static constexpr double EXPLORE_RATE = 5.0;
 
 inline bool isWin(int result, int toPlay, int currentColor)
@@ -17,18 +23,18 @@ inline bool isWin(int result, int toPlay, int currentColor)
 coord Uct::search(const Board & board, int color)
 {
 	toPlay = color;
-	static constexpr int playouts = 18000;
 
 	// TODO: Clear tree before search or after!
 	// Best time would be during opponents move
 	tree.init(board, color);
 
-	for (int i = 0; i < playouts; ++i)
+	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board bb = board;
+
 		playout(bb);
 
-		if (i % (playouts / 15) == 0 && i != 0)
+		if (i % (TOTAL_PLAYOUTS / 15) == 0 && i != 0)
 			tree.printStatistics();
 	}
 
@@ -77,8 +83,10 @@ void Uct::walkTree(Board & board, UctNodeBase& root, SmallVec<int, 100>& moves, 
 	}
 	color = flipColor(color);
 
-
 	++path->visits;
+
+	// TODO: Only expand nodes once some threshold of playouts has been reached!?
+	//if(++path->visits > EXPAND_FRACTION)
 	tree.expandNode(board, *path, color);
 
 	board.makeMove({ path->idx, color });
@@ -91,7 +99,7 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 	int idx = 0;
 	double best = std::numeric_limits<double>::min();
 
-	node.children->foreachChild(node.size, [&](UctNodeBase& n)
+	node.children->foreachChild(node.size, [&](const UctNodeBase& n)
 	{
 		double uct;
 

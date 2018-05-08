@@ -51,6 +51,7 @@ SearchStatistics SearchTree::getStatistics() const
 	}
 
 	// Resign when we're winning less than this many games in play
+	// TODO: Make this dynamic?
 	static constexpr double ResignThreshold = 0.05;
 
 	const auto& bestNode = root.children->nodes[bestIdx];
@@ -143,6 +144,7 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 		return;
 
 	UctNodeBase* node = &root;
+
 	node->wins += isWin;
 
 	// Loop through all nodes we moved through 
@@ -154,9 +156,12 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 	{
 		node = &node->children->nodes[it];
 		node->wins += isWin;
+
+		//++depth;
 	//	std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
 	}
 
+	//std::cout << "Max Depth Reached = " << depth << '\n';
 	//std::cout << '\n';
 }
 

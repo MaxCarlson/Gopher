@@ -121,6 +121,7 @@ struct Board
 	int captures[Stone::MAX];
 
 	// Info about squares (points) on the board
+	// TODO: Make this char?
 	int points[BoardMaxIdx];
 
 	FastList<coord, BoardMaxIdx> free;

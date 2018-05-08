@@ -25,7 +25,7 @@ struct UctNodeBase
 
 	UctTreeNodes* children = nullptr;
 
-	bool expanded() const { return visits; }
+	bool expanded() const { return size; }
 	bool isLeaf() const;
 };
 
