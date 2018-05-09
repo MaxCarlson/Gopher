@@ -7,11 +7,12 @@
 
 static constexpr int TOTAL_PLAYOUTS = 18000;
 
+static constexpr double UCT_K = 0.5;
+
+
 // TODO: ? Expand a leaf node when it's been 
 // visited this # of times
-// static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
-
-static constexpr double EXPLORE_RATE = 5.0;
+static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
 
 /*
 inline bool isWin(int result, int toPlay, int currentColor)
@@ -57,7 +58,7 @@ coord Uct::search(const Board & board, int color)
 void Uct::playout(Board & board)
 {
 	static constexpr double HopelessRatio = 25.0;
-	static constexpr int MaxGameLen = 400;
+	static constexpr int MaxGameLen = 200;
 
 	static SmallVec<int, 100> moves;
 	moves.clear();
@@ -67,15 +68,10 @@ void Uct::playout(Board & board)
 
 	walkTree(board, tree.root, moves, color);
 
-
-	const int result = Playouts::playRandomGame(board, color, MaxGameLen, HopelessRatio);
-	
+	const int result = Playouts::playRandomGame(board, color, MaxGameLen, HopelessRatio);	
 	const bool win = isWin(result);
 	
 	tree.recordSearchResults(moves, color, win);
-
-	//const bool isWin(result, toPlay, color);
-	//tree.recordSearchResults(moves, toPlay, win);
 }
 
 // Walk the tree from root using UCT
@@ -90,6 +86,7 @@ void Uct::walkTree(Board & board, UctNodeBase& root, SmallVec<int, 100>& moves, 
 		path = &chooseChild(*path, bestIdx);
 		// Record the index of the move, we'll use it later to walk
 		// the tree and record the results of this search
+		// TODO: Perhaps do these things both in the same function recursively?
 		moves.emplace_back(bestIdx);
 
 		color = flipColor(color);
@@ -120,7 +117,7 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 		else
 			uct = (static_cast<double>(c.wins)
 				/ static_cast<double>(c.visits))
-				+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * c.visits));
+				+ UCT_K * std::sqrt(std::log(node.visits) / c.visits);
 
 		if (uct > best)
 		{
