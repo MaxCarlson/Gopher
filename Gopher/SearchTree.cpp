@@ -19,7 +19,7 @@ bool UctNodeBase::isLeaf() const
 
 void SearchTree::init(const Board& board, int color) 
 {
-	baseColor = color;
+	rootColor = color;
 	expandNode(board, root, color);
 	++root.visits;
 }
@@ -74,7 +74,7 @@ coord SearchTree::getBestMove() const
 void SearchTree::printStatistics() const
 {
 	const auto stats = getStatistics();
-	Move move = { stats.bestIdx, baseColor };
+	Move move = { stats.bestIdx, rootColor };
 	auto xy = moveToXY(move);
 
 	std::cerr << moveToString(move) << " with " << stats.winRate << " winrate \n";
@@ -140,12 +140,17 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 
 void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool isWin)
 {
-	if (!isWin)
-		return;
+	//if (!isWin)
+	//	return;
+
+	if (color != rootColor)
+		isWin = !isWin;
 
 	UctNodeBase* node = &root;
 
 	node->wins += isWin;
+	//isWin = !isWin;
+
 
 	// Loop through all nodes we moved through 
 	// and score them relative to side to move
@@ -156,10 +161,14 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 	{
 		node = &node->children->nodes[it];
 		node->wins += isWin;
+		isWin = !isWin;
 
-		//++depth;
+		++depth;
 	//	std::cout << "NodeInfo: Depth-" << depth++ << " Visits-" << node->visits << " Wins-" << node->wins << '\n';
 	}
+
+	if (depth >= 2)
+		int a = 5;
 
 	//std::cout << "Max Depth Reached = " << depth << '\n';
 	//std::cout << '\n';

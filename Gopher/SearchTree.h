@@ -25,7 +25,7 @@ struct UctNodeBase
 
 	UctTreeNodes* children = nullptr;
 
-	bool expanded() const { return size; }
+	bool expanded() const { return size; } // TODO: This should not be used with size
 	bool isLeaf() const;
 };
 
@@ -68,7 +68,7 @@ class SearchTree
 
 public:
 
-	int baseColor;
+	int rootColor;
 	UctNodeBase root;
 
 	void init(const Board& board, int color);

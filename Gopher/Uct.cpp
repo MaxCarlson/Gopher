@@ -7,17 +7,24 @@
 
 static constexpr int TOTAL_PLAYOUTS = 18000;
 
-// Expand a leaf node when it's been 
+// TODO: ? Expand a leaf node when it's been 
 // visited this # of times
-//static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
+// static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
 
 static constexpr double EXPLORE_RATE = 5.0;
 
+/*
 inline bool isWin(int result, int toPlay, int currentColor)
 {
 	return (toPlay == currentColor)
 		? result > 0 
 		: result < 0;
+}
+*/
+
+inline bool isWin(int result)
+{
+	return result > 0;
 }
 
 coord Uct::search(const Board & board, int color)
@@ -62,12 +69,18 @@ void Uct::playout(Board & board)
 
 
 	const int result = Playouts::playRandomGame(board, color, MaxGameLen, HopelessRatio);
-	const bool win = isWin(result, toPlay, color);
+	
+	const bool win = isWin(result);
+	
+	tree.recordSearchResults(moves, color, win);
 
-	tree.recordSearchResults(moves, toPlay, win);
+	//const bool isWin(result, toPlay, color);
+	//tree.recordSearchResults(moves, toPlay, win);
 }
 
 // Walk the tree from root using UCT
+//
+// TODO: Possible only generate  a single child at a time each time the leaf node is visited!!
 void Uct::walkTree(Board & board, UctNodeBase& root, SmallVec<int, 100>& moves, int& color)
 {
 	UctNodeBase* path = &root;
@@ -85,8 +98,6 @@ void Uct::walkTree(Board & board, UctNodeBase& root, SmallVec<int, 100>& moves, 
 
 	++path->visits;
 
-	// TODO: Only expand nodes once some threshold of playouts has been reached!?
-	//if(++path->visits > EXPAND_FRACTION)
 	tree.expandNode(board, *path, color);
 
 	board.makeMove({ path->idx, color });
@@ -99,17 +110,17 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 	int idx = 0;
 	double best = std::numeric_limits<double>::min();
 
-	node.children->foreachChild(node.size, [&](const UctNodeBase& n)
+	node.children->foreachChild(node.size, [&](const UctNodeBase& c)
 	{
 		double uct;
 
 		// Give preference to unvisited nodes randomly
-		if (n.visits == 0) 
+		if (c.visits == 0) 
 			uct = 10000.0 + static_cast<double>(Random::fastRandom(10000));
 		else
-			uct = (static_cast<double>(n.wins)
-				/ static_cast<double>(n.visits))
-				+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * n.visits));
+			uct = (static_cast<double>(c.wins)
+				/ static_cast<double>(c.visits))
+				+ std::sqrt(std::log(node.visits) / (EXPLORE_RATE * c.visits));
 
 		if (uct > best)
 		{
