@@ -184,6 +184,8 @@ public:
 	groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
 	groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
 
+	const Group& groupInfoAt(const coord idx) const { return groups.groupInfoById(groupAt(idx)); }
+
 	int at(int idx) const { return points[idx]; }
 	int& at(int idx) { return points[idx]; }
 

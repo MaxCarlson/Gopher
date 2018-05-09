@@ -5,6 +5,7 @@
 constexpr int MAX_ROLL = 100;
 namespace TryValues
 {
+	int atari = 90;
 	int nakade = 80;
 };
 
@@ -46,6 +47,11 @@ bool tryHeuristics(Board & board, Move& ourMove)
 	if (isPass(board.lastMove))
 		return false;
 
+	// Atari check
+	if (TryValues::atari > Random::fastRandom(MAX_ROLL) 
+		&& atariCheck(board, ourMove, board.lastMove))
+		return true;
+
 	// Nakade check
 	if (TryValues::nakade > Random::fastRandom(MAX_ROLL)
 		&& board.immediateLibCount(board.lastMove.idx) > 0
@@ -55,6 +61,50 @@ bool tryHeuristics(Board & board, Move& ourMove)
 	}
 
 	return false;
+}
+
+bool atariCheck(const Board & board, Move & move, const Move & lastMove)
+{
+	// Check to see if opponent move put any 
+	// of our stones into atari
+	coord atariIdx = 0;
+	board.foreachNeighbor(lastMove.idx, [&](coord idx, int color)
+	{
+		if (color != move.color 
+			|| board.groupInfoAt(idx).libs > 1)
+			return;
+
+		atariIdx = idx;
+	});
+
+	if (!atariIdx)
+		return false;
+
+	board.printBoard();
+	printMove(lastMove);
+
+	groupId atariGid = board.groupAt(atariIdx);
+
+	// If so, play a saving move at random if possible
+	// TODO:
+	// Make this more descriminate
+	
+	bool savingMove = false;
+	board.foreachInGroup(atariGid, [&](coord idx) 
+	{
+		if (board.immediateLibCount(idx) > 0)
+			board.foreachNeighbor(idx, [&](coord nidx, int color)
+			{
+				// Pick a saving move that's not a suicide
+				if (color == Stone::NONE && board.immediateLibCount(nidx) > 0)
+				{
+					move.idx = nidx;
+					savingMove = true;
+				}
+			});
+	});
+
+	return savingMove;
 }
 
 bool nakadeCheck(const Board& board, Move &move, const Move& theirMove)

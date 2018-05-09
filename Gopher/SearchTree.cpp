@@ -158,6 +158,8 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 		isWin = !isWin;
 		//++depth;
 	}
+
 	//std::cout << "Max Depth Reached " << depth << '\n';
+
 }
 
