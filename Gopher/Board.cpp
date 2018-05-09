@@ -186,6 +186,7 @@ bool Board::isOnePointEye(coord idx, Stone color) const
 	return isEyeLike(idx, color) && !isFalseEyelike(idx, color);
 }
 
+// Doesn't prevent suicide moves
 bool Board::isValid(const Move & m) const
 {
 	if(points[m.idx] != Stone::NONE)
@@ -198,17 +199,13 @@ bool Board::isValid(const Move & m) const
 	if (ko == m)
 		return false;
 
-	return true;
-
-	// Is this an optimization? Why not allow non-eyelike - non ko
-	// moves if there's a group of points ready to be captured on the board (Atari)?
-	/*
-	foreach_neighbor(board, coord, {
-		group_t g = group_at(board, c);
-		groups_in_atari += (board_group_info(board, g).libs == 1);
+	int playingAtari = 0;
+	foreachNeighbor(m.idx, [&](coord idx, int color)
+	{
+		playingAtari += (groupInfoAt(idx).libs == 1);
 	});
-	return !!groups_in_atari;
-	*/
+
+	return playingAtari;
 }
 
 bool Board::isValidNoSuicide(const Move & m) const
@@ -223,12 +220,12 @@ bool Board::isValidNoSuicide(const Move & m) const
 	bool res = false;
 	foreachNeighbor(m.idx, [&](int idx, int color)
 	{
-		if (at(idx) == flipColor(m.color)
-			&& groups.groupInfoById(groupAt(idx)).libs == 1)
+		if (color == flipColor(m.color)
+			&& groupInfoAt(idx).libs == 1)
 			res = true;
 
-		else if (at(idx) == m.color
-			&& groups.groupInfoById(groupAt(idx)).libs > 1)
+		else if (color == m.color
+			&& groupInfoAt(idx).libs > 1)
 			res = true;
 	});
 

@@ -116,8 +116,8 @@ UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
 			uct = 10000.0 + static_cast<double>(Random::fastRandom(10000));
 		else
 			uct = (static_cast<double>(c.wins)
-				/ static_cast<double>(c.visits))
-				+ UCT_K * std::sqrt(std::log(node.visits) / c.visits);
+				/  static_cast<double>(c.visits))
+				+  UCT_K * std::sqrt(std::log(node.visits) / c.visits);
 
 		if (uct > best)
 		{

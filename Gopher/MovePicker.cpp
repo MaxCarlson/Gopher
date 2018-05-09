@@ -6,9 +6,9 @@
 constexpr int MAX_ROLL = 100;
 namespace TryValues
 {
-	int atari = 90;
+	int atari = 99;
 	int nakade = 80;
-	int capture = 50;
+	int capture = 70;
 };
 
 namespace MovePicker
