@@ -11,4 +11,5 @@ namespace MovePicker
 
 	bool atariCheck(const Board& board, Move &move, const Move& lastMove);
 	bool nakadeCheck(const Board& board, Move &move, const Move& theirMove);
+	bool captureCheck(const Board& board, Move &move, const Move& theirMove);
 }

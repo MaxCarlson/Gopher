@@ -52,7 +52,7 @@ SearchStatistics SearchTree::getStatistics() const
 
 	// Resign when we're winning less than this many games in play
 	// TODO: Make this dynamic?
-	static constexpr double ResignThreshold = 0.05;
+	static constexpr double ResignThreshold = 0.000005;
 
 	const auto& bestNode = root.children->nodes[bestIdx];
 	bestIdx = bestNode.idx;
