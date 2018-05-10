@@ -5,7 +5,7 @@
 
 #include <iomanip>
 
-inline void printNode(const UctNodeBase& it, int color)
+inline void printNode(const TreeNode& it, int color)
 {
 	std::cout << moveToString({ it.idx, color })
 		<< " Visits: "   << std::setw(5) << it.visits << " | "
@@ -14,7 +14,7 @@ inline void printNode(const UctNodeBase& it, int color)
 		<< " WinRate: "  << static_cast<double>(it.wins) / static_cast<double>(it.visits) << '\n';
 }
 
-bool UctNodeBase::isLeaf() const
+bool TreeNode::isLeaf() const
 {
 	return !children;
 }
@@ -82,12 +82,12 @@ void SearchTree::printStatistics() const
 	std::cerr << moveToString(move) << " with " << stats.winRate << " winrate \n";
 }
 
-void SearchTree::allocateChildren(UctNodeBase & node)
+void SearchTree::allocateChildren(TreeNode & node)
 {
 	node.children = new UctTreeNodes;
 }
 
-void deallocateNode(UctNodeBase& root)
+void deallocateNode(TreeNode& root)
 {
 	if (!root.children)
 		return;
@@ -105,19 +105,19 @@ void deallocateNode(UctNodeBase& root)
 //
 // Actually this might slow things down, lot's of work 
 // moving nodes down the tree
-void SearchTree::writeOverBranch(UctNodeBase& root)
+void SearchTree::writeOverBranch(TreeNode& root)
 {
 	root.visits = root.wins = root.idx = 0;
 	
 	if(root.children)
-		root.children->foreachChild(root.size, [&](UctNodeBase& n)
+		root.children->foreachChild(root.size, [&](TreeNode& n)
 		{
 			writeOverBranch(n);
 		});
 	root.size = 0;
 }
 
-void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
+void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 {
 	if (!board.free.size())
 		return;
@@ -142,10 +142,15 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 
 void SearchTree::recordSearchResults(const AmafMap& moves, int color, bool isWin)
 {
+	RAVE::updateTree(moves, &root, rootColor, color, isWin);
+	return;
+
+	/* TESTING ABOVE ^^^ */
+
 	if (color != rootColor)
 		isWin = !isWin;
 
-	UctNodeBase* node = &root;
+	TreeNode* node = &root;
 
 	node->wins += isWin;
 

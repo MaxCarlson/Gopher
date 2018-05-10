@@ -1,6 +1,7 @@
 #include "Playout.h"
 #include "Board.h"
 #include "MovePicker.h"
+#include "Amaf.h"
 
 namespace Playouts
 {
@@ -13,6 +14,8 @@ namespace Playouts
 		while (pass < 2 && --length > 0)
 		{
 			const Move m = MovePicker::pickMove(board, color);
+
+			amaf.addMove(m.idx);
 
 			if (isPass(m.idx))
 				++pass;

@@ -75,9 +75,9 @@ void Uct::playout(Board & board)
 // Walk the tree from root using UCT
 //
 // TODO: Possible only generate  a single child at a time each time the leaf node is visited!!
-void Uct::walkTree(Board & board, UctNodeBase& root, int& color)
+void Uct::walkTree(Board & board, TreeNode& root, int& color)
 {
-	UctNodeBase* path = &root;
+	TreeNode* path = &root;
 	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{
 		int bestIdx = 0;
@@ -101,12 +101,12 @@ void Uct::walkTree(Board & board, UctNodeBase& root, int& color)
 
 // Do not call this on a node with no children
 // winrate + sqrt( (ln(parent.visits) ) / (5*n.nodevisits) )
-UctNodeBase& Uct::chooseChild(UctNodeBase & node, int& bestIdx) const
+TreeNode& Uct::chooseChild(TreeNode & node, int& bestIdx) const
 {
 	int idx = 0;
 	double best = std::numeric_limits<double>::min();
 
-	node.children->foreachChild(node.size, [&](const UctNodeBase& c)
+	node.children->foreachChild(node.size, [&](const TreeNode& c)
 	{
 		double uct;
 

@@ -2,13 +2,15 @@
 #include "defines.h"
 #include "Containers\SmallVec.h"
 
+struct TreeNode;
+
 struct AmafMap
 {
 	SmallVec<coord, MAX_GAME_LENGTH> moves;
 
-	// Denotes where we start counting from,
-	// since moves holds the moves made during tree 
-	// traversal as well
+	// Denotes where we start counting from in some places,
+	// and where we stop in others since moves
+	// holds the move indices made during tree traversal as well
 	int root = 0;
 
 	void addMove(const coord idx)
@@ -28,4 +30,9 @@ struct AmafMap
 		moves.clear();
 	}
 };
+
+namespace RAVE
+{
+	void updateTree(const AmafMap& moves, TreeNode* root, int toMove, int color, bool isWin);
+}
 

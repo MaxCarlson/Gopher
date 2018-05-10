@@ -4,7 +4,7 @@
 
 struct Board;
 using coord = int;
-struct UctNodeBase;
+struct TreeNode;
 template<class T, int, class Alloc>
 class SmallVec;
 
@@ -20,10 +20,10 @@ private:
 	AmafMap amafMap;
 
 	void playout(Board& board);
-	void walkTree(Board& board, UctNodeBase& root, int& color);
+	void walkTree(Board& board, TreeNode& root, int& color);
 
 	// Find the best child of the node based on UCT's algo
-	UctNodeBase& chooseChild(UctNodeBase& node, int& bestIdx) const;
+	TreeNode& chooseChild(TreeNode& node, int& bestIdx) const;
 
 };
 

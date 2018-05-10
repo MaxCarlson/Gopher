@@ -10,14 +10,22 @@ using coord = int;
 struct UctTreeNodes;
 struct AmafMap;
 
-struct UctNodeBase
+struct Stat
 {
-	UctNodeBase() = default;
-	UctNodeBase(coord idx) : idx(idx) {}
+	int wins;
+	int visits;
+};
+
+struct TreeNode
+{
+	TreeNode() = default;
+	TreeNode(coord idx) : idx(idx) {}
 
 	int wins = 0;
 	int visits = 0;		// TODO: enable_if stuff based on MAX_VISITS possible to reduce size of this ?
 	coord idx;
+
+	Stat amaf;
 
 	// Keep track of how many children
 	// we actually have as the small vec in children
@@ -32,7 +40,7 @@ struct UctNodeBase
 
 struct UctTreeNodes
 {
-	SmallVec<UctNodeBase, AVG_CHILDREN> nodes;
+	SmallVec<TreeNode, AVG_CHILDREN> nodes;
 
 	template<class F>
 	void foreachChild(int size, F&& f)
@@ -65,12 +73,12 @@ struct SearchStatistics
 
 class SearchTree
 {
-	void allocateChildren(UctNodeBase& node);
+	void allocateChildren(TreeNode& node);
 
 public:
 
 	int rootColor;
-	UctNodeBase root;
+	TreeNode root;
 
 	void init(const Board& board, int color);
 	void afterSearch();
@@ -79,10 +87,10 @@ public:
 	coord getBestMove() const;
 	void printStatistics() const;
 
-	void writeOverBranch(UctNodeBase& root);
+	void writeOverBranch(TreeNode& root);
 
 
-	void expandNode(const Board& board, UctNodeBase& node, int color);
+	void expandNode(const Board& board, TreeNode& node, int color);
 
 	// Walk the tree from the root and record the results of the playout
 	// visits have already been incremeneted
