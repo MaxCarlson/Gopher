@@ -10,8 +10,12 @@ constexpr int BoardOffset = 2;
 constexpr int BoardMaxIdx = (BoardSize + BoardOffset) * (BoardSize + BoardOffset);
 constexpr int BoardMaxGroups = BoardSize * BoardSize * 2 / 3;
 
+constexpr int MAX_GAME_LENGTH = 400;
+
 // No letter I in go coordinates
 static const char* letters = { "ABCDEFGHJKLMNOPQRSTUVWXYZ" };
+
+using coord = int;
 
 // We need to reverse the y axis numbers
 // e.g. on a 19x19 board 1 becomes 19, 2 becomes 18

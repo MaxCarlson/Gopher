@@ -1,5 +1,6 @@
 #pragma once
 #include "SearchTree.h"
+#include "Amaf.h"
 
 struct Board;
 using coord = int;
@@ -16,9 +17,10 @@ public:
 private:
 	int toPlay;
 	SearchTree tree;
+	AmafMap amafMap;
 
 	void playout(Board& board);
-	void walkTree(Board& board, UctNodeBase& root, SmallVec<int, 100>& moves, int& color);
+	void walkTree(Board& board, UctNodeBase& root, int& color);
 
 	// Find the best child of the node based on UCT's algo
 	UctNodeBase& chooseChild(UctNodeBase& node, int& bestIdx) const;

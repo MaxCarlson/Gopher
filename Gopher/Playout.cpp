@@ -4,7 +4,7 @@
 
 namespace Playouts
 {
-	int playRandomGame(Board& board, int color, int length, double deathRatio)
+	int playRandomGame(Board& board, AmafMap& amaf, int color, int length, double deathRatio)
 	{
 		const int ourColor = color;
 		color = flipColor(color);

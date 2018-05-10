@@ -8,6 +8,7 @@ constexpr int AVG_CHILDREN = 1;
 
 using coord = int;
 struct UctTreeNodes;
+struct AmafMap;
 
 struct UctNodeBase
 {
@@ -85,7 +86,7 @@ public:
 
 	// Walk the tree from the root and record the results of the playout
 	// visits have already been incremeneted
-	void recordSearchResults(SmallVec<int, 100>& moves, int color, bool isWin);
+	void recordSearchResults(const AmafMap& moves, int color, bool isWin);
 };
 
 

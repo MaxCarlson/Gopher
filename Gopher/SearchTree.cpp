@@ -1,6 +1,8 @@
 #include "SearchTree.h"
 #include "Board.h"
 #include "Threads.h"
+#include "Amaf.h"
+
 #include <iomanip>
 
 inline void printNode(const UctNodeBase& it, int color)
@@ -138,7 +140,7 @@ void SearchTree::expandNode(const Board & board, UctNodeBase & node, int color)
 	});
 }
 
-void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool isWin)
+void SearchTree::recordSearchResults(const AmafMap& moves, int color, bool isWin)
 {
 	if (color != rootColor)
 		isWin = !isWin;
@@ -151,8 +153,10 @@ void SearchTree::recordSearchResults(SmallVec<int, 100>& moves, int color, bool 
 	// loop through all nodes we moved through 
 	// and score them relative to side to move
 	//int depth = 1;
-	for (const auto it : moves)
+	for(int i = 0; i < moves.root; ++i)
 	{
+		const auto it = moves.moves[i];
+
 		node = &node->children->nodes[it];
 		node->wins += isWin;
 		isWin = !isWin;

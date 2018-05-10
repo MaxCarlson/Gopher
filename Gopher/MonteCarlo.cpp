@@ -40,7 +40,8 @@ coord MonteCarlo::genMove(int color)
 		if (!isPass(m) && !boardCopy.groupAt(m.idx))
 			continue;
 		
-		const int result = Playouts::playRandomGame(boardCopy, color, MaxGameLen, HopelessRatio);
+		/* THIS IS NON FUNCTIONAL AS AMAF MAP NEEDS TO BE PASSED IN */
+		const int result = 0;//Playouts::playRandomGame(boardCopy, color, MaxGameLen, HopelessRatio);
 
 		if (result == 0)
 		{	// Superko, ignore this playout and try again

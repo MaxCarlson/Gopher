@@ -58,36 +58,35 @@ coord Uct::search(const Board & board, int color)
 void Uct::playout(Board & board)
 {
 	static constexpr double HopelessRatio = 25.0;
-	static constexpr int MaxGameLen = 200;
 
-	static SmallVec<int, 100> moves;
-	moves.clear();
+	amafMap.clear();
 
 	// Start walk from root
 	int color = toPlay;
 
-	walkTree(board, tree.root, moves, color);
+	walkTree(board, tree.root, color);
 
-	const int result = Playouts::playRandomGame(board, color, MaxGameLen, HopelessRatio);	
+	const int result = Playouts::playRandomGame(board, amafMap, color, MAX_GAME_LENGTH, HopelessRatio);	
 	const bool win = isWin(result);
 	
-	tree.recordSearchResults(moves, color, win);
+	tree.recordSearchResults(amafMap, color, win);
 }
 
 // Walk the tree from root using UCT
 //
 // TODO: Possible only generate  a single child at a time each time the leaf node is visited!!
-void Uct::walkTree(Board & board, UctNodeBase& root, SmallVec<int, 100>& moves, int& color)
+void Uct::walkTree(Board & board, UctNodeBase& root, int& color)
 {
 	UctNodeBase* path = &root;
 	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{
 		int bestIdx = 0;
 		path = &chooseChild(*path, bestIdx);
+
 		// Record the index of the move, we'll use it later to walk
 		// the tree and record the results of this search
 		// TODO: Perhaps do these things both in the same function recursively?
-		moves.emplace_back(bestIdx);
+		amafMap.addMoveInTree(bestIdx);
 
 		color = flipColor(color);
 	}
