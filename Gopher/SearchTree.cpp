@@ -131,13 +131,13 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 		allocateChildren(node);
 
 	int i = 0;
-	board.foreachFreePoint([&](coord idx)
+	board.foreachFreePoint([&](coord idx) // Likely optimization point
 	{
-		if (!board.isValidNoSuicide({ idx, color }))
+		if (!board.isValidNoSuicide({ idx, !color }))
 			return;
 
 		if (node.size >= node.children->nodes.size())
-			node.children->nodes.emplace_back(idx); // Likely optimization point
+			node.children->nodes.emplace_back(idx); 
 		else
 			node.children->nodes[i].idx = std::move(idx); // TODO: Customize a SmallVec like data structure
 		++i;

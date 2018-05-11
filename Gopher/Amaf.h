@@ -14,10 +14,10 @@ struct AmafMap
 		moves.emplace_back(idx);
 	}
 
-	void addMoveInTree(const coord idx)
+	void addMoveInTree(const coord moveIdx, const int arrayIdx)
 	{
-		moves.emplace_back(idx);
-		movesInTree.emplace_back(idx);
+		moves.emplace_back(moveIdx);
+		movesInTree.emplace_back(arrayIdx);
 	}
 
 	void clear()

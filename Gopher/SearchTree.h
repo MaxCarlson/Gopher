@@ -25,13 +25,12 @@ struct TreeNode
 
 	coord idx;
 
+	// Keep track of the actual size we hold,
+	// children likely has more total nodes than we have child nodes
+	int size = 0;
+
 	MoveStat amaf;
 	MoveStat uct;
-
-	// Keep track of how many children
-	// we actually have as the small vec in children
-	// likely has more spaces filled that we haven't deallocated
-	int size = 0; // TODO: Right now due to aligment this doesn't make a difference in size if it and idx are both shorts or not, revisit
 
 	UctTreeNodes* children = nullptr;
 

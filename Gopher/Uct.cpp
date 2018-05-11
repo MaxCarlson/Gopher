@@ -86,7 +86,7 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 		// Record the index of the move, we'll use it later to walk
 		// the tree and record the results of this search
 		// TODO: Perhaps do these things both in the same function recursively?
-		amafMap.addMoveInTree(bestIdx);
+		amafMap.addMoveInTree(path->idx, bestIdx);
 
 		color = flipColor(color);
 	}

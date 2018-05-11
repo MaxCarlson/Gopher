@@ -22,26 +22,22 @@ namespace RAVE
 		// So Pass as -1 isn't out of bounds
 		int* movesByIdx = &movesTmp[1];
 
-		// Add moves by index backwards so 
-		// newer moves overwrite older ones 
-		// TODO: Should i >= 0 be i >= moves.movesInTree.size() ?
+		// Add moves by index backwards so newer moves overwrite older ones. 
+		// Don't add moves that are in the search tree itself
 		for (int i = moves.moves.size() - 1; i >= 0; --i)
-			movesByIdx[moves.moves[i]] = i;
+			movesByIdx[moves.moves[i]] = i + moves.movesInTree.size();
 
+		
 		// Traverse down the tree from the root,
 		// updating node win statistics and AMAF values
 		++node->uct.visits;
 		node->uct.wins += isWin;
-
 		for (int mIdx = 0; mIdx < moves.movesInTree.size(); ++mIdx)
 		{
 			node = &node->children->nodes[moves.movesInTree[mIdx]];
 
-			// Update the nodes win statistics
+			// Update the nodes win and visited statistics
 			node->uct.wins += isWin;
-
-			// TODO: Why does this completely mess the engine up having this here?
-			// There's something seriously wrong somewhere!
 			++node->uct.visits;
 
 			// Update AMAF values
