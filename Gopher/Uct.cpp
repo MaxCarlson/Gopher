@@ -81,7 +81,6 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{
 		int bestIdx = 0;
-		//path = &chooseChild(*path, bestIdx);
 		path = &RAVE::chooseChild(amafMap, *path, bestIdx);
 
 		// Record the index of the move, we'll use it later to walk
@@ -93,42 +92,7 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 	}
 	color = flipColor(color);
 
-	++path->visits;
-
 	tree.expandNode(board, *path, color);
 
 	board.makeMove({ path->idx, color });
-}
-
-// Do not call this on a node with no children
-// winrate + sqrt( (ln(parent.visits) ) / (5*n.nodevisits) )
-TreeNode& Uct::chooseChild(TreeNode & node, int& bestIdx) const
-{
-	int idx = 0;
-	double best = std::numeric_limits<double>::min();
-
-	node.children->foreachChild(node.size, [&](const TreeNode& c)
-	{
-		double uct;
-
-		// Give preference to unvisited nodes randomly
-		if (c.visits == 0) 
-			uct = 10000.0 + static_cast<double>(Random::fastRandom(10000));
-		else
-			uct = (static_cast<double>(c.wins)
-				/  static_cast<double>(c.visits))
-				+  UCT_K * std::sqrt(std::log(node.visits) / c.visits);
-
-		if (uct > best)
-		{
-			bestIdx = idx;
-			best = uct;
-		}
-		++idx;
-	});
-
-	// Increment visit counts
-	++node.visits;
-
-	return node.children->nodes[bestIdx];
 }

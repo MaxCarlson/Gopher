@@ -10,10 +10,12 @@ using coord = int;
 struct UctTreeNodes;
 struct AmafMap;
 
-struct Stat
+struct MoveStat
 {
 	int wins = 0;
 	int visits = 0;
+
+	void clear() { wins = visits = 0; }
 };
 
 struct TreeNode
@@ -21,11 +23,10 @@ struct TreeNode
 	TreeNode() = default;
 	TreeNode(coord idx) : idx(idx) {}
 
-	int wins = 0;
-	int visits = 0;		// TODO: enable_if stuff based on MAX_VISITS possible to reduce size of this ?
 	coord idx;
 
-	Stat amaf;
+	MoveStat amaf;
+	MoveStat uct;
 
 	// Keep track of how many children
 	// we actually have as the small vec in children
@@ -36,6 +37,7 @@ struct TreeNode
 
 	bool expanded() const { return size; } // TODO: This should not be used with size
 	bool isLeaf() const;
+	void clearStats();
 };
 
 struct UctTreeNodes

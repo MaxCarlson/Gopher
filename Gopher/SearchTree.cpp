@@ -8,10 +8,10 @@
 inline void printNode(const TreeNode& it, int color)
 {
 	std::cout << moveToString({ it.idx, color })
-		<< " Visits: "   << std::setw(5) << it.visits << " | "
-		<< " Wins: "     << std::setw(5) << it.wins   << " | "
+		<< " Visits: "   << std::setw(5) << it.uct.visits << " | "
+		<< " Wins: "     << std::setw(5) << it.uct.wins   << " | "
 		<< " Children: " << std::setw(3) << it.size   << " | "
-		<< " WinRate: "  << static_cast<double>(it.wins) / static_cast<double>(it.visits) << '\n';
+		<< " WinRate: "  << static_cast<double>(it.uct.wins) / static_cast<double>(it.uct.visits) << '\n';
 }
 
 bool TreeNode::isLeaf() const
@@ -19,11 +19,16 @@ bool TreeNode::isLeaf() const
 	return !children;
 }
 
+void TreeNode::clearStats()
+{
+	uct.clear();
+	amaf.clear();
+}
+
 void SearchTree::init(const Board& board, int color) 
 {
 	rootColor = color;
 	expandNode(board, root, color);
-	++root.visits;
 }
 
 void SearchTree::afterSearch()
@@ -44,9 +49,9 @@ SearchStatistics SearchTree::getStatistics() const
 	{
 		//printNode(it, baseColor);
 
-		if (it.visits > bestVisits)
+		if (it.uct.visits > bestVisits)
 		{
-			bestVisits = it.visits;
+			bestVisits = it.uct.visits;
 			bestIdx = idx;
 		}
 		++idx;
@@ -59,8 +64,8 @@ SearchStatistics SearchTree::getStatistics() const
 	const auto& bestNode = root.children->nodes[bestIdx];
 	bestIdx = bestNode.idx;
 
-	double winRate = static_cast<double>(bestNode.wins)
-				   / static_cast<double>(bestNode.visits);
+	double winRate = static_cast<double>(bestNode.uct.wins)
+				   / static_cast<double>(bestNode.uct.visits);
 
 	if (winRate < ResignThreshold)
 		bestIdx = Resign;
@@ -107,7 +112,7 @@ void deallocateNode(TreeNode& root)
 // moving nodes down the tree
 void SearchTree::writeOverBranch(TreeNode& root)
 {
-	root.visits = root.wins = root.idx = 0;
+	root.clearStats();
 	
 	if(root.children)
 		root.children->foreachChild(root.size, [&](TreeNode& n)

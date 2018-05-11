@@ -30,12 +30,19 @@ namespace RAVE
 
 		// Traverse down the tree from the root,
 		// updating node win statistics and AMAF values
+		++node->uct.visits;
+		node->uct.wins += isWin;
+
 		for (int mIdx = 0; mIdx < moves.movesInTree.size(); ++mIdx)
 		{
 			node = &node->children->nodes[moves.movesInTree[mIdx]];
 
 			// Update the nodes win statistics
-			node->wins += isWin;
+			node->uct.wins += isWin;
+
+			// TODO: Why does this completely mess the engine up having this here?
+			// There's something seriously wrong somewhere!
+			++node->uct.visits;
 
 			// Update AMAF values
 			node->children->foreachChild(node->size, [&](TreeNode &child)
@@ -56,7 +63,7 @@ namespace RAVE
 				// overwrite moves closer to the root with older moves
 
 				++child.amaf.visits;
-				child.amaf.wins += isWin;
+				child.amaf.wins += !isWin;
 			});
 
 			isWin = !isWin;
@@ -66,9 +73,9 @@ namespace RAVE
 	static constexpr double RAVE_EQ = 3000.0;
 	static constexpr double UCT_EXPLORE = 0.5;
 
-	// AMAF playouts, AMAF value, Node playouts
 	// Idea is to start out using RAVE and as visits increase,
 	// start letting MonteCarlo UCT have a higher weight
+	// AMAF playouts, AMAF value, Node playouts
 	inline double getBeta(double amafP, double amafV, double uctP)
 	{
 		return amafP / (amafP + uctP + uctP * amafP / RAVE_EQ);
@@ -79,14 +86,14 @@ namespace RAVE
 		double val;
 
 		// TODO: These should be cached and updated in updateTree?
-		const double uct = static_cast<double>(child.wins) / static_cast<double>(child.visits);
+		const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);
 
 		if (child.amaf.visits)
 		{
 			// TODO: These should be cached and updated in updateTree?
 			const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
 
-			const double beta = getBeta(child.amaf.visits, amaf, child.visits);
+			const double beta = getBeta(child.amaf.visits, amaf, child.uct.visits);
 			val = (1.0 - beta) * uct + (beta * amaf);
 		}
 		else
@@ -105,15 +112,16 @@ namespace RAVE
 			double val;
 
 			// Give preference to unvisited nodes randomly
-			if (c.visits == 0)
+			if (c.uct.visits == 0)
 				val = 10000.0 + static_cast<double>(Random::fastRandom(10000));
 			else
 				val = uctRave(c) + UCT_EXPLORE 
-					* std::sqrt(std::log(node.visits) / c.visits);
-				/*
+					* std::sqrt(std::log(node.uct.visits) / c.uct.visits);
+
+				/* // Old straight UCT
 				uct = (static_cast<double>(c.wins)
 					/ static_cast<double>(c.visits))
-				+ UCT_K * std::sqrt(std::log(node.visits) / c.visits);
+				+ UCT_EXPLORE * std::sqrt(std::log(node.visits) / c.visits);
 				*/
 
 			if (val > best)
@@ -123,9 +131,6 @@ namespace RAVE
 			}
 			++idx;
 		});
-
-		// Increment visit counts
-		++node.visits;
 
 		return node.children->nodes[bestIdx];
 	}

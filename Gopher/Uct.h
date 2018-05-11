@@ -21,10 +21,6 @@ private:
 
 	void playout(Board& board);
 	void walkTree(Board& board, TreeNode& root, int& color);
-
-	// Find the best child of the node based on UCT's algo
-	TreeNode& chooseChild(TreeNode& node, int& bestIdx) const;
-
 };
 
 inline Uct uct;

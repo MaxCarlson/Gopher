@@ -8,13 +8,11 @@ namespace TryValues
 {
 	int atari = 99;
 	int nakade = 80;
-	int capture = 100;
+	int capture = 80;
 };
 
 namespace MovePicker
 {
-
-
 
 // Goes through a list of heuristics to find a possible move
 // if no heuristic hit we'll just generate a random one
@@ -33,7 +31,7 @@ Move pickMove(Board & board, int color)
 		board.makeMove(m);
 		return m;
 	}
-	
+
 	int rng = Random::fastRandom(board.free.size());
 	for (int i = rng; i < board.free.size(); ++i)
 		if (board.tryRandomMove(static_cast<Stone>(color), m.idx, i))
@@ -43,8 +41,10 @@ Move pickMove(Board & board, int color)
 		if (board.tryRandomMove(static_cast<Stone>(color), m.idx, i))
 			return m;
 
+	m = { Pass, color };
+	board.makeMoveGtp(m);
 
-	return { Pass, color };
+	return m;
 }
 
 bool tryHeuristics(Board & board, Move& ourMove)
