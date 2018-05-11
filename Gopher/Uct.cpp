@@ -81,7 +81,8 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{
 		int bestIdx = 0;
-		path = &chooseChild(*path, bestIdx);
+		//path = &chooseChild(*path, bestIdx);
+		path = &RAVE::chooseChild(amafMap, *path, bestIdx);
 
 		// Record the index of the move, we'll use it later to walk
 		// the tree and record the results of this search

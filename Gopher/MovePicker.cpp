@@ -8,7 +8,7 @@ namespace TryValues
 {
 	int atari = 99;
 	int nakade = 80;
-	int capture = 70;
+	int capture = 100;
 };
 
 namespace MovePicker
@@ -29,7 +29,10 @@ Move pickMove(Board & board, int color)
 	}
 
 	if (tryHeuristics(board, m))
+	{
+		board.makeMove(m);
 		return m;
+	}
 	
 	int rng = Random::fastRandom(board.free.size());
 	for (int i = rng; i < board.free.size(); ++i)

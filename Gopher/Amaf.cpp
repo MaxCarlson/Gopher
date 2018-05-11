@@ -71,34 +71,27 @@ namespace RAVE
 	// start letting MonteCarlo UCT have a higher weight
 	inline double getBeta(double amafP, double amafV, double uctP)
 	{
-		/*
-		if (r.playouts) {
-			 At the beginning, beta is at 1 and RAVE is used.
-			* At b->equiv_rate, beta is at 1/3 and gets steeper on. 
-			floating_t beta;
-			if (b->sylvain_rave) {
-				beta = r.playouts / (r.playouts + n.playouts + n.playouts * r.playouts / b->equiv_rave);
-		*/
-		if (amafP)
-			return amafP / (amafP + uctP + uctP * amafP / RAVE_EQ);
-		else
-			return amafV;
+		return amafP / (amafP + uctP + uctP * amafP / RAVE_EQ);
 	}
 
 	inline double uctRave(const TreeNode& child)
 	{
 		double val;
-		if(child.visits == 0)
-			val = 10000.0 + static_cast<double>(Random::fastRandom(10000));
-		else
+
+		// TODO: These should be cached and updated in updateTree?
+		const double uct = static_cast<double>(child.wins) / static_cast<double>(child.visits);
+
+		if (child.amaf.visits)
 		{
 			// TODO: These should be cached and updated in updateTree?
-			double uct = static_cast<double>(child.wins) / static_cast<double>(child.visits);
-			double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
+			const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
 
 			const double beta = getBeta(child.amaf.visits, amaf, child.visits);
-			val = (1 - beta) * uct + (beta * amaf);
+			val = (1.0 - beta) * uct + (beta * amaf);
 		}
+		else
+			val = uct;
+		
 		return val;
 	}
 
@@ -109,13 +102,13 @@ namespace RAVE
 
 		node.children->foreachChild(node.size, [&](const TreeNode& c)
 		{
-			double uct;
+			double val;
 
 			// Give preference to unvisited nodes randomly
 			if (c.visits == 0)
-				uct = 10000.0 + static_cast<double>(Random::fastRandom(10000));
+				val = 10000.0 + static_cast<double>(Random::fastRandom(10000));
 			else
-				uct = uctRave(c) + UCT_EXPLORE 
+				val = uctRave(c) + UCT_EXPLORE 
 					* std::sqrt(std::log(node.visits) / c.visits);
 				/*
 				uct = (static_cast<double>(c.wins)
@@ -123,10 +116,10 @@ namespace RAVE
 				+ UCT_K * std::sqrt(std::log(node.visits) / c.visits);
 				*/
 
-			if (uct > best)
+			if (val > best)
 			{
 				bestIdx = idx;
-				best = uct;
+				best = val;
 			}
 			++idx;
 		});
