@@ -12,8 +12,8 @@ struct AmafMap;
 
 struct Stat
 {
-	int wins;
-	int visits;
+	int wins = 0;
+	int visits = 0;
 };
 
 struct TreeNode

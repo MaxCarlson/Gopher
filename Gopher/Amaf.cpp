@@ -21,21 +21,21 @@ namespace RAVE
 		// So Pass as -1 isn't out of bounds
 		int* movesByIdx = &movesTmp[1];
 
-		// The moves from 0 - moves.root are actually the index
-		// of the moves within the vector of children. Don't look at them for AMAF
-		// TODO: Should this be changed?
-		for (int i = moves.root; i < moves.moves.size(); )
-			movesByIdx[moves.moves[i]] = ++i;
+		// Add moves by index backwards so 
+		// newer moves overwrite older ones 
+		// TODO: Should i >= 0 be i >= moves.movesInTree.size() ?
+		for (int i = moves.moves.size() - 1; i >= 0; --i)
+			movesByIdx[moves.moves[i]] = i;
 
-		int i = 0;
-		node->wins += isWin;
-		node = &node->children->nodes[moves.moves[i++]];
-
-		while (node)
+		// Traverse down the tree from the root,
+		// updating node win statistics and AMAF values
+		for (int mIdx = 0; mIdx < moves.movesInTree.size(); ++mIdx)
 		{
+			node = &node->children->nodes[moves.movesInTree[mIdx]];
+
 			// Update the nodes win statistics
 			node->wins += isWin;
-			
+
 			// Update AMAF values
 			node->children->foreachChild(node->size, [&](TreeNode &child)
 			{
@@ -46,7 +46,7 @@ namespace RAVE
 
 				// Don't use moves not played by this nodes color
 				// TODO: Make sure this matches up
-				const int dist = firstPlayed - i + 1;
+				const int dist = firstPlayed - mIdx;
 				if (dist & 1)
 					return;
 
@@ -59,11 +59,6 @@ namespace RAVE
 			});
 
 			isWin = !isWin;
-
-			if (node->isLeaf())
-				return;
-
-			node = &node->children->nodes[moves.moves[i++]];
 		}
 	}
 }

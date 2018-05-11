@@ -29,7 +29,9 @@ namespace Playouts
 		}
 
 		const double score = board.scoreFast();
-		const int result = ourColor == Stone::WHITE ? score * 2 : -(score * 2);
+		const int result = ourColor == Stone::WHITE 
+			? static_cast<int>( score * 2) 
+			: static_cast<int>(-score * 2);
 
 		//std::cout << "Random playout result for color " << printStone(ourColor) << " " << score << '\n';
 

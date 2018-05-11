@@ -7,11 +7,7 @@ struct TreeNode;
 struct AmafMap
 {
 	SmallVec<coord, MAX_GAME_LENGTH> moves;
-
-	// Denotes where we start counting from in some places,
-	// and where we stop in others since moves
-	// holds the move indices made during tree traversal as well
-	int root = 0;
+	SmallVec<int, 100> movesInTree;
 
 	void addMove(const coord idx)
 	{
@@ -21,13 +17,13 @@ struct AmafMap
 	void addMoveInTree(const coord idx)
 	{
 		moves.emplace_back(idx);
-		++root;
+		movesInTree.emplace_back(idx);
 	}
 
 	void clear()
 	{
-		root = 0;
 		moves.clear();
+		movesInTree.clear();
 	}
 };
 

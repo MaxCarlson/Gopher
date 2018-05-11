@@ -143,32 +143,5 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 void SearchTree::recordSearchResults(const AmafMap& moves, int color, bool isWin)
 {
 	RAVE::updateTree(moves, &root, rootColor, color, isWin);
-	return;
-
-	/* TESTING ABOVE ^^^ */
-
-	if (color != rootColor)
-		isWin = !isWin;
-
-	TreeNode* node = &root;
-
-	node->wins += isWin;
-
-	// Starting from root
-	// loop through all nodes we moved through 
-	// and score them relative to side to move
-	//int depth = 1;
-	for(int i = 0; i < moves.root; ++i)
-	{
-		const auto it = moves.moves[i];
-
-		node = &node->children->nodes[it];
-		node->wins += isWin;
-		isWin = !isWin;
-		//++depth;
-	}
-
-	//std::cout << "Max Depth Reached " << depth << '\n';
-
 }
 
