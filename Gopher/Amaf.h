@@ -30,5 +30,7 @@ struct AmafMap
 namespace RAVE
 {
 	void updateTree(const AmafMap& moves, TreeNode* root, int toMove, int color, bool isWin);
+
+	TreeNode& chooseChild(const AmafMap& moves, TreeNode& root, int& bestIdx);
 }
 
