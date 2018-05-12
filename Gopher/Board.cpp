@@ -111,18 +111,18 @@ double Board::scoreFast() const
 {
 	int scores[Stone::MAX] = { 0 };
 
-	foreachPoint([&](int idx, int type)
+	foreachPoint([&](int idx, int color)
 	{
-		if (type == Stone::NONE)
+		if (color == Stone::NONE)
 		{
 			if (isOnePointEye(idx, Stone::BLACK))
-				type = Stone::BLACK;
+				color = Stone::BLACK;
 			else if (isOnePointEye(idx, Stone::WHITE))
-				type = Stone::WHITE;
+				color = Stone::WHITE;
 			else
-				type = Stone::NONE;
+				color = Stone::NONE;
 		}	
-		++scores[type];
+		++scores[color];
 	});
 
 	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
@@ -170,9 +170,9 @@ bool Board::isFalseEyelike(coord idx, Stone color) const
 {
 	int numNeighbors[Stone::MAX] = { 0, 0, 0, 0 };
 
-	eachDiagonalNeighbor(idx, [&](int index, int id)
+	eachDiagonalNeighbor(idx, [&](int index, int color)
 	{
-		++numNeighbors[at(index)];
+		++numNeighbors[color];
 	});
 
 	// Do we have two enemy stones diagonally (or side of the board
