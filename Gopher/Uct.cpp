@@ -41,8 +41,8 @@ coord Uct::search(const Board & board, int color)
 
 		playout(bb);
 
-		if (i % (TOTAL_PLAYOUTS / 15) == 0 && i != 0)
-			tree.printStatistics();
+		if (i % (TOTAL_PLAYOUTS / 10) == 0 && i != 0)
+			tree.printBestLine();
 	}
 
 	const coord bestMove = tree.getBestMove();

@@ -79,7 +79,7 @@ inline std::vector<int> fillFlipY()
 	return flips;
 }
 
-inline std::string moveToString(const Move& m)
+inline std::string moveToString(const Move& m, bool color = false)
 {
 	static const std::string pass = "Pass";
 	static const std::string resign = "Resign";
@@ -98,11 +98,18 @@ inline std::string moveToString(const Move& m)
 		int x = m.idx % BoardRealSize;
 		int y = m.idx / BoardRealSize;
 
-		ss << printStone(m.color) << " ";
+		if(color)
+			ss << printStone(m.color) << " ";
+
 		ss << letters[x - 1] << flipY[y];
 	}
 
 	return ss.str();
+}
+
+inline std::string moveToString(coord idx)
+{
+	return moveToString({ idx, Stone::NONE });
 }
 
 inline void printMove(const Move& m)

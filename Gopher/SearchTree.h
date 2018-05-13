@@ -68,7 +68,8 @@ struct UctTreeNodes
 
 struct SearchStatistics
 {
-	coord bestIdx;
+	coord idx; // This is only here to easily represent Resign and pass
+	TreeNode *best;
 	double winRate;
 };
 
@@ -84,9 +85,9 @@ public:
 	void init(const Board& board, int color);
 	void afterSearch();
 
-	SearchStatistics getStatistics() const;
+	SearchStatistics getStatistics(const TreeNode& root) const;
 	coord getBestMove() const;
-	void printStatistics() const;
+	void printBestLine() const;
 
 	void writeOverBranch(TreeNode& root);
 

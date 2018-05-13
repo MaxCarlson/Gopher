@@ -2,7 +2,6 @@
 #include "Board.h"
 #include "Threads.h"
 #include "Amaf.h"
-
 #include <iomanip>
 
 inline void printNode(const TreeNode& it, int color)
@@ -36,15 +35,14 @@ void SearchTree::afterSearch()
 	writeOverBranch(root);
 }
 
-SearchStatistics SearchTree::getStatistics() const
+SearchStatistics SearchTree::getStatistics(const TreeNode& root) const
 {
-	coord bestIdx = Pass;
-	int bestVisits = 0;
-
 	// The most searched move should be the best  
 	// move as UCT should be searching it 
 	// exponentially more than the worst
 
+	int bestIdx = 0;
+	int bestVisits = 0;
 	for (int idx = 0; idx < root.size; ++idx)
 	{
 		auto& node = root.children->nodes[idx];
@@ -55,38 +53,59 @@ SearchStatistics SearchTree::getStatistics() const
 		}
 	}
 
-	// Resign when we're winning less than this % games in play
-	static constexpr double ResignThreshold = 0.0005;
-
-	double winRate = 0.0;
+	SearchStatistics s;
 
 	if (bestIdx != Pass)
 	{
-		const auto& bestNode = root.children->nodes[bestIdx];
-		bestIdx = bestNode.idx;
+		s.best = &root.children->nodes[bestIdx];
 
-		winRate = static_cast<double>(bestNode.uct.wins)
-			/ static_cast<double>(bestNode.uct.visits);
+		static constexpr double ResignThreshold = 0.0005;
 
-		if (winRate < ResignThreshold)
-			bestIdx = Resign;
+		s.winRate = static_cast<double>(s.best->uct.wins)
+				  / static_cast<double>(s.best->uct.visits);
+
+		if (s.winRate < ResignThreshold)
+			s.idx = Resign;
+		else
+			s.idx = s.best->idx;
+	}
+	else
+	{
+		s.idx = Pass;
+		s.winRate = 0.0; // TODO: This is misleading
+		s.best = nullptr;
 	}
 
-	return { bestIdx, winRate };
+	return s;
 }
 
 coord SearchTree::getBestMove() const
 {
-	return getStatistics().bestIdx;
+	return getStatistics(root).idx;
 }
 
-void SearchTree::printStatistics() const
+void SearchTree::printBestLine() const
 {
-	const auto stats = getStatistics();
-	Move move = { stats.bestIdx, rootColor };
-	auto xy = moveToXY(move);
+	auto* node = &root;
 
-	std::cerr << moveToString(move) << " with " << stats.winRate << " winrate \n";
+	bool first = true;
+	while (!node->isLeaf())
+	{
+		auto stats = getStatistics(*node);
+
+		if (!stats.best)
+			break;
+
+		if (first)
+			std::cerr << "seq: " << moveToString(stats.idx) << " " << std::setw(4) << std::fixed << std::setprecision(2) << stats.winRate * 100.0 << "% ";
+		else
+			std::cerr << moveToString(stats.idx) << " ";
+
+		node = stats.best;
+		first = false;
+	}
+
+	std::cerr << '\n';
 }
 
 void SearchTree::allocateChildren(TreeNode & node)
