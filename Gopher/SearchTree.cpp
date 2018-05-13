@@ -38,23 +38,21 @@ void SearchTree::afterSearch()
 
 SearchStatistics SearchTree::getStatistics() const
 {
-	int idx = 0;
-	coord bestIdx = 0;
+	coord bestIdx = Pass;
 	int bestVisits = 0;
 
 	// The most searched move should be the best  
 	// move as UCT should be searching it 
 	// exponentially more than the worst
-	for (const auto& it : root.children->nodes)
-	{
-		//printNode(it, baseColor);
 
-		if (it.uct.visits > bestVisits)
+	for (int idx = 0; idx < root.size; ++idx)
+	{
+		auto& node = root.children->nodes[idx];
+		if (node.uct.visits > bestVisits)
 		{
-			bestVisits = it.uct.visits;
+			bestVisits = node.uct.visits;
 			bestIdx = idx;
 		}
-		++idx;
 	}
 
 	// Resign when we're winning less than this many games in play

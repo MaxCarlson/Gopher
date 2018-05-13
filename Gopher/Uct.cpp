@@ -6,8 +6,7 @@
 #include "Random.h"
 
 static constexpr int TOTAL_PLAYOUTS = 18000;
-
-static constexpr double UCT_K = 0.5;
+//static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
 // TODO: ? Expand a leaf node when it's been 
@@ -95,6 +94,4 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 	color = flipColor(color);
 
 	tree.expandNode(board, *path, color);
-
-	//board.makeMove({ path->idx, color });
 }

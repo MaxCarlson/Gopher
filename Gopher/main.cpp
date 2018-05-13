@@ -3,6 +3,7 @@
 
 
 #include "Random.h"
+
 int main()
 {
 	Gtp::mainLoop();
