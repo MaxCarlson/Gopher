@@ -8,7 +8,7 @@ namespace TryValues
 {
 	int atari = 99;
 	int nakade = 80;
-	int capture = 80;
+	int capture = 40;
 };
 
 namespace MovePicker

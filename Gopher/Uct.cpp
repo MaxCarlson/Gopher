@@ -5,22 +5,13 @@
 #include <math.h>
 #include "Random.h"
 
-//static constexpr int TOTAL_PLAYOUTS = 18000;
-static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
+static constexpr int TOTAL_PLAYOUTS = 15000;
+//static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
 // TODO: ? Expand a leaf node when it's been 
 // visited this # of times
 static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
-
-/*
-inline bool isWin(int result, int toPlay, int currentColor)
-{
-	return (toPlay == currentColor)
-		? result > 0 
-		: result < 0;
-}
-*/
 
 inline bool isWin(int result)
 {
@@ -56,6 +47,8 @@ coord Uct::search(const Board & board, int color)
 
 void Uct::playout(Board & board)
 {
+	// TODO: This should be determined by board size since it's not really 
+	// a ratio, but rather the number of captures we can be behind before giving up
 	static constexpr double HopelessRatio = 25.0;
 
 	amafMap.clear();

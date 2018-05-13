@@ -85,7 +85,7 @@ public:
 	void init(const Board& board, int color);
 	void afterSearch();
 
-	SearchStatistics getStatistics(const TreeNode& root) const;
+	SearchStatistics getStatistics(const TreeNode& root, bool resignOnWinChance) const;
 	coord getBestMove() const;
 	void printBestLine() const;
 
@@ -93,6 +93,9 @@ public:
 
 
 	void expandNode(const Board& board, TreeNode& node, int color);
+
+	// Prune the tree of nodes that are no longer possible
+	void pruneTree(const Board & board, TreeNode& root, int color, bool isRoot = false);
 
 	// Walk the tree from the root and record the results of the playout
 	// visits have already been incremeneted

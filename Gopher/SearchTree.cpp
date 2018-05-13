@@ -35,7 +35,7 @@ void SearchTree::afterSearch()
 	writeOverBranch(root);
 }
 
-SearchStatistics SearchTree::getStatistics(const TreeNode& root) const
+SearchStatistics SearchTree::getStatistics(const TreeNode& root, bool resignOnWinChance) const
 {
 	// The most searched move should be the best  
 	// move as UCT should be searching it 
@@ -64,7 +64,7 @@ SearchStatistics SearchTree::getStatistics(const TreeNode& root) const
 		s.winRate = static_cast<double>(s.best->uct.wins)
 				  / static_cast<double>(s.best->uct.visits);
 
-		if (s.winRate < ResignThreshold)
+		if (s.winRate < ResignThreshold && resignOnWinChance)
 			s.idx = Resign;
 		else
 			s.idx = s.best->idx;
@@ -81,7 +81,7 @@ SearchStatistics SearchTree::getStatistics(const TreeNode& root) const
 
 coord SearchTree::getBestMove() const
 {
-	return getStatistics(root).idx;
+	return getStatistics(root, true).idx;
 }
 
 void SearchTree::printBestLine() const
@@ -91,15 +91,26 @@ void SearchTree::printBestLine() const
 	bool first = true;
 	while (!node->isLeaf())
 	{
-		auto stats = getStatistics(*node);
+		auto stats = getStatistics(*node, false);
 
 		if (!stats.best)
 			break;
 
 		if (first)
-			std::cerr << "seq: " << moveToString(stats.idx) << " " << std::setw(4) << std::fixed << std::setprecision(2) << stats.winRate * 100.0 << "% ";
+		{
+			std::cerr << "seq: " << moveToString(stats.idx) << " ";
+			if (stats.best->uct.visits < 20)
+				std::cerr << std::setw(5) << "< data " << std::setw(2) << " ";
+			else
+				std::cerr << std::setw(5) << std::fixed << std::setprecision(2) << stats.winRate * 100.0 << "%" << std::setw(3) << " ";
+		}
 		else
-			std::cerr << moveToString(stats.idx) << " ";
+		{
+			if (stats.best->uct.visits < 5  && stats.best->amaf.visits < 20)
+				std::cerr << std::setw(5) << "< data " << std::setw(2) << " ";
+			else
+				std::cerr << std::setw(5) << moveToString(stats.idx) << std::setw(5) << " ";
+		}
 
 		node = stats.best;
 		first = false;
@@ -164,6 +175,34 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 		++i;
 		++node.size;
 	});
+}
+
+void SearchTree::pruneTree(const Board & board, TreeNode& root, int color, bool isRoot)
+{
+	// TODO: Need to write a SmallVec<> v.shrink_to_fit();
+	int otherColor = flipColor(color);
+	
+	// Don't flip color when we're passed the root
+	// TODO: Root being the same color as the move from it should be changed everywhere?
+	if(isRoot)
+		otherColor = color;
+	
+	if (root.isLeaf())
+		return;
+
+	root.children->foreachChild(root.size, [&](TreeNode& child)
+	{
+
+		pruneTree(board, child, otherColor);
+
+		if (!board.isValidNoSuicide({ child.idx, color }))
+		{
+			//root.children->nodes.erase();
+		}
+	});
+
+	//if(erased)
+	//	root.children->nodes.shrink_to_fit();
 }
 
 void SearchTree::recordSearchResults(const AmafMap& moves, int color, bool isWin)
