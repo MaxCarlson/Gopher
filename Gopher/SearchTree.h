@@ -22,6 +22,7 @@ struct TreeNode
 {
 	TreeNode() = default;
 	TreeNode(coord idx) : idx(idx) {}
+	~TreeNode();
 
 	coord idx;
 
@@ -95,7 +96,7 @@ public:
 	void expandNode(const Board& board, TreeNode& node, int color);
 
 	// Prune the tree of nodes that are no longer possible
-	void pruneTree(const Board & board, TreeNode& root, int color, bool isRoot = false);
+	void pruneTree(TreeNode& root, int color, bool isRoot = false);
 
 	// Walk the tree from the root and record the results of the playout
 	// visits have already been incremeneted

@@ -13,6 +13,12 @@ inline void printNode(const TreeNode& it, int color)
 		<< " WinRate: "  << static_cast<double>(it.uct.wins) / static_cast<double>(it.uct.visits) << '\n';
 }
 
+TreeNode::~TreeNode()
+{
+	if (children)
+		delete children;
+}
+
 bool TreeNode::isLeaf() const
 {
 	return !children;
@@ -32,6 +38,7 @@ void SearchTree::init(const Board& board, int color)
 
 void SearchTree::afterSearch()
 {
+	pruneTree(root, rootColor, true);
 	writeOverBranch(root);
 }
 
@@ -177,9 +184,8 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 	});
 }
 
-void SearchTree::pruneTree(const Board & board, TreeNode& root, int color, bool isRoot)
+void SearchTree::pruneTree(TreeNode& root, int color, bool isRoot)
 {
-	// TODO: Need to write a SmallVec<> v.shrink_to_fit();
 	int otherColor = flipColor(color);
 	
 	// Don't flip color when we're passed the root
@@ -190,19 +196,30 @@ void SearchTree::pruneTree(const Board & board, TreeNode& root, int color, bool 
 	if (root.isLeaf())
 		return;
 
+	auto& children = root.children->nodes;
+
 	root.children->foreachChild(root.size, [&](TreeNode& child)
 	{
-
-		pruneTree(board, child, otherColor);
-
-		if (!board.isValidNoSuicide({ child.idx, color }))
-		{
-			//root.children->nodes.erase();
-		}
+		pruneTree(child, otherColor);
 	});
 
-	//if(erased)
-	//	root.children->nodes.shrink_to_fit();
+	// Prune all the spots for children that will no longer
+	// be filled
+	// TODO Test root.size + 1
+
+	if (root.size < children.size() - 1) // - 5 or - 10 ?
+	{
+		if (root.size)
+		{
+			children.erase(children.begin() + root.size, children.end());
+			children.shrink_to_fit();
+		}
+		else
+		{
+			delete root.children;
+			root.children = nullptr;
+		}
+	}
 }
 
 void SearchTree::recordSearchResults(const AmafMap& moves, int color, bool isWin)
