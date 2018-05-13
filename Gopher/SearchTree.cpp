@@ -55,18 +55,22 @@ SearchStatistics SearchTree::getStatistics() const
 		}
 	}
 
-	// Resign when we're winning less than this many games in play
-	// TODO: Make this dynamic?
-	static constexpr double ResignThreshold = 0.000005;
+	// Resign when we're winning less than this % games in play
+	static constexpr double ResignThreshold = 0.0005;
 
-	const auto& bestNode = root.children->nodes[bestIdx];
-	bestIdx = bestNode.idx;
+	double winRate = 0.0;
 
-	double winRate = static_cast<double>(bestNode.uct.wins)
-				   / static_cast<double>(bestNode.uct.visits);
+	if (bestIdx != Pass)
+	{
+		const auto& bestNode = root.children->nodes[bestIdx];
+		bestIdx = bestNode.idx;
 
-	if (winRate < ResignThreshold)
-		bestIdx = Resign;
+		winRate = static_cast<double>(bestNode.uct.wins)
+			/ static_cast<double>(bestNode.uct.visits);
+
+		if (winRate < ResignThreshold)
+			bestIdx = Resign;
+	}
 
 	return { bestIdx, winRate };
 }

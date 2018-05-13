@@ -5,8 +5,8 @@
 #include <math.h>
 #include "Random.h"
 
-static constexpr int TOTAL_PLAYOUTS = 18000;
-//static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
+//static constexpr int TOTAL_PLAYOUTS = 18000;
+static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
 // TODO: ? Expand a leaf node when it's been 
