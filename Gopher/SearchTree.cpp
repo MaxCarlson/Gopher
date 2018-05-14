@@ -11,12 +11,17 @@ inline void printNode(const TreeNode& it, int color)
 		<< " Wins: "     << std::setw(5) << it.uct.wins   << " | "
 		<< " Children: " << std::setw(3) << it.size   << " | "
 		<< " WinRate: "  << static_cast<double>(it.uct.wins) / static_cast<double>(it.uct.visits) << '\n';
+	// TODO: Add amaf stats
 }
 
 TreeNode::~TreeNode()
 {
 	if (children)
+	{
 		delete children;
+		children = nullptr;
+	}
+
 }
 
 bool TreeNode::isLeaf() const
@@ -38,7 +43,12 @@ void SearchTree::init(const Board& board, int color)
 
 void SearchTree::afterSearch()
 {
-	pruneTree(root, rootColor, true);
+	timer(true);
+	pruneTree(root);
+	std::cerr << "Tree pruned in ";
+	timer(false);
+	std::cerr << "s \n";
+
 	writeOverBranch(root);
 }
 
@@ -48,7 +58,7 @@ SearchStatistics SearchTree::getStatistics(const TreeNode& root, bool resignOnWi
 	// move as UCT should be searching it 
 	// exponentially more than the worst
 
-	int bestIdx = 0;
+	int bestIdx = Pass;
 	int bestVisits = 0;
 	for (int idx = 0; idx < root.size; ++idx)
 	{
@@ -131,24 +141,6 @@ void SearchTree::allocateChildren(TreeNode & node)
 	node.children = new UctTreeNodes;
 }
 
-void deallocateNode(TreeNode& root)
-{
-	if (!root.children)
-		return;
-	
-	for (auto& n : root.children->nodes)
-		deallocateNode(n);
-	
-	delete root.children;
-}
-
-// It seems prudent not to write over the branch we end 
-// up choosing (and the oponents reply) 
-// TODO: 
-// Integrate this idea
-//
-// Actually this might slow things down, lot's of work 
-// moving nodes down the tree
 void SearchTree::writeOverBranch(TreeNode& root)
 {
 	root.clearStats();
@@ -184,15 +176,88 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 	});
 }
 
-void SearchTree::pruneTree(TreeNode& root, int color, bool isRoot)
+int SearchTree::pruneTree(TreeNode& root)
 {
-	int otherColor = flipColor(color);
-	
-	// Don't flip color when we're passed the root
-	// TODO: Root being the same color as the move from it should be changed everywhere?
-	if(isRoot)
-		otherColor = color;
-	
+	static unsigned long long i = 0;
+	++i;
+
+	if (i == 2885743)
+		int a = 5;
+
+	if (root.isLeaf())
+		return false;
+
+	int toDelete = 0;
+	auto& children = root.children->nodes;
+
+	if (children.size() > root.size)
+		toDelete += children.size() - root.size;
+
+	root.children->foreachChild(root.size, [&](TreeNode& child)
+	{
+		if (pruneTree(child))		
+			++toDelete;
+	});
+
+	if (root.size == 0)
+	{
+		delete root.children;
+		root.children = nullptr;
+	}
+	else
+	{
+		children.erase(children.end() - toDelete, children.end());
+		root.size = children.size();
+	}
+
+	return !root.size;
+}
+
+
+/*
+int SearchTree::pruneTree(TreeNode& root)
+{
+	if (root.isLeaf())
+		return false;
+
+	auto& children = root.children->nodes;
+	static int i = 0;
+
+	int idx = 0;
+	root.children->foreachChild(root.size, [&](TreeNode& child)
+	{
+		if (pruneTree(child))
+		{
+			++i;
+			if (i == 9)
+				int a = 5;
+
+			children.erase(children.begin() + idx); // TODO: Change to fast_erase with small vec
+			--root.size;
+		}
+		++idx;
+	});
+
+	if (root.size < 1)
+	{
+		delete root.children;
+		root.children = nullptr;
+		return true;
+	}
+	else if (root.size < children.size() - 5 // TODO: Reexamine this
+		 || (root.size < 5 && root.size < children.size()))
+	{
+		children.erase(children.begin() + root.size, children.end());
+		children.shrink_to_fit();
+		root.size = children.size();
+	}
+
+	// Root of this node didn't lose a direct child
+	return false;
+}
+
+void SearchTree::pruneTree(TreeNode& root)
+{
 	if (root.isLeaf())
 		return;
 
@@ -200,27 +265,34 @@ void SearchTree::pruneTree(TreeNode& root, int color, bool isRoot)
 
 	root.children->foreachChild(root.size, [&](TreeNode& child)
 	{
-		pruneTree(child, otherColor);
+		pruneTree(child);
 	});
 
 	// Prune all the spots for children that will no longer
 	// be filled
-	// TODO Test root.size + 1
 
+	static int i = 0;
 	if (root.size < children.size() - 1) // - 5 or - 10 ?
 	{
 		if (root.size)
 		{
+			++i;
+			if (i == 101)
+				int a = 5;
+
 			children.erase(children.begin() + root.size, children.end());
 			children.shrink_to_fit();
+			root.size = children.size();
 		}
 		else
 		{
 			delete root.children;
 			root.children = nullptr;
+			root.size = 0;
 		}
 	}
 }
+*/
 
 void SearchTree::recordSearchResults(const AmafMap& moves, int color, bool isWin)
 {

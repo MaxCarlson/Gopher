@@ -40,12 +40,14 @@ struct TreeNode
 	void clearStats();
 };
 
+#include <vector>
 struct UctTreeNodes
 {
-	SmallVec<TreeNode, AVG_CHILDREN> nodes;
+	//SmallVec<TreeNode, AVG_CHILDREN> nodes;
+	std::vector<TreeNode> nodes;
 
 	template<class F>
-	void foreachChild(int size, F&& f)
+	void foreachChild(const int& size, F&& f)
 	{
 		for (int i = 0; i < size; ++i)
 			f(nodes[i]);
@@ -55,7 +57,7 @@ struct UctTreeNodes
 	// a llambda [&](UctNodeBase&, bool&)
 	// set stop to false to bool iterating
 	template<class F>
-	void foreachChildBreak(int size, F&& f)
+	void foreachChildBreak(const int& size, F&& f)
 	{
 		bool stop = false;
 		for (int i = 0; i < size; ++i)
@@ -96,7 +98,7 @@ public:
 	void expandNode(const Board& board, TreeNode& node, int color);
 
 	// Prune the tree of nodes that are no longer possible
-	void pruneTree(TreeNode& root, int color, bool isRoot = false);
+	int pruneTree(TreeNode& root);
 
 	// Walk the tree from the root and record the results of the playout
 	// visits have already been incremeneted
