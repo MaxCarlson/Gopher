@@ -201,13 +201,17 @@ int SearchTree::pruneTree(TreeNode& root)
 
 	if (root.size == 0)
 	{
-		delete root.children;
+		if(root.children)
+			delete root.children;
 		root.children = nullptr;
 	}
 	else
 	{
 		children.erase(children.end() - toDelete, children.end());
 		root.size = children.size();
+		
+		if (root.size < children.capacity() / 3)
+			children.shrink_to_fit();
 	}
 
 	return !root.size;
