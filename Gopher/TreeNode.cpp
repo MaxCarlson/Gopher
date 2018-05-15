@@ -33,7 +33,7 @@ void TreeNode::addChild(coord pos)
 	if (size >= children->nodes.size())
 		children->nodes.emplace_back(pos);
 	else
-		children->nodes[size].idx = std::move(pos);
+		children->nodes[size].idx = pos;
 	++size;
 }
 
@@ -57,6 +57,7 @@ void TreeNode::deallocateChildren()
 	deallocChildren(*this);
 }
 
+/*
 void TreeNode::deallocateRange(int first, int end)
 {
 	for (int i = first; i < end; ++i)
@@ -64,3 +65,4 @@ void TreeNode::deallocateRange(int first, int end)
 
 	size -= end - first;
 }
+*/

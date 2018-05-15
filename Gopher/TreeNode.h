@@ -37,7 +37,7 @@ struct TreeNode
 	void addChild(coord pos);
 
 	void deallocateChildren();
-	void deallocateRange(int first, int end);
+	//void deallocateRange(int first, int end);
 
 	template<class F>
 	void foreachChild(F&& f);

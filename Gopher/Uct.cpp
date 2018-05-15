@@ -5,8 +5,8 @@
 #include <math.h>
 #include "Random.h"
 
-//static constexpr int TOTAL_PLAYOUTS = 15000;
-static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
+static constexpr int TOTAL_PLAYOUTS = 15000;
+//static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
 // TODO: ? Expand a leaf node when it's been 
@@ -32,8 +32,8 @@ coord Uct::search(const Board & board, int color)
 
 		playout(bb);
 
-		//if (i % (TOTAL_PLAYOUTS / 10) == 0 && i != 0)
-			//tree.printBestLine();
+		if (i % (TOTAL_PLAYOUTS / 10) == 0 && i != 0)
+			tree.printBestLine();
 	}
 
 	const coord bestMove = tree.getBestMove();

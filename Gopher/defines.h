@@ -36,18 +36,18 @@ inline int gtpFlipY(int y)
 	return flipper[y];
 }
 
-// Just a simple timer for quick benchmarking
-inline void timer(bool startNow)
+namespace Time
 {
 	using namespace std::chrono;
 
-	static std::chrono::time_point<std::chrono::steady_clock> start;
-
-	if (startNow)
+	inline std::chrono::time_point<std::chrono::steady_clock> startTimer()
 	{
-		start = high_resolution_clock::now();
-		return;
+		return high_resolution_clock::now();
 	}
 
-	std::cout << duration_cast<duration<double>>(high_resolution_clock::now() - start).count() << "\n";
+	template<class TimeType>
+	inline decltype(auto) endTime(const std::chrono::time_point<std::chrono::steady_clock>& startTime)
+	{
+		return duration_cast<TimeType>(high_resolution_clock::now() - startTime).count();
+	}
 }

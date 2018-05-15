@@ -23,13 +23,11 @@ void SearchTree::init(const Board& board, int color)
 
 void SearchTree::afterSearch()
 {
-	timer(true); // TODO: Remove timer for printing
+	auto st = Time::startTimer();
 	pruneTree(root);
-	std::cerr << "Tree pruned in ";
-	timer(false);
-	std::cerr << "s \n";
-
 	writeOverBranch(root);
+
+	std::cerr << "Tree pruned in " << Time::endTime<std::chrono::duration<double>>(st) << "s \n";
 }
 
 SearchStatistics SearchTree::getStatistics(const TreeNode& root, bool resignOnWinChance) const
