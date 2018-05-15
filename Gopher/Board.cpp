@@ -14,28 +14,28 @@ void printPos(const int i)
 	switch (i)
 	{
 	case Stone::NONE:
-		std::cout << " .";
+		std::cerr << " .";
 		break;
 	case Stone::BLACK:
-		std::cout << " b";
+		std::cerr << " b";
 		break;
 	case Stone::WHITE:
-		std::cout << " w";
+		std::cerr << " w";
 		break;
 	case Stone::OFFBOARD:
-		std::cout << " X";
+		std::cerr << " X";
 		break;
 	default:
-		std::cout << "BoardIdxIssue!";
+		std::cerr << "BoardIdxIssue!";
 	}
 }
 
 void printRow(const Board& board, int row)
 {
-	std::cout << std::setw(2) << gtpFlipY(row) << "|";
+	std::cerr << std::setw(2) << gtpFlipY(row) << "|";
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printPos(board.at(getIdx(i, row)));
-	std::cout << " | \n";
+	std::cerr << " | \n";
 }
 
 void printBoardTop(int spaces)
@@ -43,21 +43,21 @@ void printBoardTop(int spaces)
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 	{
 		for (int j = 0; j < spaces; ++j)
-			std::cout << ' ';
+			std::cerr << ' ';
 
-		std::cout << letters[i - 1];
+		std::cerr << letters[i - 1];
 	}
-	std::cout << '\n';
+	std::cerr << '\n';
 }
 
 void Board::printBoard() const
 {
-	std::cout << "\n   ";
+	std::cerr << "\n   ";
 	printBoardTop(1);
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 		printRow(*this, i);
 	
-	std::cout << "\n";
+	std::cerr << "\n";
 }
 
 void printBoardAsGroups(const Board& board)
@@ -65,12 +65,12 @@ void printBoardAsGroups(const Board& board)
 	printBoardTop(3);
 	for (int i = 1; i < BoardRealSize - 1; ++i)
 	{
-		std::cout << i << "|";
+		std::cerr << i << "|";
 		for (int j = 1; j < BoardRealSize - 1; ++j)
-			std::cout << " " << std::setw(3) << std::left << board.groupAt(getIdx(j, i));
-		std::cout << " | \n";
+			std::cerr << " " << std::setw(3) << std::left << board.groupAt(getIdx(j, i));
+		std::cerr << " | \n";
 	}
-	std::cout << '\n';
+	std::cerr << '\n';
 }
 
 void Board::init()
@@ -429,7 +429,7 @@ int Board::groupCapture(groupId gid)
 	Group& g = groups.groupInfoById(gid);
 
 	if (g.libs != 0)
-		std::cout << "Non zero libs group caputure! " << g.libs << "\n";
+		std::cerr << "Non zero libs group caputure! " << g.libs << "\n";
 
 	std::memset(&g, 0, sizeof(Group));
 
@@ -554,9 +554,9 @@ bool Board::makeMove(const Move & m)
 {
 	if (at(m.idx) != Stone::NONE) // Remove when done debugging
 	{
-		std::cout << '\n';
+		std::cerr << '\n';
 		printBoard();
-		std::cout << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
+		std::cerr << "Attempting to land on a non-vacant spot!! " << m.idx << '\n';
 	}
 
 	//if (m.idx == BoardRealSize * 9 + 1) // C9 Debugging!
@@ -568,7 +568,7 @@ bool Board::makeMove(const Move & m)
 		if (groups.isGroupCaptured(group))
 		{
 			// TODO: Undo this and return false?
-			//std::cout << "Self Suicide! \n"; 
+			//std::cerr << "Self Suicide! \n"; 
 			groupCapture(group);
 		}
 		return true;

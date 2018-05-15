@@ -10,7 +10,7 @@
 #include <map>
 #include <array>
 
-std::array<std::string, 13> Commands =
+std::array<std::string, 14> Commands =
 {
 	"name",
 	"version",
@@ -22,6 +22,7 @@ std::array<std::string, 13> Commands =
 	"boardsize",
 	"clear_board",
 	"genmove",
+	"final_score",
 	"quit",
 	"print",
 	"play_self"
@@ -103,9 +104,10 @@ void buildCommandsMap(Map& options)
 	options.emplace(Commands[7], setBoardSize);
 	options.emplace(Commands[8], clearBoard);
 	options.emplace(Commands[9], generateMove);
-	options.emplace(Commands[10], quitGtp);
-	options.emplace(Commands[11], gtpPrintBoard);
-	options.emplace(Commands[12], playSelf);
+	options.emplace(Commands[10], finalScore);
+	options.emplace(Commands[11], quitGtp);
+	options.emplace(Commands[12], gtpPrintBoard);
+	options.emplace(Commands[13], playSelf);
 }
 
 void mainLoop()
@@ -140,7 +142,7 @@ void mainLoop()
 			gtpStatus = findCommand->second(is, id);
 		}
 		else
-			gtpFailure(id, "Uknown command! ", inputString);
+			gtpFailure(id, "Unknown command! ", inputString);
 
 		if (gtpStatus == GTP_FAIL)
 			gtpPanic();
@@ -317,6 +319,35 @@ int clearBoard(std::istringstream& is, int id)
 	return gtpSuccess(id, "");
 }
 
+int finalScore(std::istringstream& is, int id)
+{
+	int winner = Stone::WHITE;
+	// Score from whites perspective
+	double score = board.scoreReal();
+
+	if (score < 0.45)
+	{
+		score = -score;
+		winner = flipColor(winner);
+	}
+
+	std::stringstream ss;
+	ss << (winner == Stone::BLACK ? "B+" : "W+");
+
+	int intScore = std::floor(score);
+	double hp = score - static_cast<double>(intScore);
+
+	ss << intScore;
+
+	if (hp)
+		ss << ".5";
+
+	if (score == 0.0)
+		ss.str() = "0";
+
+	return gtpSuccess(id, ss.str());
+}
+
 int quitGtp(std::istringstream& is, int id)
 {
 	return gtpFailure(id, "Quitting");
@@ -324,9 +355,7 @@ int quitGtp(std::istringstream& is, int id)
 
 int gtpPrintBoard(std::istringstream& is, int id)
 {
-	std::cout << "\n # \n";
 	board.printBoard();
-	std::cout << "\n # \n";
 
 	return gtpSuccess(id);
 }
