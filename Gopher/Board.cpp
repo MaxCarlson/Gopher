@@ -130,23 +130,13 @@ double Board::scoreFast() const
 
 double Board::scoreReal() const // NOT DONE
 {
-	int ownedBy[BoardMaxIdx] = { 0 };
-
 	int scores[Stone::MAX] = { 0 };
 
-	// Add up current points
 	foreachPoint([&](int idx, int color)
 	{
-		ownedBy[idx] = color;
-	});
-	
-	foreachPoint([&](int idx, int color)
-	{
-		if (color == Stone::WHITE || color == Stone::BLACK)
-		{
-			++scores[color];
-		}
-		else if (color == Stone::NONE)
+		++scores[color];
+		
+		if (color == Stone::NONE)
 		{
 			int white = neighborCount(idx, Stone::WHITE);
 			int black = neighborCount(idx, Stone::BLACK);

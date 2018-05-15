@@ -264,11 +264,9 @@ int play(std::istringstream& is, int id)
 
 	Move m = { idx, color };
 
-	if (isPass(m))
-	{
-		// Check if we're ahead and pass if that's the case
-	}
 
+	if (isPass(m) || isResign(m))
+		;
 	else if (!board.isValid(m))
 		return gtpFailure(id, "invalid coordinates for move");
 
