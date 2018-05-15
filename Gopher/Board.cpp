@@ -128,32 +128,39 @@ double Board::scoreFast() const
 	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
 }
 
-double Board::scoreReal(const MoveStack &moves) const // NOT DONE
+double Board::scoreReal() const // NOT DONE
 {
 	int ownedBy[BoardMaxIdx] = { 0 };
 
 	int scores[Stone::MAX] = { 0 };
 
-	// Only look at Black and White
-	const int zeroOut[] = { 0, 1, 2, 0 };
-
 	// Add up current points
 	foreachPoint([&](int idx, int color)
 	{
-		ownedBy[idx] = zeroOut[color];
-		++scores[color];
+		ownedBy[idx] = color;
+	});
+	
+	foreachPoint([&](int idx, int color)
+	{
+		if (color == Stone::WHITE || color == Stone::BLACK)
+		{
+			++scores[color];
+		}
+		else if (color == Stone::NONE)
+		{
+			int white = neighborCount(idx, Stone::WHITE);
+			int black = neighborCount(idx, Stone::BLACK);
+
+			if (white > 0 && black == 0)
+				++scores[Stone::WHITE];
+			
+			else if (black > 0 && white == 0)
+				++scores[Stone::BLACK];
+		}
 	});
 
-	// Look at dead groups
-	for (int i = 0; i < moves.size(); ++i)
-	{
-		foreachInGroup(moves[i].idx, [&](groupId id)
-		{
-
-		});
-	}
-
-	return 0.0;
+	return komi + (captures[Stone::WHITE] + scores[Stone::WHITE]) 
+			    - (captures[Stone::BLACK] + scores[Stone::BLACK]);
 }
 
 int Board::neighborCount(coord idx, Stone color) const

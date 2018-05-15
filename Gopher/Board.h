@@ -143,7 +143,7 @@ public:
 	// Helper functions
 	void printBoard() const;
 	double scoreFast() const;
-	double scoreReal(const MoveStack &moves) const;
+	double scoreReal() const;
 
 	// Board state status functions
 	int neighborCount(coord idx, Stone color) const;

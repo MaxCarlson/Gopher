@@ -207,6 +207,12 @@ int setKomi(std::istringstream& is, int id)
 // Convert gtp coordinates to our index
 int getIdxFromGtp(const std::string& s)
 {
+	if (s == "Pass" || s == "pass")
+		return Pass;
+
+	else if (s == "Resign" || s == "resign")
+		return Resign;
+
 	char tx = (std::tolower(s[0])); 
 
 	// Fix any index at our greater than i
@@ -220,8 +226,6 @@ int getIdxFromGtp(const std::string& s)
 	std::stringstream ss;
 	for (int i = 1; i < s.size(); ++i)
 		ss << s[i];
-
-	// TODO: Need to flip y coord along BoardRealSize, ie 1 becomes 19, 18 becomes 2
 
 	int y = gtpFlipY( std::stoi(ss.str()));
 
@@ -255,14 +259,17 @@ int play(std::istringstream& is, int id)
 	is >> tmp;
 	Stone color = gtpWOrB(tmp);
 
-	// TODO: Add pass and resign
-
 	is >> tmp;
 	int idx = getIdxFromGtp(tmp);
 
 	Move m = { idx, color };
 
-	if (!board.isValid(m))
+	if (isPass(m))
+	{
+		// Check if we're ahead and pass if that's the case
+	}
+
+	else if (!board.isValid(m))
 		return gtpFailure(id, "invalid coordinates for move");
 
 	board.makeMoveGtp(m);
