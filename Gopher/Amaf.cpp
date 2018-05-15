@@ -128,6 +128,9 @@ namespace RAVE
 			++idx;
 		});
 
+		//if (bestIdx >= node.children->nodes.size() || bestIdx < 0 || bestIdx >= node.size)
+		//	int a = 5;
+
 		return node.children->nodes[bestIdx];
 	}
 }

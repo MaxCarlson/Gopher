@@ -32,8 +32,8 @@ coord Uct::search(const Board & board, int color)
 
 		playout(bb);
 
-		if (i % (TOTAL_PLAYOUTS / 10) == 0 && i != 0)
-			tree.printBestLine();
+		//if (i % (TOTAL_PLAYOUTS / 10) == 0 && i != 0)
+			//tree.printBestLine();
 	}
 
 	const coord bestMove = tree.getBestMove();
@@ -69,12 +69,6 @@ void Uct::playout(Board & board)
 // TODO: Possible only generate  a single child at a time each time the leaf node is visited!!
 void Uct::walkTree(Board & board, TreeNode& root, int& color)
 {
-	static unsigned long long ii;
-	++ii;
-
-	if (ii == 63800)
-		int a = 5;
-
 	TreeNode* path = &root;
 	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{

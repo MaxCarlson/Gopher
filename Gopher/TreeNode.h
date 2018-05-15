@@ -33,6 +33,11 @@ struct TreeNode
 	bool expanded() const { return size; } // TODO: This should not be used with size
 	bool isLeaf() const;
 	void clearStats();
+	void allocateChildren();
+	void addChild(coord pos);
+
+	void deallocateChildren();
+	void deallocateRange(int first, int end);
 
 	template<class F>
 	void foreachChild(F&& f);

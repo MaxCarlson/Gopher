@@ -116,31 +116,20 @@ void SearchTree::printBestLine() const
 	std::cerr << '\n';
 }
 
-void SearchTree::allocateChildren(TreeNode & node)
-{
-	node.children = new UctTreeNodes;
-}
-
 void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 {
 	if (!board.free.size())
 		return;
 
 	if (!node.children)
-		allocateChildren(node);
+		node.allocateChildren();
 
-	int i = 0;
 	board.foreachFreePoint([&](coord idx) 
 	{
 		if (!board.isValidNoSuicide({ idx, !color }))
 			return;
 
-		if (node.size >= node.children->nodes.size())
-			node.children->nodes.emplace_back(idx);
-		else
-			node.children->nodes[i].idx = std::move(idx); 
-		++i;
-		++node.size;
+		node.addChild(idx);
 	});
 }
 
@@ -156,26 +145,8 @@ void SearchTree::writeOverBranch(TreeNode& root)
 	root.size = 0;
 }
 
-void deallocChildren(TreeNode& root)
-{
-	if (root.children)
-	{
-		for (auto& c : root.children->nodes)
-			deallocChildren(c);
-		
-		root.children->nodes.clear();
-
-		delete root.children;
-		root.children = nullptr;
-	}
-	root.size = 0;
-}
-
 int SearchTree::pruneTree(TreeNode& root)
 {
-	static unsigned long long i = 0;
-	++i; // For debugging
-
 	if (root.isLeaf())
 		return false;
 
@@ -193,12 +164,13 @@ int SearchTree::pruneTree(TreeNode& root)
 
 	if (root.size - toDelete <= 0 || children.size() < 1)
 	{
-		deallocChildren(root);
+		root.deallocateChildren();
 	}
 	else
 	{
 		//children.erase(children.end() - toDelete, children.end());
 		//root.size = children.size();
+		//root.deallocateRange(children.size() - toDelete, children.size());
 		
 		//if (root.size < children.capacity() / 3)
 		//	children.shrink_to_fit();

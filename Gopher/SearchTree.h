@@ -16,8 +16,6 @@ struct SearchStatistics
 
 class SearchTree
 {
-	void allocateChildren(TreeNode& node);
-
 public:
 
 	int rootColor;
