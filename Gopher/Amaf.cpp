@@ -1,6 +1,6 @@
 #include "Amaf.h"
-#include "SearchTree.h"
 #include "Random.h"
+#include "TreeNode.h"
 #include <array>
 
 
@@ -41,7 +41,7 @@ namespace RAVE
 			++node->uct.visits;
 
 			// Update AMAF values
-			node->children->foreachChild(node->size, [&](TreeNode &child)
+			node->foreachChild([&](TreeNode &child)
 			{
 				const int firstPlayed = movesByIdx[child.idx];
 
@@ -103,7 +103,7 @@ namespace RAVE
 		int idx = 0;
 		double best = std::numeric_limits<double>::min();
 
-		node.children->foreachChild(node.size, [&](const TreeNode& c)
+		node.foreachChild([&](const TreeNode& c)
 		{
 			double val;
 

@@ -135,6 +135,7 @@
     <ClCompile Include="Playout.cpp" />
     <ClCompile Include="SearchTree.cpp" />
     <ClCompile Include="Threads.cpp" />
+    <ClCompile Include="TreeNode.cpp" />
     <ClCompile Include="Uct.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +151,7 @@
     <ClInclude Include="SearchTree.h" />
     <ClInclude Include="Stone.h" />
     <ClInclude Include="Threads.h" />
+    <ClInclude Include="TreeNode.h" />
     <ClInclude Include="Uct.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

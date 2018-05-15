@@ -5,8 +5,8 @@
 #include <math.h>
 #include "Random.h"
 
-static constexpr int TOTAL_PLAYOUTS = 15000;
-//static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
+//static constexpr int TOTAL_PLAYOUTS = 15000;
+static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
 // TODO: ? Expand a leaf node when it's been 
@@ -69,6 +69,12 @@ void Uct::playout(Board & board)
 // TODO: Possible only generate  a single child at a time each time the leaf node is visited!!
 void Uct::walkTree(Board & board, TreeNode& root, int& color)
 {
+	static unsigned long long ii;
+	++ii;
+
+	if (ii == 63800)
+		int a = 5;
+
 	TreeNode* path = &root;
 	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
 	{

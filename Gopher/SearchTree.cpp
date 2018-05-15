@@ -2,6 +2,7 @@
 #include "Board.h"
 #include "Threads.h"
 #include "Amaf.h"
+#include "TreeNode.h"
 #include <iomanip>
 
 inline void printNode(const TreeNode& it, int color)
@@ -14,27 +15,6 @@ inline void printNode(const TreeNode& it, int color)
 	// TODO: Add amaf stats
 }
 
-TreeNode::~TreeNode()
-{
-	if (children)
-	{
-		delete children;
-		children = nullptr;
-	}
-
-}
-
-bool TreeNode::isLeaf() const
-{
-	return !children;
-}
-
-void TreeNode::clearStats()
-{
-	uct.clear();
-	amaf.clear();
-}
-
 void SearchTree::init(const Board& board, int color) 
 {
 	rootColor = color;
@@ -43,7 +23,7 @@ void SearchTree::init(const Board& board, int color)
 
 void SearchTree::afterSearch()
 {
-	timer(true);
+	timer(true); // TODO: Remove timer for printing
 	pruneTree(root);
 	std::cerr << "Tree pruned in ";
 	timer(false);
@@ -141,18 +121,6 @@ void SearchTree::allocateChildren(TreeNode & node)
 	node.children = new UctTreeNodes;
 }
 
-void SearchTree::writeOverBranch(TreeNode& root)
-{
-	root.clearStats();
-	
-	if(root.children)
-		root.children->foreachChild(root.size, [&](TreeNode& n)
-		{
-			writeOverBranch(n);
-		});
-	root.size = 0;
-}
-
 void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 {
 	if (!board.free.size())
@@ -162,27 +130,51 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 		allocateChildren(node);
 
 	int i = 0;
-	board.foreachFreePoint([&](coord idx) // Likely optimization point
+	board.foreachFreePoint([&](coord idx) 
 	{
 		if (!board.isValidNoSuicide({ idx, !color }))
 			return;
 
 		if (node.size >= node.children->nodes.size())
-			node.children->nodes.emplace_back(idx); 
+			node.children->nodes.emplace_back(idx);
 		else
-			node.children->nodes[i].idx = std::move(idx); // TODO: Customize a SmallVec like data structure
+			node.children->nodes[i].idx = std::move(idx); 
 		++i;
 		++node.size;
 	});
 }
 
+void SearchTree::writeOverBranch(TreeNode& root)
+{
+	root.clearStats();
+	
+	if(root.children)
+		root.foreachChild([&](TreeNode& child)
+		{
+			writeOverBranch(child);
+		});
+	root.size = 0;
+}
+
+void deallocChildren(TreeNode& root)
+{
+	if (root.children)
+	{
+		for (auto& c : root.children->nodes)
+			deallocChildren(c);
+		
+		root.children->nodes.clear();
+
+		delete root.children;
+		root.children = nullptr;
+	}
+	root.size = 0;
+}
+
 int SearchTree::pruneTree(TreeNode& root)
 {
 	static unsigned long long i = 0;
-	++i;
-
-	if (i == 2885743)
-		int a = 5;
+	++i; // For debugging
 
 	if (root.isLeaf())
 		return false;
@@ -193,25 +185,23 @@ int SearchTree::pruneTree(TreeNode& root)
 	if (children.size() > root.size)
 		toDelete += children.size() - root.size;
 
-	root.children->foreachChild(root.size, [&](TreeNode& child)
+	root.foreachChild([&](TreeNode& child)
 	{
 		if (pruneTree(child))		
 			++toDelete;
 	});
 
-	if (root.size == 0)
+	if (root.size - toDelete <= 0 || children.size() < 1)
 	{
-		if(root.children)
-			delete root.children;
-		root.children = nullptr;
+		deallocChildren(root);
 	}
 	else
 	{
-		children.erase(children.end() - toDelete, children.end());
-		root.size = children.size();
+		//children.erase(children.end() - toDelete, children.end());
+		//root.size = children.size();
 		
-		if (root.size < children.capacity() / 3)
-			children.shrink_to_fit();
+		//if (root.size < children.capacity() / 3)
+		//	children.shrink_to_fit();
 	}
 
 	return !root.size;

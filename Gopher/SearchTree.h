@@ -1,73 +1,11 @@
 #pragma once
-#include <Containers\SmallVec.h>
-
+#include "TreeNode.h"
 struct Board;
-
 
 constexpr int AVG_CHILDREN = 1;
 
 using coord = int;
-struct UctTreeNodes;
 struct AmafMap;
-
-struct MoveStat
-{
-	int wins = 0;
-	int visits = 0;
-
-	void clear() { wins = visits = 0; }
-};
-
-struct TreeNode
-{
-	TreeNode() = default;
-	TreeNode(coord idx) : idx(idx) {}
-	~TreeNode();
-
-	coord idx;
-
-	// Keep track of the actual size we hold,
-	// children likely has more total nodes than we have child nodes
-	int size = 0;
-
-	MoveStat amaf;
-	MoveStat uct;
-
-	UctTreeNodes* children = nullptr;
-
-	bool expanded() const { return size; } // TODO: This should not be used with size
-	bool isLeaf() const;
-	void clearStats();
-};
-
-#include <vector>
-struct UctTreeNodes
-{
-	//SmallVec<TreeNode, AVG_CHILDREN> nodes;
-	std::vector<TreeNode> nodes;
-
-	template<class F>
-	void foreachChild(const int& size, F&& f)
-	{
-		for (int i = 0; i < size; ++i)
-			f(nodes[i]);
-	}
-
-	// Takes a size to iterate through
-	// a llambda [&](UctNodeBase&, bool&)
-	// set stop to false to bool iterating
-	template<class F>
-	void foreachChildBreak(const int& size, F&& f)
-	{
-		bool stop = false;
-		for (int i = 0; i < size; ++i)
-		{
-			f(nodes[i], stop);
-			if (stop)
-				return;
-		}
-	}
-};
 
 struct SearchStatistics
 {
@@ -92,12 +30,11 @@ public:
 	coord getBestMove() const;
 	void printBestLine() const;
 
-	void writeOverBranch(TreeNode& root);
-
-
 	void expandNode(const Board& board, TreeNode& node, int color);
 
-	// Prune the tree of nodes that are no longer possible
+
+	void writeOverBranch(TreeNode& root);
+	// Prune the tree of nodes that are no longer needed
 	int pruneTree(TreeNode& root);
 
 	// Walk the tree from the root and record the results of the playout
