@@ -122,6 +122,8 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 	if (!node.children)
 		node.allocateChildren();
 
+	// TODO: Add in Grandfather heuristic (Setting stats to that of the same node up the tree n - 2)
+
 	board.foreachFreePoint([&](coord idx) 
 	{
 		if (!board.isValidNoSuicide({ idx, !color }))
@@ -162,6 +164,8 @@ int SearchTree::pruneTree(TreeNode& root)
 
 	if (root.size - toDelete <= 0 || children.size() < 1)
 	{
+		// TODO: Look into how many extra allocations this causes
+		// TODO: Custom allocator to preallocate tree memory
 		root.deallocateChildren();
 	}
 	else

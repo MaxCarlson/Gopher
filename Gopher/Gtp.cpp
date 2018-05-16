@@ -323,6 +323,7 @@ int finalScore(std::istringstream& is, int id)
 {
 	int winner = Stone::WHITE;
 	// Score from whites perspective
+	// TODO: Probably need to try and find dead groups!?
 	double score = board.scoreReal();
 
 	if (score < 0.45)
