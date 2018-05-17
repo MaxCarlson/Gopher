@@ -35,9 +35,6 @@ namespace RAVE
 		
 		// Traverse down the tree from the root,
 		// updating node win statistics and AMAF values
-		//++node->uct.visits;
-		//node->uct.wins += isWin;
-
 		node->uct.addData(1, isWin);
 
 		for (int mIdx = 0; mIdx < moves.movesInTree.size(); ++mIdx)
@@ -45,8 +42,6 @@ namespace RAVE
 			node = &node->children->nodes[moves.movesInTree[mIdx]];
 
 			// Update the nodes win and visited statistics
-			//node->uct.wins += isWin;
-			//++node->uct.visits;
 			node->uct.addData(1, isWin);
 
 			// Update AMAF values
@@ -58,28 +53,23 @@ namespace RAVE
 					return;
 
 				// Don't use moves not played by this nodes color
-				// TODO: Make sure this matches up
 				const int dist = firstPlayed - (mIdx + 1);
 				if (dist & 1)
 					return;
 
-				// TODO: Later moves are worth less
-
-				//++child.amaf.visits;
-				//child.amaf.wins += !isWin;
-
+				// Earlier moves are worth more
 				static constexpr double RAVE_DIST = 3.0;
 				const int weight = 1 + (RAVE_DIST * (gameLength - firstPlayed) / (gameLength - mIdx));
 
-				child.amaf.addData(weight, !isWin);
+				child.amaf.addData(weight, !isWin * weight);
 			});
 
 			isWin = !isWin;
 		}
 	}
 
-	static constexpr double RAVE_EQ = 3000.0; 
-	static constexpr double UCT_EXPLORE = 0.5; 
+	static constexpr double RAVE_EQ = 2000.0; 
+	static constexpr double UCT_EXPLORE = 0.35; 
 
 	// Idea is to start out using RAVE and as visits increase,
 	// start letting MonteCarlo UCT have a higher weight

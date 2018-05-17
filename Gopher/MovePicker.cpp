@@ -64,6 +64,7 @@ bool tryHeuristics(Board & board, Move& ourMove)
 		return true;
 	
 	// Check board for capturable enemies
+	// TODO: This is Super slow
 	if (TryValues::capture > Random::fastRandom(MAX_ROLL)
 		&& captureCheck(board, ourMove, board.lastMove))
 		return true;

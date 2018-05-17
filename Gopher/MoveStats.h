@@ -14,9 +14,9 @@ struct MoveStat
 
 	void addData(const int playouts, const int wins)
 	{
-		const int preWins = static_cast<int>(winrate * visits);
+		const int previousWins = static_cast<int>(winrate * visits);
 
 		visits += playouts;
-		winrate = static_cast<double>(preWins + wins) / static_cast<double>(visits);
+		winrate = static_cast<double>(previousWins + wins) / static_cast<double>(visits);
 	}
 };

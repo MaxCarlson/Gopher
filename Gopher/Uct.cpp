@@ -9,9 +9,9 @@ static constexpr int TOTAL_PLAYOUTS = 15000;
 //static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
-// TODO: ? Expand a leaf node when it's been 
+// Expand a leaf node when it's been 
 // visited this # of times
-static constexpr int EXPAND_FRACTION = TOTAL_PLAYOUTS / 200;
+static constexpr int EXPAND_AT = 5;
 
 inline bool isWin(int result)
 {
@@ -89,5 +89,7 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 
 	// TODO: Only expand leaf nodes after n visits
 	// Wil require additional checs when traversing tree
-	tree.expandNode(board, *path, color);
+
+	if(path->uct.visits >= EXPAND_AT)
+		tree.expandNode(board, *path, color);
 }
