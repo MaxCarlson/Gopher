@@ -8,6 +8,9 @@ namespace RAVE
 {
 	void updateTree(const AmafMap & moves, TreeNode * node, int toMove, int color, bool isWin)
 	{
+		if (!moves.movesInTree.size())
+			return;
+
 		if (toMove != color)
 			isWin = !isWin;
 
@@ -24,7 +27,7 @@ namespace RAVE
 
 		// Add moves by index backwards so newer moves overwrite older ones. 
 		// Don't add moves that are in the search tree itself
-		for (int i = moves.moves.size() - 1; i >= 0; --i)
+		for (int i = moves.moves.size() - 1; i >= moves.movesInTree.size(); --i)
 			movesByIdx[moves.moves[i]] = i + moves.movesInTree.size();
 
 		
@@ -56,7 +59,6 @@ namespace RAVE
 
 				// TODO: Later moves are worth less
 				// TODO: Make sure amafMap during playout doesn't 
-				// overwrite moves closer to the root with older moves
 
 				++child.amaf.visits;
 				child.amaf.wins += !isWin;
@@ -128,9 +130,6 @@ namespace RAVE
 			}
 			++idx;
 		});
-
-		//if (bestIdx >= node.children->nodes.size() || bestIdx < 0 || bestIdx >= node.size)
-		//	int a = 5;
 
 		return node.children->nodes[bestIdx];
 	}

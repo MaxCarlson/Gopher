@@ -6,8 +6,8 @@ struct TreeNode;
 
 struct AmafMap
 {
-	SmallVec<coord, MAX_GAME_LENGTH> moves;
 	SmallVec<int, 100> movesInTree;
+	SmallVec<coord, MAX_GAME_LENGTH> moves;
 
 	void addMove(const coord idx)
 	{
