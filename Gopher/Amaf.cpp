@@ -25,23 +25,29 @@ namespace RAVE
 		// So Pass as -1 isn't out of bounds
 		int* movesByIdx = &movesTmp[1];
 
+		const int gameLength = moves.moves.size();
+
 		// Add moves by index backwards so newer moves overwrite older ones. 
 		// Don't add moves that are in the search tree itself
-		for (int i = moves.moves.size() - 1; i >= moves.movesInTree.size(); --i)
-			movesByIdx[moves.moves[i]] = i + moves.movesInTree.size();
+		for (int i = gameLength - 1; i >= moves.movesInTree.size(); --i)
+			movesByIdx[moves.moves[i]] = i;
 
 		
 		// Traverse down the tree from the root,
 		// updating node win statistics and AMAF values
-		++node->uct.visits;
-		node->uct.wins += isWin;
+		//++node->uct.visits;
+		//node->uct.wins += isWin;
+
+		node->uct.addData(1, isWin);
+
 		for (int mIdx = 0; mIdx < moves.movesInTree.size(); ++mIdx)
 		{
 			node = &node->children->nodes[moves.movesInTree[mIdx]];
 
 			// Update the nodes win and visited statistics
-			node->uct.wins += isWin;
-			++node->uct.visits;
+			//node->uct.wins += isWin;
+			//++node->uct.visits;
+			node->uct.addData(1, isWin);
 
 			// Update AMAF values
 			node->foreachChild([&](TreeNode &child)
@@ -53,23 +59,27 @@ namespace RAVE
 
 				// Don't use moves not played by this nodes color
 				// TODO: Make sure this matches up
-				const int dist = firstPlayed - mIdx;
+				const int dist = firstPlayed - (mIdx + 1);
 				if (dist & 1)
 					return;
 
 				// TODO: Later moves are worth less
-				// TODO: Make sure amafMap during playout doesn't 
 
-				++child.amaf.visits;
-				child.amaf.wins += !isWin;
+				//++child.amaf.visits;
+				//child.amaf.wins += !isWin;
+
+				static constexpr double RAVE_DIST = 3.0;
+				const int weight = 1 + (RAVE_DIST * (gameLength - firstPlayed) / (gameLength - mIdx));
+
+				child.amaf.addData(weight, !isWin);
 			});
 
 			isWin = !isWin;
 		}
 	}
 
-	static constexpr double RAVE_EQ = 3000.0;
-	static constexpr double UCT_EXPLORE = 0.5;
+	static constexpr double RAVE_EQ = 3000.0; 
+	static constexpr double UCT_EXPLORE = 0.5; 
 
 	// Idea is to start out using RAVE and as visits increase,
 	// start letting MonteCarlo UCT have a higher weight
@@ -79,17 +89,19 @@ namespace RAVE
 		return simsAmaf / (simsAmaf + simsUct + simsAmaf * simsUct / RAVE_EQ);
 	}
 
-	inline double uctRave(const TreeNode& child)
+	double uctRave(const TreeNode& child)
 	{
 		double val;
 
 		// TODO: These should be cached and updated in updateTree?
-		const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);
+		//const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);
+		const double uct = child.uct.winrate;
 
 		if (child.amaf.visits)
 		{
 			// TODO: These should be cached and updated in updateTree?
-			const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
+			//const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
+			const double amaf = child.amaf.winrate;
 
 			const double beta = getBeta(child.amaf.visits, child.uct.visits);
 

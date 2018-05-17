@@ -146,6 +146,7 @@
     <ClInclude Include="MovePicker.h" />
     <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Move.h" />
+    <ClInclude Include="MoveStats.h" />
     <ClInclude Include="Playout.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="SearchTree.h" />

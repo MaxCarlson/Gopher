@@ -17,7 +17,7 @@ namespace Playouts
 
 			amaf.addMove(m.idx);
 
-			if (isPass(m.idx))
+			if (isPass(m))
 				++pass;
 			else
 				pass = 0;

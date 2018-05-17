@@ -9,9 +9,9 @@ inline void printNode(const TreeNode& it, int color)
 {
 	std::cout << moveToString({ it.idx, color })
 		<< " Visits: "   << std::setw(5) << it.uct.visits << " | "
-		<< " Wins: "     << std::setw(5) << it.uct.wins   << " | "
+		//<< " Wins: "     << std::setw(5) << it.uct.winrate   << " | "
 		<< " Children: " << std::setw(3) << it.size   << " | "
-		<< " WinRate: "  << static_cast<double>(it.uct.wins) / static_cast<double>(it.uct.visits) << '\n';
+		<< " WinRate: "  << it.uct.winrate << '\n';
 	// TODO: Add amaf stats
 }
 
@@ -56,8 +56,9 @@ SearchStatistics SearchTree::getStatistics(const TreeNode& root, bool resignOnWi
 
 		static constexpr double ResignThreshold = 0.0005;
 
-		s.winRate = static_cast<double>(s.best->uct.wins)
-				  / static_cast<double>(s.best->uct.visits);
+		//s.winRate = static_cast<double>(s.best->uct.wins)
+		//		  / static_cast<double>(s.best->uct.visits);
+		s.winRate = s.best->uct.winrate;
 
 		if (s.winRate < ResignThreshold && resignOnWinChance)
 			s.idx = Resign;
@@ -163,6 +164,9 @@ int SearchTree::pruneTree(TreeNode& root)
 	if (root.size - toDelete <= 0 || children.size() < 1)
 	{
 		// TODO: Look into how many extra allocations this causes
+		// TODO: Look into why there's a huge deallocation about 2/3rd the way through the game
+		// usually 3/4's of the tree's memory is deallcated
+		//
 		// TODO: Custom allocator to preallocate tree memory
 		root.deallocateChildren();
 	}

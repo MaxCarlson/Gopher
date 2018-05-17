@@ -1,17 +1,10 @@
 #pragma once
+#include "MoveStats.h"
 #include <vector>
 #include <Containers\SmallVec.h>
 
 using coord = int;
 struct UctTreeNodes;
-
-struct MoveStat
-{
-	int wins = 0;
-	int visits = 0;
-
-	void clear() { wins = visits = 0; }
-};
 
 struct TreeNode
 {

@@ -86,5 +86,8 @@ void Uct::walkTree(Board & board, TreeNode& root, int& color)
 	}
 	color = flipColor(color);
 
+
+	// TODO: Only expand leaf nodes after n visits
+	// Wil require additional checs when traversing tree
 	tree.expandNode(board, *path, color);
 }
