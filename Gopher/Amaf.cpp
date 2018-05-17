@@ -72,9 +72,9 @@ namespace RAVE
 	// Idea is to start out using RAVE and as visits increase,
 	// start letting MonteCarlo UCT have a higher weight
 	// AMAF playouts, AMAF value, Node playouts
-	inline double getBeta(double amafP, double amafV, double uctP)
+	inline double getBeta(double simsAmaf, double simsUct)
 	{
-		return amafP / (amafP + uctP + uctP * amafP / RAVE_EQ);
+		return simsAmaf / (simsAmaf + simsUct + simsAmaf * simsUct / RAVE_EQ);
 	}
 
 	inline double uctRave(const TreeNode& child)
@@ -89,8 +89,9 @@ namespace RAVE
 			// TODO: These should be cached and updated in updateTree?
 			const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
 
-			const double beta = getBeta(child.amaf.visits, amaf, child.uct.visits);
-			val = (1.0 - beta) * uct + (beta * amaf);
+			const double beta = getBeta(child.amaf.visits, child.uct.visits);
+
+			val = (beta * amaf) + ((1.0 - beta) * uct);
 		}
 		else
 			val = uct;
@@ -115,9 +116,9 @@ namespace RAVE
 					* std::sqrt(std::log(node.uct.visits) / c.uct.visits);
 
 				/* // Old straight UCT
-				uct = (static_cast<double>(c.wins)
-					/ static_cast<double>(c.visits))
-				+ UCT_EXPLORE * std::sqrt(std::log(node.visits) / c.visits);
+				val = (static_cast<double>(c.uct.wins)
+					/ static_cast<double>(c.uct.visits))
+				+ UCT_EXPLORE * std::sqrt(std::log(node.uct.visits) / c.uct.visits);
 				*/
 
 			if (val > best)

@@ -122,8 +122,6 @@ void SearchTree::expandNode(const Board & board, TreeNode & node, int color)
 	if (!node.children)
 		node.allocateChildren();
 
-	// TODO: Add in Grandfather heuristic (Setting stats to that of the same node up the tree n - 2)
-
 	board.foreachFreePoint([&](coord idx) 
 	{
 		if (!board.isValidNoSuicide({ idx, !color }))
