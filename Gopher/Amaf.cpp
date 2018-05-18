@@ -53,47 +53,68 @@ namespace RAVE
 					return;
 
 				// Don't use moves not played by this nodes color
-				const int dist = firstPlayed - (mIdx + 1);
+				const int dist = firstPlayed - (mIdx + 1); // + 0 for RevParity
 				if (dist & 1)
 					return;
 
 				// Earlier moves are worth more
 				static constexpr double RAVE_DIST = 3.0;
 				const int weight = 1 + (RAVE_DIST * (gameLength - firstPlayed) / (gameLength - mIdx));
+				//int weight = 1; // Only for NoDistWeight
 
-				child.amaf.addData(weight, !isWin * weight);
+				child.amaf.addData(weight, !isWin * weight); 
 			});
 
 			isWin = !isWin;
 		}
 	}
 
-	static constexpr double RAVE_EQ = 2000.0; 
+	static constexpr double RAVE_EQ = 450.0; 
 	static constexpr double UCT_EXPLORE = 0.35; 
 
 	// Idea is to start out using RAVE and as visits increase,
 	// start letting MonteCarlo UCT have a higher weight
 	// AMAF playouts, AMAF value, Node playouts
+	/*
 	inline double getBeta(double simsAmaf, double simsUct)
 	{
 		return simsAmaf / (simsAmaf + simsUct + simsAmaf * simsUct / RAVE_EQ);
 	}
+	*/
+
+	///*
+	inline double getBeta(double simsAmaf, double simsUct)
+	{
+		return 0.3;
+	}
+	//*/
+	/*
+	// Give more weight to UCT as simsAMAF increases
+	// 100% weight to UCT when simsAMAF goes over USE_UCT
+	inline double getBeta(double simsAmaf, double simsUct)
+	{
+		static constexpr double USE_UCT = 100;
+
+		return std::max(0.0, (USE_UCT - simsAmaf) / USE_UCT);
+	}
+	*/
 
 	double uctRave(const TreeNode& child)
 	{
 		double val;
 
 		// TODO: These should be cached and updated in updateTree?
-		//const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);
-		const double uct = child.uct.winrate;
+		const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);
+		//const double uct = child.uct.winrate;
 
 		if (child.amaf.visits)
 		{
 			// TODO: These should be cached and updated in updateTree?
-			//const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
-			const double amaf = child.amaf.winrate;
+			const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
+			//const double amaf = child.amaf.winrate;
 
 			const double beta = getBeta(child.amaf.visits, child.uct.visits);
+
 
 			val = (beta * amaf) + ((1.0 - beta) * uct);
 		}

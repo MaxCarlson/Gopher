@@ -11,7 +11,7 @@ static constexpr int TOTAL_PLAYOUTS = 15000;
 
 // Expand a leaf node when it's been 
 // visited this # of times
-static constexpr int EXPAND_AT = 5;
+static constexpr int EXPAND_AT = 2; 
 
 inline bool isWin(int result)
 {
@@ -70,7 +70,7 @@ void Uct::playout(Board & board)
 void Uct::walkTree(Board & board, TreeNode& root, int& color)
 {
 	TreeNode* path = &root;
-	while (path->expanded() && !path->isLeaf()) // TODO: One of these should be enough?
+	while (path->expanded() && !path->isLeaf()) 
 	{
 		int bestIdx = 0;
 		path = &RAVE::chooseChild(amafMap, *path, bestIdx);

@@ -7,12 +7,13 @@
 
 inline void printNode(const TreeNode& it, int color)
 {
+	/*
 	std::cout << moveToString({ it.idx, color })
 		<< " Visits: "   << std::setw(5) << it.uct.visits << " | "
 		//<< " Wins: "     << std::setw(5) << it.uct.winrate   << " | "
 		<< " Children: " << std::setw(3) << it.size   << " | "
 		<< " WinRate: "  << it.uct.winrate << '\n';
-	// TODO: Add amaf stats
+	// TODO: Add amaf stats*/
 }
 
 void SearchTree::init(const Board& board, int color) 
@@ -56,9 +57,9 @@ SearchStatistics SearchTree::getStatistics(const TreeNode& root, bool resignOnWi
 
 		static constexpr double ResignThreshold = 0.0005;
 
-		//s.winRate = static_cast<double>(s.best->uct.wins)
-		//		  / static_cast<double>(s.best->uct.visits);
-		s.winRate = s.best->uct.winrate;
+		s.winRate = static_cast<double>(s.best->uct.wins)
+				  / static_cast<double>(s.best->uct.visits);
+		//s.winRate = s.best->uct.winrate;
 
 		if (s.winRate < ResignThreshold && resignOnWinChance)
 			s.idx = Resign;
