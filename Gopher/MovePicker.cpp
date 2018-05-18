@@ -7,6 +7,7 @@ constexpr int MAX_ROLL = 100;
 namespace TryValues
 {
 	int atari = 99;
+	int local_atari = MAX_ROLL;
 	int nakade = 80;
 	int capture = 40;
 };
@@ -52,6 +53,12 @@ bool tryHeuristics(Board & board, Move& ourMove)
 	if (isPass(board.lastMove))
 		return false;
 
+	// Following Pachi's idea of local checks first
+
+	if (TryValues::local_atari > Random::fastRandom(MAX_ROLL)
+		&& localAtari(board, ourMove, board.lastMove))
+		return true;
+
 	// Atari check
 	if (TryValues::atari > Random::fastRandom(MAX_ROLL) 
 		&& atariCheck(board, ourMove, board.lastMove))
@@ -67,6 +74,55 @@ bool tryHeuristics(Board & board, Move& ourMove)
 	// TODO: This is Super slow
 	if (TryValues::capture > Random::fastRandom(MAX_ROLL)
 		&& captureCheck(board, ourMove, board.lastMove))
+		return true;
+
+	return false;
+}
+
+// Did our opponent play a self-atari move?
+// Did our opponent put us into atari?
+bool localAtari(const Board & board, Move & move, const Move & lastMove)
+{
+	coord atariIdx[2] = { 0 };
+	board.foreachNeighbor(lastMove.idx, [&](coord idx, int color)
+	{
+		if (board.groupInfoAt(idx).libs > 1)
+			return;
+
+		atariIdx[color == move.color] = idx;
+	});
+
+	if (!atariIdx[0] && !atariIdx[1])
+		return false;
+
+	const auto findLiberty = [&](coord atariAt)
+	{
+		const groupId atariGid = board.groupAt(atariAt);
+
+		bool savingMove = false;
+		board.foreachInGroup(atariGid, [&](coord idx)
+		{
+			if (board.immediateLibCount(idx) > 0)
+				board.foreachNeighbor(idx, [&](coord nidx, int color)
+			{
+				// Pick a saving move that's not a suicide
+				if (color == Stone::NONE && board.immediateLibCount(nidx) > 0)
+				{
+					move.idx = nidx;
+					savingMove = true;
+				}
+			});
+		});
+		return savingMove;
+	};
+
+	// Capture other group if possible
+	// TODO: Do a random roll here and don't capture
+	// if it's a small group, could be a better move out there?
+	if (atariIdx[1] && findLiberty(atariIdx[1]))
+		return true;
+	// Save our group
+	if (atariIdx[0] && findLiberty(atariIdx[0]))
 		return true;
 
 	return false;
@@ -118,6 +174,9 @@ bool atariCheck(const Board & board, Move & move, const Move & lastMove)
 
 bool captureCheck(const Board & board, Move & move, const Move & theirMove)
 {
+	// TODO: Cache groups so we don't have to loop through every point
+	// This would allow for randomly iterating through groups easier as well
+	//
 	// TODO: Look at moves to reduce liberty counts to atari as well?
 
 	std::array<bool, BoardRealSize2> groupsInAtari = { 0 };

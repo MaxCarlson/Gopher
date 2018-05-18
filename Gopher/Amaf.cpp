@@ -88,23 +88,26 @@ namespace RAVE
 		return 0.3;
 	}
 	//*/
-	/*
+
+	///*
 	// Give more weight to UCT as simsAMAF increases
 	// 100% weight to UCT when simsAMAF goes over USE_UCT
-	inline double getBeta(double simsAmaf, double simsUct)
+	inline double getBeta(double simsAmaf, double simsUct) // This is currently the best
 	{
 		static constexpr double USE_UCT = 100;
 
 		return std::max(0.0, (USE_UCT - simsAmaf) / USE_UCT);
 	}
-	*/
+	//*/
 
+	/*
 	inline double getBeta(double simsAmaf, double simsUct)
 	{
-		static constexpr double RAVE_BIAS = 100.0;
+		static constexpr double RAVE_BIAS = 0.1;
 		
 		return simsAmaf / (simsUct + simsAmaf + (4 * simsUct * simsAmaf * RAVE_BIAS));
 	}
+	*/
 
 	double uctRave(const TreeNode& child)
 	{
@@ -121,7 +124,6 @@ namespace RAVE
 			//const double amaf = child.amaf.winrate;
 
 			const double beta = getBeta(child.amaf.visits, child.uct.visits);
-
 
 			val = (beta * amaf) + ((1.0 - beta) * uct);
 		}
@@ -151,7 +153,7 @@ namespace RAVE
 				val = (static_cast<double>(c.uct.wins)
 					/ static_cast<double>(c.uct.visits))
 				+ UCT_EXPLORE * std::sqrt(std::log(node.uct.visits) / c.uct.visits);
-				*/
+				//*/
 
 			if (val > best)
 			{
