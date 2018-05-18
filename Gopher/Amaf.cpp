@@ -82,7 +82,7 @@ namespace RAVE
 	}
 	*/
 
-	///*
+	/*
 	inline double getBeta(double simsAmaf, double simsUct)
 	{
 		return 0.3;
@@ -98,6 +98,13 @@ namespace RAVE
 		return std::max(0.0, (USE_UCT - simsAmaf) / USE_UCT);
 	}
 	*/
+
+	inline double getBeta(double simsAmaf, double simsUct)
+	{
+		static constexpr double RAVE_BIAS = 100.0;
+		
+		return simsAmaf / (simsUct + simsAmaf + (4 * simsUct * simsAmaf * RAVE_BIAS));
+	}
 
 	double uctRave(const TreeNode& child)
 	{

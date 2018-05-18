@@ -128,6 +128,7 @@ double Board::scoreFast() const
 	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
 }
 
+/*
 double Board::scoreReal() const // NOT DONE
 {
 	int scores[Stone::MAX] = { 0 };
@@ -152,6 +153,92 @@ double Board::scoreReal() const // NOT DONE
 	return komi + (captures[Stone::WHITE] + scores[Stone::WHITE]) 
 			    - (captures[Stone::BLACK] + scores[Stone::BLACK]);
 }
+*/
+
+double Board::scoreReal() const // NOT DONE
+{
+	int scores[Stone::MAX] = { 0 };
+	int ownedBy[BoardRealSize2] = { 0 };
+
+	static constexpr int filter[] = { 0, 1, 2, 0 };
+
+	foreachPoint([&](int idx, int color)
+	{
+		ownedBy[idx] = filter[color];
+	});
+
+	static constexpr int Dame = 3;
+
+	bool update;
+	do 
+	{
+		update = false;
+
+		foreachFreePoint([&](coord idx)
+		{
+			if (ownedBy[idx] == Dame)
+				return;
+
+			int neigh[4] = { 0 };
+			foreachNeighbor(idx, [&](coord idx, int color)
+			{
+				++neigh[ownedBy[idx]];
+			});
+
+			// Owned by both colors or neighboring a dame
+			// We're also a dame
+			if (neigh[Stone::BLACK] && neigh[Stone::WHITE] || neigh[Dame])
+			{
+				ownedBy[idx] = Dame;
+
+				foreachNeighbor(idx, [&](coord idx, int color)
+				{
+					if (color == Stone::NONE)
+						ownedBy[idx] = Dame;
+				});
+				update = true;
+				return;
+			}
+
+			// If we only have neighbors of one color
+			// that color owns us
+			if (!ownedBy[idx]
+				&& (neigh[Stone::BLACK] || neigh[Stone::WHITE]))
+			{
+				int owner = neigh[Stone::BLACK] 
+						  ? Stone::BLACK : Stone::WHITE;
+
+				ownedBy[idx] = owner;
+
+				foreachNeighbor(idx, [&](coord idx, int color)
+				{
+					if (color == Stone::NONE && !ownedBy[idx])
+						ownedBy[idx] = owner;
+				});
+
+				update = true;
+			}
+		});
+
+	} while (update);
+
+	//int dames = 0;
+
+	foreachPoint([&](coord idx, int color)
+	{
+		if (color != Stone::OFFBOARD && !ownedBy[idx]) // Comment out when not debugging
+			std::cerr << "Iterator error in real score \n";
+
+		//if (ownedBy[idx] == Dame) // Not currently in use
+		//	++dames;
+
+		++scores[ownedBy[idx]];
+	});
+
+	return komi + (captures[Stone::WHITE] + scores[Stone::WHITE])
+			    - (captures[Stone::BLACK] + scores[Stone::BLACK]);
+}
+
 
 int Board::neighborCount(coord idx, Stone color) const
 {
