@@ -98,12 +98,13 @@ struct GroupManager
 	// (which is idx of first group stone)
 	Group groups[BoardMaxIdx];
 
+	FastList<coord, BoardMaxGroups> groupList;
+
 	Group& groupInfoById(const groupId id) { return groups[id]; }
 	const Group& groupInfoById(const groupId id) const { return groups[id]; }
 
 	coord& groupNextStone(const coord idx) { return nextStone[idx]; }
 	const coord& groupNextStone(const coord idx) const { return nextStone[idx]; }
-
 
 	bool isGroupCaptured(const groupId id) const { return groups[id].libs == 0; }
 };
@@ -217,6 +218,12 @@ public:
 	template<class F>
 	void eachDiagonalNeighbor(int idx, F&& f) const;
 
+	// Loop through each group by groupId
+	template<class F>
+	void foreachGroup(F&& f);
+	template<class F>
+	void foreachGroup(F&& f) const;
+
 	// Loop through the each member in group, 
 	// llambda syntax should be [](int idx) { func }
 	template<class F>
@@ -226,7 +233,6 @@ public:
 
 	template<class F>
 	void foreachInGroupBreak(groupId id, F&& f) const;
-
 
 	template<class F>
 	void foreachFreePoint(F&& f) const;
@@ -283,6 +289,19 @@ inline void Board::eachDiagonalNeighbor(int idx, F&& f) const
 	f(idx + BoardRealSize - 1, points[idx + BoardRealSize - 1]);
 	f(idx - BoardRealSize + 1, points[idx - BoardRealSize + 1]);
 	f(idx - BoardRealSize - 1, points[idx - BoardRealSize - 1]);
+}
+
+template<class F>
+inline void Board::foreachGroup(F && f)
+{
+	for (int i = 0; i < groups.groupList.size(); ++i)
+		f(groups.groupList[i]);
+}
+template<class F>
+inline void Board::foreachGroup(F && f) const
+{
+	for (int i = 0; i < groups.groupList.size(); ++i)
+		f(groups.groupList[i]);
 }
 
 template<class F>

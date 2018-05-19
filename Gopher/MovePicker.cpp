@@ -103,13 +103,14 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 		const groupId atariGid = board.groupAt(atariAt);
 
 		bool savingMove = false;
+		const auto& group = board.groupInfoAt(atariAt);
 
-		board.groupInfoAt(atariAt).forCachedLibs([&](coord idx)
+		group.forCachedLibs([&](coord idx)
 		{
 			// Pick a saving move that's not a suicide
 			if (board.at(idx) == Stone::NONE 
-				&& board.immediateLibCount(idx) > 0
-				|| (board.adjacentGroupWithLibs(idx, move.color)))
+				&& (board.immediateLibCount(idx) > 0 
+				||  board.adjacentGroupWithLibs(idx, move.color)))
 			{
 				move.idx = idx;
 				savingMove = true;
@@ -142,19 +143,19 @@ bool local2Lib(const Board & board, Move & move, const Move & lastMove)
 		return false;
 
 	bool found = false;
-	board.foreachInGroupBreak(gid, [&](coord idx, bool& stop)
+
+	const auto& group = board.groupInfoAt(lastMove.idx);
+
+	group.forCachedLibs([&](coord idx)
 	{
-		if (board.immediateLibCount(idx) > 0)
-			board.foreachNeighbor(idx, [&](coord nidx, int color)
-			{
-				// Pick a saving move that's not a suicide
-				// TODO: Look for a move that attaches to an existing group of ours?
-				if (color == Stone::NONE && board.immediateLibCount(nidx) > 0)
-				{
-					move.idx = nidx;
-					stop = found = true;
-				}
-			});
+		// Pick a move that reduces the groups liberties to 1 (Atari)
+		if (board.at(idx) == Stone::NONE 
+			&& (board.immediateLibCount(idx) > 0 
+			||  board.adjacentGroupWithLibs(idx, move.color)))
+		{
+			move.idx = idx;
+			found = true;
+		}
 	});
 
 	return found;

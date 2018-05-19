@@ -5,7 +5,7 @@
 #include <math.h>
 #include "Random.h"
 
-static constexpr int TOTAL_PLAYOUTS = 15000;
+static constexpr int TOTAL_PLAYOUTS = 215000;
 //static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 

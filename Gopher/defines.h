@@ -4,9 +4,10 @@
 #include <iostream>
 
 constexpr int BoardSize = 9;
-constexpr int BoardRealSize = BoardSize + 2;
-constexpr int BoardRealSize2 = BoardRealSize * BoardRealSize;
+constexpr int BoardSize2 = BoardSize * BoardSize;
 constexpr int BoardOffset = 2;
+constexpr int BoardRealSize = BoardSize + BoardOffset;
+constexpr int BoardRealSize2 = BoardRealSize * BoardRealSize;
 constexpr int BoardMaxIdx = (BoardSize + BoardOffset) * (BoardSize + BoardOffset);
 constexpr int BoardMaxGroups = BoardSize * BoardSize * 2 / 3;
 
