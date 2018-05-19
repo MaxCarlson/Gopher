@@ -5,7 +5,7 @@
 #include <math.h>
 #include "Random.h"
 
-static constexpr int TOTAL_PLAYOUTS = 215000;
+static constexpr int TOTAL_PLAYOUTS = 15000;
 //static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
@@ -26,6 +26,8 @@ coord Uct::search(const Board & board, int color)
 	// Best time would be during opponents move
 	tree.init(board, color);
 
+	auto start = Time::startTimer();
+
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board bb = board;
@@ -35,6 +37,8 @@ coord Uct::search(const Board & board, int color)
 		if (i % (TOTAL_PLAYOUTS / 10) == 0 && i != 0)
 			tree.printBestLine();
 	}
+
+	std::cerr << "\n Search Time: " << Time::endTime<std::chrono::duration<double>>(start) << '\n';
 
 	const coord bestMove = tree.getBestMove();
 

@@ -27,6 +27,24 @@ Move pickMove(Board & board, int color)
 		return m;
 	}
 
+	/*
+	int searched = 0;
+	int found = 0;
+	board.foreachGroup([&](groupId gid)
+	{
+		for (int i = 0; i < BoardRealSize2; ++i)
+			if (board.groups.groupIds[i] == gid)
+			{
+				++found;
+				break;
+			}
+
+		++searched;
+	});
+	if (found != searched)
+		std::cerr << "Oh No! " << searched - found << '\n';
+		*/
+
 	if (tryHeuristics(board, m))
 	{
 		board.makeMove(m);
