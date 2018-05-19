@@ -128,33 +128,6 @@ double Board::scoreFast() const
 	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
 }
 
-/*
-double Board::scoreReal() const // NOT DONE
-{
-	int scores[Stone::MAX] = { 0 };
-
-	foreachPoint([&](int idx, int color)
-	{
-		++scores[color];
-		
-		if (color == Stone::NONE)
-		{
-			int white = neighborCount(idx, Stone::WHITE);
-			int black = neighborCount(idx, Stone::BLACK);
-
-			if (white > 0 && black == 0)
-				++scores[Stone::WHITE];
-			
-			else if (black > 0 && white == 0)
-				++scores[Stone::BLACK];
-		}
-	});
-
-	return komi + (captures[Stone::WHITE] + scores[Stone::WHITE]) 
-			    - (captures[Stone::BLACK] + scores[Stone::BLACK]);
-}
-*/
-
 double Board::scoreReal() const // NOT DONE
 {
 	int scores[Stone::MAX] = { 0 };
@@ -321,6 +294,17 @@ int Board::immediateLibCount(coord idx) const
 	return 4 - (neighborCount(idx, Stone::BLACK) 
 			 + neighborCount(idx, Stone::WHITE) 
 			 + neighborCount(idx, Stone::OFFBOARD));
+}
+
+bool Board::adjacentGroupWithLibs(coord idx, int color) const
+{
+	bool found = false;
+	foreachNeighbor(idx, [&](coord idx, int gColor)
+	{
+		if (gColor == color && groupInfoAt(idx).libs > 1)
+			found = true;
+	});
+	return found;
 }
 
 // Pass this the idx of the first group stone

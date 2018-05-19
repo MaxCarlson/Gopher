@@ -6,8 +6,8 @@
 constexpr int MAX_ROLL = 100;
 namespace TryValues
 {
-	int atari = 99;
 	int local_atari = MAX_ROLL;
+	int local_2Lib = 60;
 	int nakade = 80;
 	int capture = 40;
 };
@@ -55,13 +55,16 @@ bool tryHeuristics(Board & board, Move& ourMove)
 
 	// Following Pachi's idea of local checks first
 
+	// Check to see if opponent played self atari, 
+	// or if he put one of our groups into atari
 	if (TryValues::local_atari > Random::fastRandom(MAX_ROLL)
 		&& localAtari(board, ourMove, board.lastMove))
 		return true;
 
-	// Atari check
-	if (TryValues::atari > Random::fastRandom(MAX_ROLL) 
-		&& atariCheck(board, ourMove, board.lastMove))
+	// See if we can reduce the group our opponent played on
+	// to atari
+	if (TryValues::local_2Lib > Random::fastRandom(MAX_ROLL)
+		&& local2Lib(board, ourMove, board.lastMove))
 		return true;
 
 	// Nakade check
@@ -100,19 +103,19 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 		const groupId atariGid = board.groupAt(atariAt);
 
 		bool savingMove = false;
-		board.foreachInGroup(atariGid, [&](coord idx)
+
+		board.groupInfoAt(atariAt).forCachedLibs([&](coord idx)
 		{
-			if (board.immediateLibCount(idx) > 0)
-				board.foreachNeighbor(idx, [&](coord nidx, int color)
+			// Pick a saving move that's not a suicide
+			if (board.at(idx) == Stone::NONE 
+				&& board.immediateLibCount(idx) > 0
+				|| (board.adjacentGroupWithLibs(idx, move.color)))
 			{
-				// Pick a saving move that's not a suicide
-				if (color == Stone::NONE && board.immediateLibCount(nidx) > 0)
-				{
-					move.idx = nidx;
-					savingMove = true;
-				}
-			});
+				move.idx = idx;
+				savingMove = true;
+			}
 		});
+
 		return savingMove;
 	};
 
@@ -121,55 +124,40 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 	// if it's a small group, could be a better move out there?
 	if (atariIdx[1] && findLiberty(atariIdx[1]))
 		return true;
+
 	// Save our group
+	// This can and does lead to playing futile attampts
+	// to keep a dead group alive
 	if (atariIdx[0] && findLiberty(atariIdx[0]))
 		return true;
 
 	return false;
 }
 
-bool atariCheck(const Board & board, Move & move, const Move & lastMove)
+bool local2Lib(const Board & board, Move & move, const Move & lastMove)
 {
-	// Check to see if opponent move put any 
-	// of our stones into atari
-	coord atariIdx = 0;
-	board.foreachNeighbor(lastMove.idx, [&](coord idx, int color)
-	{
-		if (color != move.color 
-			|| board.groupInfoAt(idx).libs > 1)
-			return;
+	groupId gid = board.groupAt(lastMove.idx);
 
-		atariIdx = idx;
-	});
-
-	if (!atariIdx)
+	if (board.groupLibCount(gid) > 2)
 		return false;
 
-	//board.printBoard();
-	//printMove(lastMove);
-
-	groupId atariGid = board.groupAt(atariIdx);
-
-	// If so, play a saving move at random if possible
-	// TODO:
-	// Make this more descriminate
-	
-	bool savingMove = false;
-	board.foreachInGroup(atariGid, [&](coord idx) 
+	bool found = false;
+	board.foreachInGroupBreak(gid, [&](coord idx, bool& stop)
 	{
 		if (board.immediateLibCount(idx) > 0)
 			board.foreachNeighbor(idx, [&](coord nidx, int color)
 			{
 				// Pick a saving move that's not a suicide
+				// TODO: Look for a move that attaches to an existing group of ours?
 				if (color == Stone::NONE && board.immediateLibCount(nidx) > 0)
 				{
 					move.idx = nidx;
-					savingMove = true;
+					stop = found = true;
 				}
 			});
 	});
 
-	return savingMove;
+	return found;
 }
 
 bool captureCheck(const Board & board, Move & move, const Move & theirMove)

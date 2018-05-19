@@ -89,7 +89,7 @@ namespace RAVE
 	}
 	//*/
 
-	///*
+	/*
 	// Give more weight to UCT as simsAMAF increases
 	// 100% weight to UCT when simsAMAF goes over USE_UCT
 	inline double getBeta(double simsAmaf, double simsUct) // This is currently the best
@@ -98,20 +98,29 @@ namespace RAVE
 
 		return std::max(0.0, (USE_UCT - simsAmaf) / USE_UCT);
 	}
-	//*/
+	*/
 
-	/*
+	///*
 	inline double getBeta(double simsAmaf, double simsUct)
 	{
 		static constexpr double RAVE_BIAS = 0.1;
 		
 		return simsAmaf / (simsUct + simsAmaf + (4 * simsUct * simsAmaf * RAVE_BIAS));
 	}
-	*/
+	//*/
 
 	double uctRave(const TreeNode& child)
 	{
 		double val;
+
+		/*/
+		double a = getBeta(10, 5);
+		double aa = getBeta(5, 15);
+		double aaa = getBeta(80, 2);
+		double aaaa = getBeta(90, 7);
+		double aaaaa = getBeta(50, 75);
+		double aaaaaa = getBeta(30, 15);
+		*/
 
 		// TODO: These should be cached and updated in updateTree?
 		const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);

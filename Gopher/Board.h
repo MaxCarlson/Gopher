@@ -73,8 +73,15 @@ struct Group
 {
 	// Liberty count
 	int libs;
-	// Exact liberty locations
+	// Exact liberty locations up to GroupLibCount
 	coord lib[GroupLibCount];
+
+	template<class F>
+	void forCachedLibs(F&& f) const
+	{
+		for (int i = 0; i < libs; ++i)
+			f(lib[i]);
+	}
 
 	void addLib(const coord idx) { lib[libs++] = idx; }
 };
@@ -154,6 +161,9 @@ public:
 	bool isValidNoSuicide(const Move& m) const;
 	int immediateLibCount(coord idx) const;
 
+	// is there a group of color with > 1 liberty next to idx?
+	bool adjacentGroupWithLibs(coord idx, int color) const;
+
 	// Plays a random move if it can
 	// TODO: Pass or use some heuristics so random moves are less "bad"
 	coord playRandom(Stone color);
@@ -184,6 +194,7 @@ public:
 	groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
 	groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
 
+	int groupLibCount(groupId gid) const { return groups.groupInfoById(gid).libs; }
 	const Group& groupInfoAt(const coord idx) const { return groups.groupInfoById(groupAt(idx)); }
 
 	int at(int idx) const { return points[idx]; }
@@ -212,6 +223,10 @@ public:
 	void foreachInGroup(groupId id, F&& f);
 	template<class F>
 	void foreachInGroup(groupId id, F&& f) const;
+
+	template<class F>
+	void foreachInGroupBreak(groupId id, F&& f) const;
+
 
 	template<class F>
 	void foreachFreePoint(F&& f) const;
@@ -273,18 +288,35 @@ inline void Board::eachDiagonalNeighbor(int idx, F&& f) const
 template<class F>
 inline void Board::foreachInGroup(groupId id, F && f)
 {
+	// Id is index of first stone
 	while (id != 0)
 	{
 		f(id);
+		// Set id to idx of next stone
 		id = groups.groupNextStone(id);
 	}
 }
 template<class F>
 inline void Board::foreachInGroup(groupId id, F && f) const
 {
+	// Id is index of first stone
 	while (id != 0)
 	{
 		f(id);
+		// Set id to idx of next stone
+		id = groups.groupNextStone(id);
+	}
+}
+
+template<class F>
+inline void Board::foreachInGroupBreak(groupId id, F && f) const
+{
+	// Id is index of first stone
+	bool stop = false;
+	while (id != 0 && !stop)
+	{
+		f(id, stop);
+		// Set id to idx of next stone
 		id = groups.groupNextStone(id);
 	}
 }
