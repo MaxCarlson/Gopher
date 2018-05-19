@@ -186,66 +186,49 @@ bool captureCheck(const Board & board, Move & move, const Move & theirMove)
 	//
 	// TODO: Look at moves to reduce liberty counts to atari as well?
 
-	std::array<bool, BoardRealSize2> groupsInAtari = { 0 };
+	FastList<groupId, BoardMaxGroups> groupsInAtari;
 
-	int i = 0;
-	static std::array<groupId, BoardRealSize2> groups;
-
-	board.foreachPoint([&](coord idx, int color)
+	board.foreachGroup([&](groupId gid)
 	{
-		if (color != theirMove.color)
+		// Don't look at our groups
+		if (board.at(gid) != theirMove.color)
 			return;
 
-		if (board.groupInfoAt(idx).libs > 1 
-			|| groupsInAtari[board.groupAt(idx)])
+		const auto& group = board.groups.groupInfoById(gid);
+		if (group.libs > 1)
 			return;
 
-		groupsInAtari[board.groupAt(idx)] = true;
-		groups[i++] = board.groupAt(idx);
+		groupsInAtari.emplace_back(gid);
 	});
 
-	if (!i)
+	if (!groupsInAtari.size())
 		return false;
 
-	//board.printBoard();
+	const auto findCapture = [&](groupId gid) -> bool
+	{
+		const auto& group = board.groupInfoGid(gid);
+		
+		bool found = false; // TODO: Found probably isn't nescessary since
+		group.forCachedLibs([&](coord idx)
+		{
+			found = true;
+			move.idx = idx;
+		});
+		return found;
+	};
 
 	// Select a random group in atari
-	
-	int trys = 0;
-	bool done = false;
-	while (!done)
-	{
-		const auto rng = Random::fastRandom(i);
-		// TODO: Check for duplicate random groups chosen
+	const auto rng = Random::fastRandom(groupsInAtari.size());
 
-		board.foreachInGroup(groups[rng], [&](coord idx)
-		{
-			if (board.immediateLibCount(idx) == 0)
-				return;
+	for (int i = rng; i < groupsInAtari.size(); ++i)
+		if (findCapture(groupsInAtari[i]))
+			return true;
+			
+	for (int i = 0; i < rng; ++i)
+		if (findCapture(groupsInAtari[i]))
+			return true;
 
-			// Found a possible stone we can play next to 
-			// to capture the group, look at it's neighbors
-			board.foreachNeighbor(idx, [&](coord nidx, int color)
-			{
-				if (color != Stone::NONE)
-					return;
-
-				// Make sure it's legal
-				if (board.immediateLibCount(nidx) > 0
-					|| board.neighborCount(nidx, move.color) > 0)
-				{
-					move.idx = nidx;
-					done = true;
-				}
-			});
-		});
-
-		// TODO: Replace this with something that checks all ataris we have stored?
-		if (++trys >= i)
-			break;
-	}
-
-	return done;
+	return false;
 }
 
 bool nakadeCheck(const Board& board, Move &move, const Move& theirMove)

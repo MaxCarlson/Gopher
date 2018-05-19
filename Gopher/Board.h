@@ -195,6 +195,7 @@ public:
 	groupId groupAt(const coord idx) const { return groups.groupIds[idx]; }
 	groupId& groupAt(const coord idx) { return groups.groupIds[idx]; }
 
+	const Group& groupInfoGid(groupId gid) const { return groups.groupInfoById(gid); }
 	int groupLibCount(groupId gid) const { return groups.groupInfoById(gid).libs; }
 	const Group& groupInfoAt(const coord idx) const { return groups.groupInfoById(groupAt(idx)); }
 
