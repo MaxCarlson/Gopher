@@ -20,6 +20,12 @@ namespace vals
 	constexpr int defendGroupAlways  = 3;
 }
 
+template<class Val>
+inline bool rollDice(const Val value)
+{
+	return value >= static_cast<Val>(Random::fastRandom(MAX_ROLL));
+}
+
 namespace MovePicker
 {
 
@@ -91,12 +97,6 @@ bool tryHeuristics(Board & board, Move& ourMove)
 	return false;
 }
 
-template<class Val>
-inline bool rollDice(const Val value)
-{
-	return value >= static_cast<Val>(Random::fastRandom(MAX_ROLL));
-}
-
 // Did our opponent play a self-atari move?
 // Did our opponent put us into atari?
 bool localAtari(const Board & board, Move & move, const Move & lastMove)
@@ -107,7 +107,7 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 		if (board.groupInfoAt(idx).libs > 1)
 			return;
 
-		atariIdx[color == move.color] = idx;
+		atariIdx[color == lastMove.color] = idx;
 	});
 
 	if (!atariIdx[0] && !atariIdx[1])
@@ -196,11 +196,9 @@ bool captureCheck(const Board & board, Move & move, const Move & theirMove)
 	board.foreachGroup([&](groupId gid)
 	{
 		// Don't look at our groups
-		if (board.at(gid) != theirMove.color)
-			return;
-
-		const auto& group = board.groups.groupInfoById(gid);
-		if (group.libs > 1)
+		// or at groups not in Atari
+		if (board.at(gid) != theirMove.color
+			|| board.groups.groupInfoById(gid).libs > 1)
 			return;
 
 		groupsInAtari.emplace_back(gid);
