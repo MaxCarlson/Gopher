@@ -3,7 +3,6 @@
 struct Board;
 struct Move;
 struct AmafMap;
-enum Stone;
 
 namespace MovePicker
 {

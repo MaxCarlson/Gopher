@@ -101,6 +101,7 @@ bool tryHeuristics(Board & board, Move& ourMove)
 // Did our opponent put us into atari?
 bool localAtari(const Board & board, Move & move, const Move & lastMove)
 {
+	enum { OURS, THEIRS };
 	coord atariIdx[2] = { 0 };
 	board.foreachNeighbor(lastMove.idx, [&](coord idx, int color)
 	{
@@ -109,9 +110,6 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 
 		atariIdx[color == lastMove.color] = idx;
 	});
-
-	if (!atariIdx[0] && !atariIdx[1])
-		return false;
 
 	const auto findLiberty = [&](coord atariAt)
 	{
@@ -136,23 +134,24 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 
 	// Capture other group if possible
 	// if it's a small group, could be a better move out there?
-	if (atariIdx[1] && rollDice(vals::local_atari_capture_rate) 
-		&& findLiberty(atariIdx[1]))
+	if (atariIdx[THEIRS] && rollDice(vals::local_atari_capture_rate) 
+		&& findLiberty(atariIdx[THEIRS]))
 		return true;
 
-	// Save our group
-	// This can and does lead to playing futile attempts
-	// to keep a dead group alive
-	if (!atariIdx[0])
+
+	if (!atariIdx[OURS])
 		return false;
 
 	// Roll on whether we want to save a small group
-	int gSize = board.countGroup(atariIdx[0], vals::defendGroupAlways);
+	int gSize = board.countGroup(atariIdx[OURS], vals::defendGroupAlways);
 	if (gSize < vals::defendGroupAlways
 		&& !rollDice(vals::local_atari_defend_rate))
 		return false;	
 
-	if (findLiberty(atariIdx[0]))
+	// Save our group
+	// This can and does lead to playing futile attempts
+	// to keep a dead group alive
+	if (findLiberty(atariIdx[OURS]))
 		return true;
 
 	return false;

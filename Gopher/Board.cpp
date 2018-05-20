@@ -101,7 +101,7 @@ void Board::init()
 		free.emplace_back(idx);
 	});
 
-	komi = 6.5; // TODO: Change this based on board size!
+	komi = 7.5; // TODO: Change this based on board size!
 	lastMove = { Pass, Stone::NONE };
 
 	// TODO: Generate zobrist hash stuff
@@ -208,8 +208,8 @@ double Board::scoreReal() const // NOT DONE
 		++scores[ownedBy[idx]];
 	});
 
-	return komi + (captures[Stone::WHITE] + scores[Stone::WHITE])
-			    - (captures[Stone::BLACK] + scores[Stone::BLACK]);
+	return komi + (captures[Stone::BLACK] + scores[Stone::WHITE])
+			    - (captures[Stone::WHITE] + scores[Stone::BLACK]);
 }
 
 

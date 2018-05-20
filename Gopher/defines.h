@@ -32,7 +32,7 @@ inline int gtpFlipY(int y)
 		return vec;
 	};
 
-	static const auto flipper = createFlipper();;
+	static const auto flipper = createFlipper();
 
 	return flipper[y];
 }
