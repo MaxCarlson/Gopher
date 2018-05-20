@@ -208,8 +208,7 @@ double Board::scoreReal() const // NOT DONE
 		++scores[ownedBy[idx]];
 	});
 
-	return komi + (captures[Stone::BLACK] + scores[Stone::WHITE])
-			    - (captures[Stone::WHITE] + scores[Stone::BLACK]);
+	return komi + scores[Stone::WHITE] - scores[Stone::BLACK];
 }
 
 
