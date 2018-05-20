@@ -177,6 +177,8 @@ public:
 	void groupRemoveLibs(groupId group, coord idx);
 	groupId updateNeighbor(coord idx, const Move& m, groupId group);
 	void removeStone(groupId gid, coord idx);
+	int countGroup(groupId id, int max = 0) const;
+
 
 	// Move functions
 	groupId moveNonEye(const Move& m);

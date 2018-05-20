@@ -6,11 +6,19 @@
 constexpr int MAX_ROLL = 100;
 namespace TryValues
 {
-	int local_atari = MAX_ROLL;
-	int local_2Lib = 60;
-	int nakade = 80;
-	int capture = 40;
+	constexpr int local_atari = MAX_ROLL * 0.99;
+	constexpr int local_2Lib  = MAX_ROLL * 0.60;
+	constexpr int nakade	  = MAX_ROLL * 0.80;
+	constexpr int capture	  = MAX_ROLL * 0.40;
 };
+
+namespace vals
+{
+	// Capture rate for group sizes under three
+	constexpr int local_atari_capture_rate = MAX_ROLL * 0.80;
+	constexpr int local_atari_defend_rate  = MAX_ROLL * 0.90;
+	constexpr int defendGroupAlways  = 3;
+}
 
 namespace MovePicker
 {
@@ -26,24 +34,6 @@ Move pickMove(Board & board, int color)
 		board.makeMoveGtp(m);
 		return m;
 	}
-
-	/*
-	int searched = 0;
-	int found = 0;
-	board.foreachGroup([&](groupId gid)
-	{
-		for (int i = 0; i < BoardRealSize2; ++i)
-			if (board.groups.groupIds[i] == gid)
-			{
-				++found;
-				break;
-			}
-
-		++searched;
-	});
-	if (found != searched)
-		std::cerr << "Oh No! " << searched - found << '\n';
-		*/
 
 	if (tryHeuristics(board, m))
 	{
@@ -91,13 +81,20 @@ bool tryHeuristics(Board & board, Move& ourMove)
 		&& nakadeCheck(board, ourMove, board.lastMove))
 		return true;
 	
+	// Global board checks
+
 	// Check board for capturable enemies
-	// TODO: This is Super slow
 	if (TryValues::capture > Random::fastRandom(MAX_ROLL)
 		&& captureCheck(board, ourMove, board.lastMove))
 		return true;
 
 	return false;
+}
+
+template<class Val>
+inline bool rollDice(const Val value)
+{
+	return value >= static_cast<Val>(Random::fastRandom(MAX_ROLL));
 }
 
 // Did our opponent play a self-atari move?
@@ -120,34 +117,42 @@ bool localAtari(const Board & board, Move & move, const Move & lastMove)
 	{
 		const groupId atariGid = board.groupAt(atariAt);
 
-		bool savingMove = false;
+		bool found = false;
 		const auto& group = board.groupInfoAt(atariAt);
 
 		group.forCachedLibs([&](coord idx)
 		{
-			// Pick a saving move that's not a suicide
+			// Pick a move that's not a suicide
 			if (board.at(idx) == Stone::NONE 
 				&& (board.immediateLibCount(idx) > 0 
 				||  board.adjacentGroupWithLibs(idx, move.color)))
 			{
 				move.idx = idx;
-				savingMove = true;
+				found = true;
 			}
 		});
-
-		return savingMove;
+		return found;
 	};
 
 	// Capture other group if possible
-	// TODO: Do a random roll here and don't capture
 	// if it's a small group, could be a better move out there?
-	if (atariIdx[1] && findLiberty(atariIdx[1]))
+	if (atariIdx[1] && rollDice(vals::local_atari_capture_rate) 
+		&& findLiberty(atariIdx[1]))
 		return true;
 
 	// Save our group
-	// This can and does lead to playing futile attampts
+	// This can and does lead to playing futile attempts
 	// to keep a dead group alive
-	if (atariIdx[0] && findLiberty(atariIdx[0]))
+	if (!atariIdx[0])
+		return false;
+
+	// Roll on whether we want to save a small group
+	int gSize = board.countGroup(atariIdx[0], vals::defendGroupAlways);
+	if (gSize < vals::defendGroupAlways
+		&& !rollDice(vals::local_atari_defend_rate))
+		return false;	
+
+	if (findLiberty(atariIdx[0]))
 		return true;
 
 	return false;

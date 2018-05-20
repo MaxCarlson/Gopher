@@ -83,16 +83,9 @@ namespace RAVE
 	*/
 
 	/*
-	inline double getBeta(double simsAmaf, double simsUct)
-	{
-		return 0.3;
-	}
-	//*/
-
-	/*
 	// Give more weight to UCT as simsAMAF increases
 	// 100% weight to UCT when simsAMAF goes over USE_UCT
-	inline double getBeta(double simsAmaf, double simsUct) // This is currently the best
+	inline double getBeta(double simsAmaf, double simsUct) 
 	{
 		static constexpr double USE_UCT = 100;
 
@@ -100,12 +93,12 @@ namespace RAVE
 	}
 	*/
 
-	///*
+	///* // This is currently the best
 	inline double getBeta(double simsAmaf, double simsUct)
 	{
 		static constexpr double RAVE_BIAS = 0.1;
 		
-		return simsAmaf / (simsUct + simsAmaf + (4 * simsUct * simsAmaf * RAVE_BIAS));
+		return simsAmaf / (simsUct + simsAmaf + (4.0 * simsUct * simsAmaf * RAVE_BIAS));
 	}
 	//*/
 
@@ -132,9 +125,11 @@ namespace RAVE
 			const double amaf = static_cast<double>(child.amaf.wins) / static_cast<double>(child.amaf.visits);
 			//const double amaf = child.amaf.winrate;
 
-			const double beta = getBeta(child.amaf.visits, child.uct.visits);
+			const double Beta = getBeta(child.amaf.visits, child.uct.visits);
 
-			val = (beta * amaf) + ((1.0 - beta) * uct);
+			// Iterpolate between using amaf or uct scoring for nodes
+			// depending on Beta function
+			val = (Beta * amaf) + ((1.0 - Beta) * uct);
 		}
 		else
 			val = uct;

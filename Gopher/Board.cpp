@@ -488,6 +488,18 @@ void Board::removeStone(groupId gid, coord idx)
 	free.emplace_back(idx);
 }
 
+int Board::countGroup(groupId id, int max) const
+{
+	int count = 0;
+	foreachInGroupBreak(id, [&](coord idx, bool& stop)
+	{
+		++count;
+		if (count == max)
+			stop = true;
+	});
+	return count;
+}
+
 int Board::groupCapture(groupId gid)
 {
 	int stoneCount = 0;
