@@ -5,13 +5,16 @@
 #include <math.h>
 #include "Random.h"
 
-static constexpr int TOTAL_PLAYOUTS = 15000;
+static constexpr int TOTAL_PLAYOUTS = 25000;
 //static constexpr int TOTAL_PLAYOUTS = 1000; // DebugPlayouts
 
 
 // Expand a leaf node when it's been 
 // visited this # of times
 static constexpr int EXPAND_AT = 2; 
+
+static constexpr double HopelessCaptureMax = BoardSize2 / 2.5;
+
 
 inline bool isWin(int result)
 {
@@ -51,10 +54,6 @@ coord Uct::search(const Board & board, int color)
 
 void Uct::playout(Board & board)
 {
-	// TODO: This should be determined by board size since it's not really 
-	// a ratio, but rather the number of captures we can be behind before giving up
-	static constexpr double HopelessRatio = 25.0;
-
 	amafMap.clear();
 
 	// Start walk from root
@@ -62,7 +61,7 @@ void Uct::playout(Board & board)
 
 	walkTree(board, tree.root, color);
 
-	const int result = Playouts::playRandomGame(board, amafMap, color, MAX_GAME_LENGTH, HopelessRatio);	
+	const int result = Playouts::playRandomGame(board, amafMap, color, MAX_GAME_LENGTH, HopelessCaptureMax);	
 	const bool win = isWin(result);
 	
 	tree.recordSearchResults(amafMap, color, win);

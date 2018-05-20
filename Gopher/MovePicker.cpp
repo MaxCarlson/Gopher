@@ -6,10 +6,11 @@
 constexpr int MAX_ROLL = 100;
 namespace TryValues
 {
-	constexpr int local_atari = MAX_ROLL * 0.99;
-	constexpr int local_2Lib  = MAX_ROLL * 0.60;
-	constexpr int nakade	  = MAX_ROLL * 0.80;
-	constexpr int capture	  = MAX_ROLL * 0.40;
+	constexpr int local_atari	 = MAX_ROLL * 0.99;
+	constexpr int local_2Lib     = MAX_ROLL * 0.60;
+	constexpr int nakade	     = MAX_ROLL * 0.80;
+	constexpr int global_capture = MAX_ROLL * 0.40;
+	constexpr int global_2lib	 = MAX_ROLL * 0.40;
 };
 
 namespace vals
@@ -71,18 +72,18 @@ bool tryHeuristics(Board & board, Move& ourMove)
 
 	// Check to see if opponent played self atari, 
 	// or if he put one of our groups into atari
-	if (TryValues::local_atari > Random::fastRandom(MAX_ROLL)
+	if (rollDice(TryValues::local_atari)
 		&& localAtari(board, ourMove, board.lastMove))
 		return true;
 
 	// See if we can reduce the group our opponent played on
 	// to atari
-	if (TryValues::local_2Lib > Random::fastRandom(MAX_ROLL)
+	if (rollDice(TryValues::local_2Lib)
 		&& local2Lib(board, ourMove, board.lastMove))
 		return true;
 
 	// Nakade check
-	if (TryValues::nakade > Random::fastRandom(MAX_ROLL)
+	if (rollDice(TryValues::nakade)
 		&& board.immediateLibCount(board.lastMove.idx) > 0
 		&& nakadeCheck(board, ourMove, board.lastMove))
 		return true;
@@ -90,8 +91,12 @@ bool tryHeuristics(Board & board, Move& ourMove)
 	// Global board checks
 
 	// Check board for capturable enemies
-	if (TryValues::capture > Random::fastRandom(MAX_ROLL)
-		&& captureCheck(board, ourMove, board.lastMove))
+	if (rollDice(TryValues::global_capture)
+		&& globalCaptures(board, ourMove, board.lastMove))
+		return true;
+
+	if (rollDice(TryValues::global_2lib)
+		&& global2Libs(board, ourMove, board.lastMove))
 		return true;
 
 	return false;
@@ -183,13 +188,8 @@ bool local2Lib(const Board & board, Move & move, const Move & lastMove)
 	return found;
 }
 
-bool captureCheck(const Board & board, Move & move, const Move & theirMove)
+bool globalCaptures(const Board & board, Move & move, const Move & theirMove)
 {
-	// TODO: Cache groups so we don't have to loop through every point
-	// This would allow for randomly iterating through groups easier as well
-	//
-	// TODO: Look at moves to reduce liberty counts to atari as well?
-
 	FastList<groupId, BoardMaxGroups> groupsInAtari;
 
 	board.foreachGroup([&](groupId gid)
@@ -210,7 +210,7 @@ bool captureCheck(const Board & board, Move & move, const Move & theirMove)
 	{
 		const auto& group = board.groupInfoGid(gid);
 		
-		bool found = false; // TODO: Found probably isn't nescessary since
+		bool found = false; 
 		group.forCachedLibs([&](coord idx)
 		{
 			found = true;
@@ -228,6 +228,74 @@ bool captureCheck(const Board & board, Move & move, const Move & theirMove)
 			
 	for (int i = 0; i < rng; ++i)
 		if (findCapture(groupsInAtari[i]))
+			return true;
+
+	return false;
+}
+
+// TODO: Add a lib expanding function for our global 2 libs?
+// TODO: Combine the duplicate code of this function and above func
+bool global2Libs(const Board & board, Move & move, const Move & theirMove)
+{
+	FastList<groupId, BoardMaxGroups> groupsNearAtari;
+
+	board.foreachGroup([&](groupId gid)
+	{
+		// Don't look at our groups
+		// or at groups with more or less than 2 libs
+		if (board.at(gid) != theirMove.color
+			|| board.groups.groupInfoById(gid).libs == 2)
+			return;
+	});
+
+	if (!groupsNearAtari.size())
+		return false;
+
+	const auto isPlayable = [&](coord idx) -> bool
+	{
+		if (board.immediateLibCount(idx) > 0) // TODO: Playtest this as > 1?
+			return true;
+
+		bool playable = false;
+		board.foreachNeighbor(idx, [&](coord idx, int color)
+		{
+			if (color != move.color)
+				return;
+
+			const auto& group = board.groupInfoAt(idx);
+
+			if (group.libs > 1)
+				playable = true;
+		});
+		return playable;
+	};
+
+	const auto find2Lib = [&](groupId gid) -> bool
+	{
+		const auto& group = board.groupInfoGid(gid);
+
+		coord libs[2] = { Pass, Pass };
+
+		int i = 0;
+		group.forCachedLibs([&](coord idx)
+		{
+			if (isPlayable(idx))
+				libs[i++] = idx;	
+		});
+
+		move.idx = libs[i > 1 ? Random::fastRandom(1) : 0]; // TODO: Make sure this works!
+
+		return i;
+	};
+
+	const auto rng = Random::fastRandom(groupsNearAtari.size());
+
+	for (int i = rng; i < groupsNearAtari.size(); ++i)
+		if (find2Lib(groupsNearAtari[i]))
+			return true;
+
+	for (int i = 0; i < rng; ++i)
+		if (find2Lib(groupsNearAtari[i]))
 			return true;
 
 	return false;

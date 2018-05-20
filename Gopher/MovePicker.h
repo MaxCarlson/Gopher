@@ -13,5 +13,6 @@ namespace MovePicker
 	bool local2Lib(const Board& board, Move& move, const Move& lastMove);
 
 	bool nakadeCheck(const Board& board, Move& move, const Move& theirMove);
-	bool captureCheck(const Board& board, Move& move, const Move& theirMove);
+	bool global2Libs(const Board& board, Move& move, const Move& theirMove);
+	bool globalCaptures(const Board& board, Move& move, const Move& theirMove);
 }
