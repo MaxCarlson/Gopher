@@ -53,14 +53,13 @@ namespace RAVE
 					return;
 
 				// Don't use moves not played by this nodes color
-				const int dist = firstPlayed - (mIdx + 1); // + 0 for RevParity
+				const int dist = firstPlayed - (mIdx + 1); 
 				if (dist & 1)
 					return;
 
 				// Earlier moves are worth more
 				static constexpr double RAVE_DIST = 3.0;
 				const int weight = 1 + (RAVE_DIST * (gameLength - firstPlayed) / (gameLength - mIdx));
-				//int weight = 1; // Only for NoDistWeight
 
 				child.amaf.addData(weight, !isWin * weight); 
 			});

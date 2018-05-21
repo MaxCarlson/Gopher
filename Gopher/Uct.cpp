@@ -11,7 +11,7 @@ static constexpr int TOTAL_PLAYOUTS = 25000;
 
 // Expand a leaf node when it's been 
 // visited this # of times
-static constexpr int EXPAND_AT = 2; 
+static constexpr int EXPAND_AT = 8; 
 
 static constexpr double HopelessCaptureMax = BoardSize2 / 2.5;
 
@@ -31,6 +31,9 @@ coord Uct::search(const Board & board, int color)
 
 	auto start = Time::startTimer();
 
+	// TODO: Add time limit support
+	// TODO: Add in Pass to move tree ?
+
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board bb = board;
@@ -45,8 +48,6 @@ coord Uct::search(const Board & board, int color)
 
 	const coord bestMove = tree.getBestMove();
 
-	// TODO: Need to add in heuristic for when it is best to pass!!!
-	
 	tree.afterSearch();
 
 	return bestMove;

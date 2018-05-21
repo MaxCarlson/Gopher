@@ -10,7 +10,7 @@ namespace TryValues
 	constexpr int local_2Lib     = MAX_ROLL * 0.60;
 	constexpr int nakade	     = MAX_ROLL * 0.80;
 	constexpr int global_capture = MAX_ROLL * 0.40;
-	constexpr int global_2lib	 = MAX_ROLL * 0.40;
+	constexpr int global_2lib	 = MAX_ROLL * 0.30;
 };
 
 namespace vals
