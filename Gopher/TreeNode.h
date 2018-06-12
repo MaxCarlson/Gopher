@@ -20,10 +20,11 @@ struct TreeNode
 
 	MoveStat amaf;
 	MoveStat uct;
+	//MoveStat prior;
 
 	UctTreeNodes* children = nullptr;
 
-	bool expanded() const { return size; } // TODO: This should not be used with size
+	bool empty() const { return !size; } // TODO: This should not be used with size
 	bool isLeaf() const;
 	void clearStats();
 	void allocateChildren();
@@ -41,7 +42,7 @@ struct TreeNode
 
 struct UctTreeNodes
 {
-	//SmallVec<TreeNode, AVG_CHILDREN> nodes;
+	//SmallVec<TreeNode, 80> nodes;
 	std::vector<TreeNode> nodes;
 };
 

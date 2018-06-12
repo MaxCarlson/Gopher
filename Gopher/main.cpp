@@ -2,9 +2,14 @@
 #include "Random.h"
 #include "defines.h"
 #include <chrono>
+#include "PolicyNet.h"
+
 
 int main()
 {
+
+	PolicyNet::init();
+
 	// Quick and dirty fix to make random number generator non-deterministic
 	// for purposes of self-play
 	std::random_device rd;

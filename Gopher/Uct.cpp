@@ -74,7 +74,7 @@ void Uct::playout(Board & board)
 void Uct::walkTree(Board & board, TreeNode& root, int& color)
 {
 	TreeNode* path = &root;
-	while (path->expanded() && !path->isLeaf()) 
+	while (!path->empty() && !path->isLeaf()) 
 	{
 		int bestIdx = 0;
 		path = &RAVE::chooseChild(amafMap, *path, bestIdx);

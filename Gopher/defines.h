@@ -3,7 +3,7 @@
 #include <chrono>
 #include <iostream>
 
-constexpr int BoardSize = 9;
+constexpr int BoardSize = 19;
 constexpr int BoardSize2 = BoardSize * BoardSize;
 constexpr int BoardOffset = 2;
 constexpr int BoardRealSize = BoardSize + BoardOffset;

@@ -512,9 +512,6 @@ int Board::groupCapture(groupId gid)
 
 	Group& g = groups.groupInfoById(gid);
 
-	if (g.libs != 0) // debug
-		std::cerr << "Non zero libs group caputure! " << g.libs << "\n";
-
 	groups.groupList.findErase(gid); // This could cause performance issues! Perft Test!
 
 	std::memset(&g, 0, sizeof(Group));
