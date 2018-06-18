@@ -20,6 +20,8 @@ static constexpr int BoardDepth = LayersPerState * BoardHistory + 1;
 static const std::string pathToCheckpoint = "Models/PolicyModel/latestModel";
 static const std::string pathToGraph = pathToCheckpoint + ".meta";
 
+#include <iomanip>
+
 
 namespace PolicyNet
 {
@@ -79,17 +81,18 @@ void init()
 
 void run()
 {
-	static const std::string inputName = "input/Conv2D";
-	static const std::string outputName = "Output/kernal";
+	static const std::string inputName = "Input/Conv2D:0"; // /kernel:0
+	static const std::string outputName = "Output/bias:0";
 
 	auto shape = tf::TensorShape({ BoardDepth, BoardSize, BoardSize});
 
-	int ar[2527];
+	float ar[2527] = { 0.0 };
 
 	//auto init = tf::Input::Initializer(*ar, shape);
 	//auto placeH = tf::Placeholder
 
-	tf::Tensor input(tf::DT_INT16, shape);
+	tf::Tensor input(tf::DT_FLOAT, shape);
+	std::copy_n(ar, 2527, input.flat<float>().data());
 
 	/*
 	auto inputMap = input.tensor<int, 3>();
@@ -109,6 +112,15 @@ void run()
 
 	status = session->Run(inputs, { outputName }, {}, &outputs);
 
+
+	tf::TTypes<float>::Flat flatOut = outputs[0].flat<float>();
+
+	for (int i = 0; i < BoardSize2; ++i)
+	{
+		if (i % BoardSize == 0)
+			std::cout << '\n';
+		std::cout << std::setprecision(1) << std::setw(4) << flatOut(i) << ", ";
+	}
 
 	int a = 5;
 	/*
