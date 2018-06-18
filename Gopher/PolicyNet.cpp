@@ -54,17 +54,15 @@ void init()
 	
 	//auto ss = graphDef.saver_def().filename_tensor_name();
 	//auto sss = graphDef.saver_def().restore_op_name();
-	int sz = graphDef.graph_def().node_size();
-	std::vector<std::string> vNames;
-	for (int i = 0; i < sz; i++) {
-		auto n = graphDef.graph_def().node(i);
+	//int sz = graphDef.graph_def().node_size();
+	//std::vector<std::string> vNames;
+	//for (int i = 0; i < sz; i++) {
+	//	auto n = graphDef.graph_def().node(i);
 
 		//if (n.name().find("nWeights") != std::string::npos) {
 		//	vNames.push_back(n.name());
 		//}
-	}
-	
-	
+	//}
 
 	status = session->Run(
 		{ { graphDef.saver_def().filename_tensor_name(), checkpointPathTensor }, },
@@ -81,8 +79,8 @@ void init()
 
 void run()
 {
-	static const std::string inputName = "input";
-	static const std::string outputName = "Output";
+	static const std::string inputName = "input/Conv2D";
+	static const std::string outputName = "Output/kernal";
 
 	auto shape = tf::TensorShape({ BoardDepth, BoardSize, BoardSize});
 
