@@ -16,6 +16,7 @@ namespace tf = tensorflow;
 static constexpr int LayersPerState = 2;
 static constexpr int BoardHistory = 3;
 static constexpr int BoardDepth = LayersPerState * BoardHistory + 1;
+static constexpr int InputSize = BoardDepth * BoardSize2;
 
 static const std::string pathToCheckpoint = "Models/PolicyModel/latestModel";
 static const std::string pathToGraph = pathToCheckpoint + ".meta";
@@ -32,6 +33,11 @@ namespace PolicyNet
 
 void init()
 {
+	double memFraction = 0.69;
+	bool allowMemGrowth = true;
+	options.config.mutable_gpu_options()->set_allow_growth(allowMemGrowth);
+	options.config.mutable_gpu_options()->set_per_process_gpu_memory_fraction(memFraction);
+
 	session = tf::NewSession(options);
 	//TF_CHECK_OK(tf::NewSession(options, &session));
 
@@ -51,8 +57,6 @@ void init()
 	// Read the weights
 	tf::Tensor checkpointPathTensor(tf::DT_STRING, tf::TensorShape());
 	checkpointPathTensor.scalar<std::string>()() = pathToCheckpoint;
-
-	
 	
 	//auto ss = graphDef.saver_def().filename_tensor_name();
 	//auto sss = graphDef.saver_def().restore_op_name();
@@ -81,37 +85,24 @@ void init()
 
 void run()
 {
-	static const std::string inputName = "Input/Conv2D:0"; // /kernel:0
-	static const std::string outputName = "Output/bias:0";
+	
+	static const std::string inputName = "Input_input"; 
+	static const std::string outputName = "Output/Softmax";
 
-	auto shape = tf::TensorShape({ BoardDepth, BoardSize, BoardSize});
+	auto shape = tf::TensorShape({ 1, BoardDepth, BoardSize, BoardSize });
 
-	float ar[2527] = { 0.0 };
-
-	//auto init = tf::Input::Initializer(*ar, shape);
-	//auto placeH = tf::Placeholder
+	// Placeholder until we're using actual input data
+	float inData[InputSize] = { 0.0 };
 
 	tf::Tensor input(tf::DT_FLOAT, shape);
-	std::copy_n(ar, 2527, input.flat<float>().data());
-
-	/*
-	auto inputMap = input.tensor<int, 3>();
-	
-	for (int z = 0; z < BoardDepth; ++z)
-		for (int y = 0; y < BoardSize; ++y)
-			for (int x = 0; x < BoardSize; ++x)
-				inputMap(z, x, y) = ar[z * (y * BoardSize + x)];
-	*/
-
+	std::copy_n(inData, InputSize, input.flat<float>().data());
 
 	std::vector<std::pair<std::string, tf::Tensor>> inputs = {
 		{ inputName, input },
 	};
 
 	std::vector<tf::Tensor> outputs;
-
 	status = session->Run(inputs, { outputName }, {}, &outputs);
-
 
 	tf::TTypes<float>::Flat flatOut = outputs[0].flat<float>();
 
@@ -119,7 +110,7 @@ void run()
 	{
 		if (i % BoardSize == 0)
 			std::cout << '\n';
-		std::cout << std::setprecision(1) << std::setw(4) << flatOut(i) << ", ";
+		std::cout << std::setprecision(5) << std::setw(4) << flatOut(i) << ", ";
 	}
 
 	int a = 5;
