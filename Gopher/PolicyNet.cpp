@@ -21,8 +21,10 @@ static constexpr int InputSize = BoardDepth * BoardSize2;
 static const std::string pathToCheckpoint = "Models/PolicyModel/latestModel";
 static const std::string pathToGraph = pathToCheckpoint + ".meta";
 
-#include <iomanip>
+//static const std::string pathToGraph = "Models/PolicyModel/graph.pb";
 
+#include <iomanip>
+#include <tensorflow\cc\saved_model\loader.h>
 
 namespace PolicyNet
 {
@@ -31,45 +33,32 @@ namespace PolicyNet
 	tf::SessionOptions options;
 	tf::MetaGraphDef graphDef;
 
+// TODO: Make the net optional
 void init()
 {
-	double memFraction = 0.69;
+	// Set memory growth manually. Resolves and issue with tf 1.5 for windows
+	double memFraction = 1.0;
 	bool allowMemGrowth = true;
 	options.config.mutable_gpu_options()->set_allow_growth(allowMemGrowth);
 	options.config.mutable_gpu_options()->set_per_process_gpu_memory_fraction(memFraction);
 
 	session = tf::NewSession(options);
-	//TF_CHECK_OK(tf::NewSession(options, &session));
-
-	// TODO: Make the net optional
 	if (!session)
 		throw std::runtime_error("Could no create Tensorflow Session!");
 
 	// Read in the protobuf
 	status = tf::ReadBinaryProto(tf::Env::Default(), pathToGraph, &graphDef);
 	if (!status.ok())
-		throw std::runtime_error("Error creating graph: " + status.ToString());
+		throw std::runtime_error("Error reading graph: " + status.ToString());
 
-
-	//status = session->Create(graphDef);
 	status = session->Create(graphDef.graph_def());
+	if (!status.ok())
+		throw std::runtime_error("Error creating graph: " + status.ToString());
 
 	// Read the weights
 	tf::Tensor checkpointPathTensor(tf::DT_STRING, tf::TensorShape());
 	checkpointPathTensor.scalar<std::string>()() = pathToCheckpoint;
 	
-	//auto ss = graphDef.saver_def().filename_tensor_name();
-	//auto sss = graphDef.saver_def().restore_op_name();
-	//int sz = graphDef.graph_def().node_size();
-	//std::vector<std::string> vNames;
-	//for (int i = 0; i < sz; i++) {
-	//	auto n = graphDef.graph_def().node(i);
-
-		//if (n.name().find("nWeights") != std::string::npos) {
-		//	vNames.push_back(n.name());
-		//}
-	//}
-
 	status = session->Run(
 		{ { graphDef.saver_def().filename_tensor_name(), checkpointPathTensor }, },
 		{},
@@ -87,22 +76,18 @@ void run()
 {
 	
 	static const std::string inputName = "Input_input"; 
-	static const std::string outputName = "Output/Softmax";
+	static const std::string outputName = "Output/Softmax:0";
 
-	auto shape = tf::TensorShape({ 1, BoardDepth, BoardSize, BoardSize });
+	static const auto shape = tf::TensorShape({ 1, BoardDepth, BoardSize, BoardSize });
 
 	// Placeholder until we're using actual input data
-	float inData[InputSize] = { 0.0 };
+	float inData[InputSize] = { 0.f };
 
 	tf::Tensor input(tf::DT_FLOAT, shape);
 	std::copy_n(inData, InputSize, input.flat<float>().data());
 
-	std::vector<std::pair<std::string, tf::Tensor>> inputs = {
-		{ inputName, input },
-	};
-
 	std::vector<tf::Tensor> outputs;
-	status = session->Run(inputs, { outputName }, {}, &outputs);
+	status = session->Run({ { inputName, input } }, { outputName }, {}, &outputs);
 
 	tf::TTypes<float>::Flat flatOut = outputs[0].flat<float>();
 
@@ -110,7 +95,7 @@ void run()
 	{
 		if (i % BoardSize == 0)
 			std::cout << '\n';
-		std::cout << std::setprecision(5) << std::setw(4) << flatOut(i) << ", ";
+		std::cout << std::setw(8) << std::fixed << std::setprecision(5) << flatOut(i) * 100.0 << ", ";
 	}
 
 	int a = 5;
