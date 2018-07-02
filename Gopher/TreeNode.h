@@ -42,7 +42,6 @@ struct TreeNode
 
 struct UctTreeNodes
 {
-	//SmallVec<TreeNode, 80> nodes;
 	std::vector<TreeNode> nodes;
 };
 

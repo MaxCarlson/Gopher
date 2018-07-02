@@ -1,5 +1,6 @@
 #include "PolicyNet.h"
 #include "defines.h"
+#include "GameState.h"
 #include <cntk\Include\CNTKLibrary.h>
 #include <fstream>
 #include <iostream>
@@ -8,7 +9,6 @@
 
 // Move these to defines once relevent for storage
 static constexpr int LayersPerState = 2;
-static constexpr int BoardHistory = 3;
 static constexpr int BoardDepth = LayersPerState * BoardHistory + 1;
 static constexpr int InputSize = BoardDepth * BoardSize2;
 
@@ -17,10 +17,10 @@ static const std::string fileName = "GoNet.dnn";
 
 namespace PolicyNet
 {
-	CNTK::FunctionPtr		model;
+	CNTK::FunctionPtr		 model;
 	CNTK::DeviceDescriptor*  device;
-	CNTK::Variable		    inputVar;
-	CNTK::Variable			outputVar;
+	CNTK::Variable		     inputVar;
+	CNTK::Variable			 outputVar;
 
 void init()
 {
@@ -32,7 +32,7 @@ void init()
 	outputVar = model->Output();
 
 	// Just for testing
-	auto shp = inputVar.Shape();
+	//auto shp = inputVar.Shape();
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
@@ -52,8 +52,8 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 		if (i % 19 == 0 && i != 0)
 			std::cout << '\n';
 
-		std::cout << std::fixed << std::setprecision(4)
-			<< std::setw(7) << out[i] << ", ";
+		std::cout << std::fixed << std::setprecision(2)
+			<< std::setw(6) << out[i] << ", ";
 	}
 	std::cout << '\n';
 }
