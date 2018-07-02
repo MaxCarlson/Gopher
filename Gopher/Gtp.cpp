@@ -1,6 +1,7 @@
 #include "Gtp.h"
 #include "MonteCarlo.h"
 #include "Uct.h"
+#include "GameState.h"
 
 #include <cctype>
 #include <sstream>
@@ -38,6 +39,8 @@ namespace Gtp
 {
 	Board board;
 	MoveStack moveStack;
+	GameState states;
+
 	//Stone color = Stone::BLACK;
 	std::map<std::string, std::function<int(std::istringstream&, int)>> options;
 
@@ -112,7 +115,9 @@ void buildCommandsMap(Map& options)
 
 void mainLoop()
 {
+	// Initialize board and root state
 	board.init();
+	states.makeMove(board);
 
 	buildCommandsMap(options);
 
@@ -273,6 +278,7 @@ int play(std::istringstream& is, int id)
 		return gtpFailure(id, "invalid coordinates for move");
 
 	board.makeMoveGtp(m);
+	states.makeMove(board);
 
 	if (isPass(m) || isResign(m))
 		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
@@ -296,6 +302,7 @@ int generateMove(std::istringstream& is, int id)
 	Move m = { idx, color };
 
 	board.makeMoveGtp(m);
+	states.makeMove(board);
 
 	// Rudimentry move stack
 	moveStack.emplace_back(m);
@@ -316,6 +323,7 @@ int setBoardSize(std::istringstream& is, int id)
 int clearBoard(std::istringstream& is, int id)
 {
 	board.init();
+	states.clear();
 	return gtpSuccess(id, "");
 }
 

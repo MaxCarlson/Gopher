@@ -20,5 +20,6 @@ public:
 
 	void makeMove(const Board& board);
 	void popState();
+	void clear();
 };
 

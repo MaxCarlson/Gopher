@@ -14,3 +14,8 @@ void GameState::popState()
 	--stateIdx;
 	// Don't remove states that might later be filled again
 }
+
+void GameState::clear()
+{
+	stateIdx = 0;
+}
