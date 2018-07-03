@@ -34,6 +34,7 @@ public:
 	void popState();
 	void clear();
 
+	// Generate the input the Net takes
 	NetInput genNetInput(int color) const;
 };
 

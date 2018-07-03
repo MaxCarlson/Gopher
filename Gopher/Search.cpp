@@ -8,7 +8,7 @@ static constexpr int TOTAL_PLAYOUTS = 25000;
 coord Search::search(const Board & board, GameState& state, int color)
 {
 	if (!root.isExpanded())
-		root.expand();
+		root.expand(state, board, color);
 
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
