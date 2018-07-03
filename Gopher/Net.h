@@ -1,10 +1,14 @@
 #pragma once
 
-namespace PolicyNet
+
+
+namespace Net
 {
 	void init();
 	
 	// We'll eventually pass this the board
 	void run();
+
+	
 }
 

@@ -105,15 +105,6 @@ namespace RAVE
 	{
 		double val;
 
-		/*/
-		double a = getBeta(10, 5);
-		double aa = getBeta(5, 15);
-		double aaa = getBeta(80, 2);
-		double aaaa = getBeta(90, 7);
-		double aaaaa = getBeta(50, 75);
-		double aaaaaa = getBeta(30, 15);
-		*/
-
 		// TODO: These should be cached and updated in updateTree?
 		const double uct = static_cast<double>(child.uct.wins) / static_cast<double>(child.uct.visits);
 		//const double uct = child.uct.winrate;

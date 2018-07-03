@@ -1,4 +1,4 @@
-#include "PolicyNet.h"
+#include "Net.h"
 #include "defines.h"
 #include "GameState.h"
 #include <cntk\Include\CNTKLibrary.h>
@@ -7,15 +7,10 @@
 #include <iomanip>
 
 
-// Move these to defines once relevent for storage
-static constexpr int LayersPerState = 2;
-static constexpr int BoardDepth = LayersPerState * BoardHistory + 1;
-static constexpr int InputSize = BoardDepth * BoardSize2;
-
 static const std::string modelPath = "models/PolicyModel/";
 static const std::string fileName = "GoNet.dnn";
 
-namespace PolicyNet
+namespace Net
 {
 	CNTK::FunctionPtr		 model;
 	CNTK::DeviceDescriptor*  device;
@@ -30,6 +25,8 @@ void init()
 	device    = &CNTK::DeviceDescriptor::UseDefaultDevice();
 	inputVar  = model->Arguments()[0];
 	outputVar = model->Output();
+
+	// TODO: Train two heads as in alpha go, one for value of board state one for policy to move
 
 	// Just for testing
 	//auto shp = inputVar.Shape();

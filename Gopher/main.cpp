@@ -2,13 +2,13 @@
 #include "Random.h"
 #include "defines.h"
 #include <chrono>
-#include "PolicyNet.h"
+#include "Net.h"
 
 
 int main()
 {
 
-	PolicyNet::init();
+	Net::init();
 
 	// Quick and dirty fix to make random number generator non-deterministic
 	// for purposes of self-play

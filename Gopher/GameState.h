@@ -1,9 +1,21 @@
 #pragma once
 #include "Board.h"
+#include <array>
 #include <vector>
 
 // How many states do we hold on to?
 static constexpr int BoardHistory = 3;
+// Move these to defines once relevent for storage
+static constexpr int LayersPerState = 2;
+static constexpr int BoardDepth = LayersPerState * BoardHistory + 1;
+static constexpr int InputSize = BoardDepth * BoardSize2;
+
+using NetSlice = std::vector<float>;
+
+struct NetInput
+{
+	std::array<std::array<float, BoardSize2>, BoardDepth> slices;
+};
 
 class GameState
 {
@@ -21,5 +33,8 @@ public:
 	void makeMove(const Board& board);
 	void popState();
 	void clear();
+
+	NetInput genNetInput(int color) const;
 };
+
 

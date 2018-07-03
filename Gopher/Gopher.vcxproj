@@ -140,11 +140,12 @@
     <ClCompile Include="MonteCarlo.cpp" />
     <ClCompile Include="MovePicker.cpp" />
     <ClCompile Include="Playout.cpp" />
-    <ClCompile Include="PolicyNet.cpp" />
+    <ClCompile Include="Net.cpp" />
     <ClCompile Include="Search.cpp" />
     <ClCompile Include="SearchTree.cpp" />
     <ClCompile Include="SkewMoves.cpp" />
     <ClCompile Include="Threads.cpp" />
+    <ClCompile Include="Tree.cpp" />
     <ClCompile Include="TreeNode.cpp" />
     <ClCompile Include="Uct.cpp" />
   </ItemGroup>
@@ -159,13 +160,14 @@
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveStats.h" />
     <ClInclude Include="Playout.h" />
-    <ClInclude Include="PolicyNet.h" />
+    <ClInclude Include="Net.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Search.h" />
     <ClInclude Include="SearchTree.h" />
     <ClInclude Include="SkewMoves.h" />
     <ClInclude Include="Stone.h" />
     <ClInclude Include="Threads.h" />
+    <ClInclude Include="Tree.h" />
     <ClInclude Include="TreeNode.h" />
     <ClInclude Include="Uct.h" />
   </ItemGroup>
