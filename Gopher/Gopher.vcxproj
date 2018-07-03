@@ -143,7 +143,6 @@
     <ClCompile Include="Net.cpp" />
     <ClCompile Include="Search.cpp" />
     <ClCompile Include="SearchTree.cpp" />
-    <ClCompile Include="SkewMoves.cpp" />
     <ClCompile Include="Threads.cpp" />
     <ClCompile Include="Tree.cpp" />
     <ClCompile Include="TreeNode.cpp" />
@@ -164,7 +163,6 @@
     <ClInclude Include="Random.h" />
     <ClInclude Include="Search.h" />
     <ClInclude Include="SearchTree.h" />
-    <ClInclude Include="SkewMoves.h" />
     <ClInclude Include="Stone.h" />
     <ClInclude Include="Threads.h" />
     <ClInclude Include="Tree.h" />

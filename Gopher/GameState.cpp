@@ -9,7 +9,7 @@ void GameState::makeMove(const Board & board)
 	}
 
 	// Copy the board's points into the next state
-	std::copy_n(board.points, BoardRealSize2, states[stateIdx++]);
+	std::copy_n(board.points, BoardRealSize2, states[stateIdx++].data());
 }
 
 void GameState::popState()
@@ -31,13 +31,14 @@ inline int getPaddedIdx(int x, int y)
 NetInput GameState::genNetInput(int color) const
 {
 	NetInput input;
+	input.slices.resize(InputSize);
 
 	// Fill the color slice with appropriate color
-	std::fill_n(input.slices[0], BoardSize2, static_cast<float>(color - 1));
+	std::fill_n(input.slices.data(), BoardSize2, static_cast<float>(color - 1));
 	
 	// Fill the rest of the binary slices
-	int sliceIdx = 1;
-	for (int i = 0; (i < moves && i < BoardHistory); ++i)
+	int sliceIdx = 0;
+	for (int i = 0; (i < moves && i < BoardHistory); i += 2)
 	{
 		for (int c = 0; c < 2; ++c)
 		{
@@ -47,11 +48,14 @@ NetInput GameState::genNetInput(int color) const
 				for (int y = 0; y < BoardSize; ++y)
 				{
 					const int pIdx = getPaddedIdx(x, y);
-					input.slices[sliceIdx][idx] = static_cast<float>(states[stateIdx - sliceIdx][pIdx]);
+					const int inIdx = sliceIdx * BoardSize2 + idx;
+
+					input.slices[inIdx] = static_cast<float>(states[stateIdx - sliceIdx][pIdx]);
 					++idx;
 				}
 		}
 	}
+	
 
 	return input;
 }

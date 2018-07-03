@@ -35,8 +35,6 @@ void init()
 	// 1: Figure out how we want to store the binary board states
 	// 2: Implement the storing or creation of the needed inputs
 	// 3: Figure out what orientation the flat inputVar takes (compared to the models 3D input)
-
-	run();
 }
 
 template<class T>
@@ -55,13 +53,12 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 	std::cout << '\n';
 }
 
-void testRun()
+NetResult run(const GameState& state, int color)
 {
-	std::vector<float> inputData(inputVar.Shape().TotalSize());
-	std::fill(inputData.begin(), inputData.end(), 0.f);
+	NetInput input = state.genNetInput(color);
 
 	// Create input value and input data map
-	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), inputData, *device);
+	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, *device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };
 
 	// Create output data map. Using null as Value to indicate using system allocated memory.
@@ -72,15 +69,15 @@ void testRun()
 	model->Evaluate(inputDataMap, outputDataMap, *device);
 
 	auto outputVal = outputDataMap[outputVar];
-	std::vector<std::vector<float>> outputData;
-	outputVal->CopyVariableValueTo(outputVar, outputData);
 
-	printNetOut(outputVar.Shape().TotalSize(), outputData);
-}
+	NetResult result;
+	outputVal->CopyVariableValueTo(outputVar, result.output);
 
-void run()
-{
-	testRun();
+
+	// Debugging only!
+	printNetOut(outputVar.Shape().TotalSize(), result.output);
+
+	return result;
 }
 
 }

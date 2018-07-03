@@ -14,7 +14,7 @@ using NetSlice = std::vector<float>;
 
 struct NetInput
 {
-	std::array<std::array<float, BoardSize2>, BoardDepth> slices;
+	std::vector<float> slices;
 };
 
 class GameState
