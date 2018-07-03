@@ -3,6 +3,7 @@
 #include "GameState.h"
 #include "Net.h"
 
+static constexpr int MAX_DEPTH = 250;
 static constexpr int TOTAL_PLAYOUTS = 25000;
 
 coord Search::search(const Board & board, GameState& state, int color)
@@ -12,16 +13,39 @@ coord Search::search(const Board & board, GameState& state, int color)
 
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
-		playout(board, state, &root, color);
+		playout(board, state, &root, 0, color);
 	}
 
 	// TODO: Add time based search instead of playout based!
 	return coord();
 }
 
-void Search::playout(Board board, GameState & state, UctNode* const node, int color)
+int Search::playout(Board board, GameState & state, UctNode* const node, int depth, int color)
 {
-	
+	++depth;
+	++node->visits;
+
+	// TODO: Implement stop if Passes >= 2
+	// TODO: Add output 362 for passes to Net
+	// TODO: Add dynamic depth increases with a limit early on, lossening later in the search
+	// mainly so we can get more exploration
+	if (depth >= MAX_DEPTH)
+		return board.scoreFast();
+
+	// TODO: Need to limit expansions somehow as search grows larger
+	// TODO: Dynamically lower total nodes expanded when expanding later in search
+	if (!node->isExpanded())
+		node->expand(state, board, color);
+
+	auto bestChild = node->selectChild(color);
+
+	board.makeMove({ bestChild->idx, color });
+
+	const int result = playout(board, state, bestChild, depth, flipColor(color));
+
+	node->scoreNode(result, color);
+
+	return result;
 }
 
 void Search::walkTree(Board & board, GameState & state, int & color)

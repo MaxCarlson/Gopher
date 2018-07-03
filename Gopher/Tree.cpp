@@ -26,12 +26,13 @@ void UctNode::expand(const GameState& state, const Board& board, int color)
 		// TODO: Optimize memory allocations ~ They're very poorly done here
 		auto node = UctNode{};
 		node.wins += score;
+		node.idx = rIdx;
 		children.emplace_back(node);
 		++idx;
 	}
 }
 
-void UctNode::selectChild(int color)
+UctNode* UctNode::selectChild(int color)
 {
 	int idx = 0;
 	int bestIdx = 0;
@@ -57,9 +58,15 @@ void UctNode::selectChild(int color)
 		++idx;
 	}
 
+	return &children[bestIdx];
 }
 
 bool UctNode::isExpanded()
 {
 	return expanded;
+}
+
+void UctNode::scoreNode(int result, int color)
+{
+	wins += color == BLACK ? (result <= 0) : (result >= 0);
 }
