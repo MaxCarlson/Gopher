@@ -13,7 +13,6 @@ static const std::string fileName = "GoNet.dnn";
 namespace Net
 {
 	CNTK::FunctionPtr		 model;
-	CNTK::DeviceDescriptor*  device;
 	CNTK::Variable		     inputVar;
 	CNTK::Variable			 outputVar;
 
@@ -22,7 +21,6 @@ void init()
 	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
 
 	model     = CNTK::Function::Load(ifs);
-	device    = &CNTK::DeviceDescriptor::UseDefaultDevice();
 	inputVar  = model->Arguments()[0];
 	outputVar = model->Output();
 
@@ -56,9 +54,11 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 NetResult run(const GameState& state, int color)
 {
 	NetInput input = state.genNetInput(color);
+	
+	// This needs to be called here and not before, for some reason
+	const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
 
-	// Create input value and input data map
-	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, *device);
+	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };
 
 	// Create output data map. Using null as Value to indicate using system allocated memory.
@@ -66,13 +66,12 @@ NetResult run(const GameState& state, int color)
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> outputDataMap = { { outputVar, nullptr } };
 
 	// Evaluate!
-	model->Evaluate(inputDataMap, outputDataMap, *device);
+	model->Evaluate(inputDataMap, outputDataMap, device);
 
 	auto outputVal = outputDataMap[outputVar];
 
 	NetResult result;
 	outputVal->CopyVariableValueTo(outputVar, result.output);
-
 
 	// Debugging only!
 	printNetOut(outputVar.Shape().TotalSize(), result.output);

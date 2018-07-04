@@ -7,7 +7,7 @@ inline int idxToRealIdx(int idx)
 {
 	const int x = idx % BoardSize;
 	const int y = idx / BoardSize;
-	return (y + 1) * BoardRealSize2 + (x + 1);
+	return (y + 1) * BoardRealSize + (x + 1);
 }
 
 void UctNode::expand(const GameState& state, const Board& board, int color)

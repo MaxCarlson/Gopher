@@ -18,3 +18,5 @@ private:
 	void walkTree(Board& board, GameState& state, int& color);
 };
 
+inline Search search;
+

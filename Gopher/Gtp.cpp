@@ -2,6 +2,7 @@
 #include "MonteCarlo.h"
 #include "Uct.h"
 #include "GameState.h"
+#include "Search.h"
 
 #include <cctype>
 #include <sstream>
@@ -297,7 +298,9 @@ int generateMove(std::istringstream& is, int id)
 	Stone color = gtpWOrB(colorStr);
 
 	//coord idx = monte.genMove(color);
-	coord idx = uct.search(board, color);
+	coord idx = search.search(board, states, color);
+
+	//coord idx = uct.search(board, color);
 
 	Move m = { idx, color };
 

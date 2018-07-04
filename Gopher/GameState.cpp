@@ -31,10 +31,11 @@ inline int getPaddedIdx(int x, int y)
 NetInput GameState::genNetInput(int color) const
 {
 	NetInput input;
-	input.slices.resize(InputSize);
+	input.slices.resize(InputSize, 0.f);
 
 	// Fill the color slice with appropriate color
-	std::fill_n(input.slices.data(), BoardSize2, static_cast<float>(color - 1));
+	if(color == WHITE)
+		std::fill_n(input.slices.data(), BoardSize2, static_cast<float>(color - 1));
 	
 	// Fill the rest of the binary slices
 	int sliceIdx = 0;
