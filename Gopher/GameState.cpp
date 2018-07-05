@@ -41,9 +41,9 @@ NetInput GameState::genNetInput(int color) const
 	int sliceIdx = 0;
 	for (int i = 0; (i < moves && i < BoardHistory); i += 2)
 	{
+		++sliceIdx;
 		for (int c = 0; c < 2; ++c)
 		{
-			++sliceIdx;
 			int idx = 0;
 			for (int x = 0; x < BoardSize; ++x)
 				for (int y = 0; y < BoardSize; ++y)
