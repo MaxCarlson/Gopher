@@ -37,13 +37,18 @@ int Search::playout(Board board, GameState & state, UctNode* const node, int dep
 	if (!node->isExpanded())
 		node->expand(state, board, color);
 
-	auto bestChild = node->selectChild(color);
+	const auto& bestChild = node->selectChild(color);
 
 	board.makeMove({ bestChild->idx, color });
+	state.makeMove(board);
 
 	const int result = playout(board, state, bestChild, depth, flipColor(color));
 
 	node->scoreNode(result, color);
+
+	// Roll back the board state (Not the actual board though)
+	// That will be undone at the very end
+	state.popState();
 
 	return result;
 }
