@@ -37,7 +37,7 @@ UctNode* UctNode::selectChild(int color)
 	int idx = 0;
 	int bestIdx = 0;
 	static constexpr double UCT_EXPLORE = 0.35;
-	double best = std::numeric_limits<double>::min();
+	double best = std::numeric_limits<double>::lowest();
 
 	for (const auto& child : children)
 	{

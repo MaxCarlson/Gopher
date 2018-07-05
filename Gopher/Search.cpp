@@ -13,14 +13,15 @@ coord Search::search(const Board & board, GameState& state, int color)
 
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
-		playout(board, state, &root, 0, color);
+		Board b = board;
+		playout(b, state, &root, 0, color);
 	}
 
 	// TODO: Add time based search instead of playout based!
 	return coord();
 }
 
-int Search::playout(Board board, GameState & state, UctNode* const node, int depth, int color)
+int Search::playout(Board& board, GameState & state, UctNode* const node, int depth, int color)
 {
 	++depth;
 	++node->visits;
