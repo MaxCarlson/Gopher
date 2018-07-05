@@ -74,7 +74,7 @@ NetResult run(const GameState& state, int color)
 	outputVal->CopyVariableValueTo(outputVar, result.output);
 
 	// Debugging only!
-	printNetOut(outputVar.Shape().TotalSize(), result.output);
+	//printNetOut(outputVar.Shape().TotalSize(), result.output);
 
 	return result;
 }
