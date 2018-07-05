@@ -38,15 +38,7 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 	if (!node->isExpanded())
 		node->expand(state, board, color);
 
-	if (node->children.size() < 15)
-	{
-		board.printBoard();
-		node->children.clear();
-		node->expand(state, board, color);
-	}
-
 	int result = 0;
-
 	if (!node->children.empty())
 	{
 		const auto& bestChild = node->selectChild(color);
@@ -54,6 +46,9 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 		board.makeMove({ bestChild->idx, color });
 		state.makeMove(board);
 
+		// TODO: Don't know if this recursive method that Leela uses will work
+		// without a value network. I have no way to decide when to start trimming nodes
+		// other than depth (and policy network preference)
 		result = playout(board, state, bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)

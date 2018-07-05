@@ -51,7 +51,7 @@ NetInput GameState::genNetInput(int color) const
 					const int pIdx = getPaddedIdx(x, y);
 					const int inIdx = sliceIdx * BoardSize2 + idx;
 
-					input.slices[inIdx] = static_cast<float>(states[stateIdx - sliceIdx][pIdx]);
+					input.slices[inIdx] = static_cast<float>(states[stateIdx - sliceIdx][pIdx] == c);
 					++idx;
 				}
 		}
