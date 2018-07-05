@@ -6,7 +6,7 @@ struct Board;
 
 struct UctNode
 {
-	char idx		= 0;
+	int16_t idx		= 0;
 	int wins		= 0;
 	int visits		= 0;
 	bool expanded	= false;
