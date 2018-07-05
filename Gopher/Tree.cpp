@@ -20,7 +20,10 @@ void UctNode::expand(const GameState& state, const Board& board, int color)
 	{
 		auto rIdx = idxToRealIdx(idx);
 		if (!board.isValidNoSuicide({ rIdx, color }))
+		{
+			++idx;
 			continue;
+		}
 
 		// TODO: Think about how we should bonus the nodes scored high here
 		// TODO: Optimize memory allocations ~ They're very poorly done here
