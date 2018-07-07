@@ -3,7 +3,6 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int MAX_DEPTH = 250;
 static constexpr int TOTAL_PLAYOUTS = 25000;
 
 coord Search::search(const Board & board, GameState& state, int color)
@@ -29,17 +28,20 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 	// TODO: Implement stop if Passes >= 2
 	// TODO: Add output 362 for passes to Net
 	// TODO: Add dynamic depth increases with a limit early on, lossening later in the search
-	// mainly so we can get more exploration
-	if (depth >= MAX_DEPTH)
-		return board.scoreFast();
 
 	// TODO: Need to limit expansions somehow as search grows larger
 	// TODO: Dynamically lower total nodes expanded when expanding later in search
+	int result = 0;
+	
 	if (!node->isExpanded())
+	{
 		node->expand(state, board, color);
 
-	int result = 0;
-	if (!node->children.empty())
+		// TODO: This will be replaced with the networks value head
+		// telling us the estimated win chance here
+		result = board.scoreFast();
+	}
+	else if (!node->children.empty())
 	{
 		const auto& bestChild = node->selectChild(color);
 

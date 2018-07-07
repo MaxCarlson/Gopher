@@ -7,6 +7,7 @@
 #include <iomanip>
 
 
+
 static const std::string modelPath = "models/PolicyModel/";
 static const std::string fileName = "GoNet.dnn";
 
@@ -53,8 +54,12 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 
 NetResult run(const GameState& state, int color)
 {
+
 	NetInput input = state.genNetInput(color);
 	
+	auto start = Time::startTimer();
+
+
 	// This needs to be called here and not before, for some reason
 	const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
 
@@ -69,9 +74,11 @@ NetResult run(const GameState& state, int color)
 	model->Evaluate(inputDataMap, outputDataMap, device);
 
 	auto outputVal = outputDataMap[outputVar];
-
+	
 	NetResult result;
 	outputVal->CopyVariableValueTo(outputVar, result.output);
+
+	std::cerr << "\n Search Time: " << Time::endTime<std::chrono::duration<double>>(start) << '\n';
 
 	// Debugging only!
 	//printNetOut(outputVar.Shape().TotalSize(), result.output);

@@ -51,6 +51,11 @@ NetInput GameState::genNetInput(int color) const
 					const int pIdx = getPaddedIdx(x, y);
 					const int inIdx = sliceIdx * BoardSize2 + idx;
 
+					// TODO: VERIFY THIS IS WORKING AS INTENDED
+					// 
+					// TODO: Pass trivial(simple/repeatable) but no zero input into the net
+					// here and in the python CNTK trainer and verify output is identical (also verify
+					// that the orientation in the 1D array is correct here)
 					input.slices[inIdx] = static_cast<float>(states[stateIdx - sliceIdx][pIdx] == c);
 					++idx;
 				}
