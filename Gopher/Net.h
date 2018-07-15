@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <functional>
-
+#include <algorithm>
 class GameState;
 
 // Apply softmax to the input vector
@@ -11,8 +11,9 @@ template<class T>
 void softmax(std::vector<T>& vec)
 {
 	const auto maxEle = *std::max_element(std::begin(vec), std::end(vec));
-	auto total = 0;
+	T total = 0;
 
+	// TODO: Look into effeciancies of this method!
 	std::transform(std::begin(vec),
 		std::end(vec),
 		std::begin(vec),
@@ -21,6 +22,13 @@ void softmax(std::vector<T>& vec)
 		auto ex = std::exp(x - maxEle);
 		total += ex;
 		return ex;
+	});
+	std::transform(std::begin(vec),
+		std::end(vec),
+		std::begin(vec),
+		[&](T v)
+	{
+		return v / total;
 	});
 }
 
