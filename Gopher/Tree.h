@@ -2,7 +2,9 @@
 #include <vector>
 
 class GameState;
+class NetResult;
 struct Board;
+using coord = int;
 
 struct UctNode
 {
@@ -19,4 +21,11 @@ struct UctNode
 
 	std::vector<UctNode> children;
 };
+
+namespace Tree
+{
+	inline UctNode root;
+
+	coord findBestMove();
+}
 

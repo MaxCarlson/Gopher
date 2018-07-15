@@ -74,3 +74,26 @@ void UctNode::scoreNode(bool win)
 	//wins += color == BLACK ? (result <= 0) : (result >= 0);
 	wins += win;
 }
+
+namespace Tree
+{
+
+
+coord findBestMove()
+{
+	// TODO: Should we look at both wins and win ratio?
+	auto bestNode  = std::max_element(
+		std::begin(root.children), 
+		std::end(root.children), 
+		[&](const UctNode& node0, const UctNode& node1)
+	{
+		return node0.wins < node1.wins;
+	});
+
+	return bestNode->idx;
+}
+
+
+}
+
+

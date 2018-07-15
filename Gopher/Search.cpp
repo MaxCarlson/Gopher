@@ -3,21 +3,24 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 25000;
+static constexpr int TOTAL_PLAYOUTS = 361;// 25000;
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
-	if (!root.isExpanded())
-		root.expand(state, board, color);
+	if (!Tree::root.isExpanded())
+	{
+		NetResult netResult = Net::run(state, color);
+		Tree::root.expand(state, board, netResult, color);
+	}
 
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board b = board;
-		playout(b, state, &root, 0, color);
+		playout(b, state, &Tree::root, 0, color);
 	}
 
 	// TODO: Add time based search instead of playout based!
-	return coord();
+	return Tree::findBestMove();
 }
 
 int Search::playout(Board& board, GameState & state, UctNode* const node, int depth, int color)
