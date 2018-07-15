@@ -8,14 +8,16 @@
 
 
 
-static const std::string modelPath = "models/PolicyModel/";
+//static const std::string modelPath = "models/PolicyModel/";
+static const std::string modelPath = "models/";
 static const std::string fileName = "GoNet.dnn";
 
 namespace Net
 {
-	CNTK::FunctionPtr		 model;
-	CNTK::Variable		     inputVar;
-	CNTK::Variable			 outputVar;
+	CNTK::FunctionPtr	model;
+	CNTK::Variable		inputVar;
+	CNTK::Variable		policyOut;
+	CNTK::Variable		valueOut;
 
 void init()
 {
@@ -23,12 +25,8 @@ void init()
 
 	model     = CNTK::Function::Load(ifs);
 	inputVar  = model->Arguments()[0];
-	outputVar = model->Output();
-
-	// TODO: Train two heads as in alpha go, one for value of board state one for policy to move
-
-	// Just for testing
-	//auto shp = inputVar.Shape();
+	policyOut = model->Outputs()[0];
+	valueOut  = model->Outputs()[1];
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
@@ -61,22 +59,34 @@ NetResult run(const GameState& state, int color)
 
 
 	// This needs to be called here and not before, for some reason
-	const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
+	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
+	//
+	// Only for debugging while GPU is being used for training!
+	const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };
 
 	// Create output data map. Using null as Value to indicate using system allocated memory.
 	// Alternatively, create a Value object and add it to the data map.
-	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> outputDataMap = { { outputVar, nullptr } };
+	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> outputDataMap = { { policyOut, nullptr }, { valueOut, nullptr } };
 
 	// Evaluate!
 	model->Evaluate(inputDataMap, outputDataMap, device);
 
-	auto outputVal = outputDataMap[outputVar];
-	
+	// TODO: Effeciancy here can definitely be improved.
+	// Allocating memory twice seems stupid
+	int i = 0;
 	NetResult result;
-	outputVal->CopyVariableValueTo(outputVar, result.output);
+	for (const auto& outputPair : outputDataMap)
+	{
+		const auto& var = outputPair.first;
+		const auto& val = outputPair.second;
+		std::vector<std::vector<float>> outputData;
+		val->CopyVariableValueTo(var, outputData);
+		std::move(std::begin(outputData[0]), std::end(outputData[0]), std::begin(result.output[i++]));
+	}
+	result.process();
 
 	std::cerr << "\n Search Time: " << Time::endTime<std::chrono::duration<double>>(start) << '\n';
 
