@@ -56,7 +56,7 @@ struct NetResult
 		OPPONENT
 	};
 
-	std::vector<float>& moves()		 { return output[MOVES];	  }
+	const std::vector<float>& moves() const { return output[MOVES];	  }
 	std::vector<float>& winChances() { return output[WIN_CHANCE]; }
 
 	float winChance(Side side) const

@@ -10,10 +10,10 @@ inline int idxToRealIdx(int idx)
 	return (y + 1) * BoardRealSize + (x + 1);
 }
 
-void UctNode::expand(const GameState& state, const Board& board, int color)
+void UctNode::expand(const GameState& state, const Board& board, const NetResult& result, int color)
 {
 	expanded = true;
-	NetResult result = Net::run(state, color);
+	winVal = result.winChance(NetResult::TO_MOVE);
 
 	int idx = 0;
 	for (const auto score : result.moves())
@@ -69,7 +69,8 @@ bool UctNode::isExpanded()
 	return expanded;
 }
 
-void UctNode::scoreNode(int result, int color)
+void UctNode::scoreNode(bool win)
 {
-	wins += color == BLACK ? (result <= 0) : (result >= 0);
+	//wins += color == BLACK ? (result <= 0) : (result >= 0);
+	wins += win;
 }

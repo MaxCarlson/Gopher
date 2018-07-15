@@ -28,18 +28,18 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 	// TODO: Implement stop if Passes >= 2
 	// TODO: Add output 362 for passes to Net
 	// TODO: Add dynamic depth increases with a limit early on, lossening later in the search
-
 	// TODO: Need to limit expansions somehow as search grows larger
 	// TODO: Dynamically lower total nodes expanded when expanding later in search
-	int result = 0;
+	bool isWin = 0;
 	
 	if (!node->isExpanded())
 	{
-		node->expand(state, board, color);
+		NetResult netResult = Net::run(state, color);
 
-		// TODO: This will be replaced with the networks value head
-		// telling us the estimated win chance here
-		result = board.scoreFast();
+		node->expand(state, board, netResult, color);
+
+		// TODO: Should this just be a binary win #? Probably?
+		isWin = node->winVal > 0.5;
 	}
 	else if (!node->children.empty())
 	{
@@ -48,21 +48,21 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 		board.makeMove({ bestChild->idx, color });
 		state.makeMove(board);
 
-		// TODO: Don't know if this recursive method that Leela uses will work
-		// without a value network. I have no way to decide when to start trimming nodes
-		// other than depth (and policy network preference)
-		result = playout(board, state, bestChild, depth, flipColor(color));
+		// Flip the result of our opponents playout
+		// If they won we lost
+		isWin = !playout(board, state, bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)
 		// That will be undone at the very end
 		state.popState();
 	}
-	else
-		result = board.scoreFast();
+	// How should this branch be handled?
+	//else
+	//	result = board.scoreFast();
 
-	node->scoreNode(result, color);
+	node->scoreNode(isWin);
 
-	return result;
+	return isWin;
 }
 
 void Search::walkTree(Board & board, GameState & state, int & color)
