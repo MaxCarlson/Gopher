@@ -42,7 +42,8 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 		node->expand(state, board, netResult, color);
 
 		// TODO: Should this just be a binary win #? Probably?
-		isWin = node->winVal > 0.5;
+		// TODO: BE sure not to flip this when we're coming from root!
+		isWin = node->value > 0.5;
 	}
 	else if (!node->children.empty())
 	{
@@ -53,13 +54,16 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 
 		// Flip the result of our opponents playout
 		// If they won we lost
+		//
+		// TODO: We need to make sure this isn't flipped when we're coming from root, it isn't right!!
 		isWin = !playout(board, state, bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)
 		// That will be undone at the very end
 		state.popState();
 	}
-	// How should this branch be handled?
+	// How should this branch(Leaf but previously expanded) be handled?
+	// Return recorded score?
 	//else
 	//	result = board.scoreFast();
 

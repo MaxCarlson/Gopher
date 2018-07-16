@@ -13,25 +13,19 @@ inline int idxToRealIdx(int idx)
 void UctNode::expand(const GameState& state, const Board& board, const NetResult& result, int color)
 {
 	expanded = true;
-	winVal = result.winChance(NetResult::TO_MOVE);
+	value    = result.winChance(NetResult::TO_MOVE);
 
-	int idx = 0;
-	for (const auto score : result.moves())
+	int idx = -1;
+	for (const auto moveProb : result.moves())
 	{
-		auto rIdx = idxToRealIdx(idx);
+		++idx;
+		const int16_t rIdx = idxToRealIdx(idx);
 		if (!board.isValidNoSuicide({ rIdx, color }))
-		{
-			++idx;
 			continue;
-		}
 
 		// TODO: Think about how we should bonus the nodes scored high here
 		// TODO: Optimize memory allocations ~ They're very poorly done here
-		auto node = UctNode{};
-		node.wins += score;
-		node.idx = rIdx;
-		children.emplace_back(node);
-		++idx;
+		children.emplace_back(UctNode{ rIdx, moveProb });
 	}
 }
 
@@ -46,12 +40,21 @@ UctNode* UctNode::selectChild(int color)
 	{
 		double val; 
 
+		/* // Formal UCT
 		if (child.visits == 0)
-			val = 10000.0 + static_cast<double>(Random::fastRandom(10000));
+			val = child.prior; //10000.0 + static_cast<double>(Random::fastRandom(10000));
 		else
 			val = (static_cast<double>(child.wins)
 				/ static_cast<double>(child.visits))
 			    + UCT_EXPLORE * std::sqrt(std::log(this->visits) / child.visits);
+		*/
+
+		auto usa = child.prior / static_cast<double>(1 + child.visits);
+		auto uct = (static_cast<double>(child.wins)
+				 / static_cast<double>(child.visits))
+				 + UCT_EXPLORE * std::sqrt(std::log(this->visits) / child.visits);
+
+		val = uct + usa;
 
 		if (val > best)
 		{
@@ -87,7 +90,7 @@ coord findBestMove()
 		std::end(root.children), 
 		[&](const UctNode& node0, const UctNode& node1)
 	{
-		return node0.wins < node1.wins;
+		return node0.visits < node1.visits;
 	});
 
 	return bestNode->idx;

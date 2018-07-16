@@ -88,7 +88,7 @@ NetResult run(const GameState& state, int color)
 	}
 	result.process();
 
-	std::cerr << "\n Search Time: " << Time::endTime<std::chrono::duration<double>>(start) << '\n';
+	//std::cerr << "\n Search Time: " << Time::endTime<std::chrono::duration<double>>(start) << '\n';
 
 	// Debugging only!
 	//printNetOut(outputVar.Shape().TotalSize(), result.output);
