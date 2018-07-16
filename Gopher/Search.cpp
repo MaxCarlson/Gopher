@@ -1,4 +1,5 @@
 #include "Search.h"
+#include "UctNode.h"
 #include "Board.h"
 #include "GameState.h"
 #include "Net.h"
@@ -7,16 +8,16 @@ static constexpr int TOTAL_PLAYOUTS = 361;// 25000;
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
-	if (!Tree::root.isExpanded())
+	if (!Tree::getRoot().isExpanded())
 	{
 		NetResult netResult = Net::run(state, color);
-		Tree::root.expand(state, board, netResult, color);
+		Tree::getRoot().expand(state, board, netResult, color);
 	}
 
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board b = board;
-		playout(b, state, &Tree::root, 0, color);
+		playout(b, state, &Tree::getRoot(), 0, color);
 	}
 
 	// TODO: Add time based search instead of playout based!
@@ -34,7 +35,8 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 	// TODO: Need to limit expansions somehow as search grows larger
 	// TODO: Dynamically lower total nodes expanded when expanding later in search
 	bool isWin = 0;
-	
+	const auto isRoot = depth == 1;
+
 	if (!node->isExpanded())
 	{
 		NetResult netResult = Net::run(state, color);
@@ -43,11 +45,11 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 
 		// TODO: Should this just be a binary win #? Probably?
 		// TODO: BE sure not to flip this when we're coming from root!
-		isWin = node->value > 0.5;
+		isWin = node->isWin(color);
 	}
 	else if (!node->children.empty())
 	{
-		const auto& bestChild = node->selectChild(color);
+		const auto& bestChild = node->selectChild(color, isRoot);
 
 		board.makeMove({ bestChild->idx, color });
 		state.makeMove(board);
@@ -55,7 +57,6 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 		// Flip the result of our opponents playout
 		// If they won we lost
 		//
-		// TODO: We need to make sure this isn't flipped when we're coming from root, it isn't right!!
 		isWin = !playout(board, state, bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)
@@ -64,8 +65,8 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 	}
 	// How should this branch(Leaf but previously expanded) be handled?
 	// Return recorded score?
-	//else
-	//	result = board.scoreFast();
+	else
+		isWin = node->isWin(color);
 
 	node->scoreNode(isWin);
 

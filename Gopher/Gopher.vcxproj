@@ -147,6 +147,7 @@
     <ClCompile Include="Tree.cpp" />
     <ClCompile Include="TreeNode.cpp" />
     <ClCompile Include="Uct.cpp" />
+    <ClCompile Include="UctNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Amaf.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="Tree.h" />
     <ClInclude Include="TreeNode.h" />
     <ClInclude Include="Uct.h" />
+    <ClInclude Include="UctNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
