@@ -8,11 +8,7 @@ static constexpr int TOTAL_PLAYOUTS = 361;// 25000;
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
-	if (!Tree::getRoot().isExpanded())
-	{
-		NetResult netResult = Net::run(state, color);
-		Tree::getRoot().expand(state, board, netResult, color);
-	}
+	Tree::initRoot(board, state, color);
 
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
@@ -21,7 +17,11 @@ coord Search::search(const Board & board, GameState& state, int color)
 	}
 
 	// TODO: Add time based search instead of playout based!
-	return Tree::findBestMove();
+	auto& best = Tree::findBestMove();
+	coord idx = best.idx;
+
+	Tree::cleanUp(best);
+	return idx;
 }
 
 int Search::playout(Board& board, GameState & state, UctNode* const node, int depth, int color)
@@ -47,7 +47,7 @@ int Search::playout(Board& board, GameState & state, UctNode* const node, int de
 		// TODO: BE sure not to flip this when we're coming from root!
 		isWin = node->isWin(color);
 	}
-	else if (!node->children.empty())
+	else if (!node->empty())
 	{
 		const auto& bestChild = node->selectChild(color, isRoot);
 

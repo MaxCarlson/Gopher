@@ -9,9 +9,29 @@ inline int idxToRealIdx(int idx)
 	return (y + 1) * BoardRealSize + (x + 1);
 }
 
+UctNode::UctNode(int16_t idx, float prior) : idx(idx), prior(prior) 
+{
+	children = new std::vector<UctNode>();
+}
+
+void UctNode::del()
+{
+	if (children)
+	{
+		for (auto& child : *children)
+			child.del();
+		delete children;
+		children = nullptr;
+	}
+		
+}
+
 void UctNode::expand(const GameState& state, const Board& board, const NetResult& result, int color)
 {
 	expanded = true;
+
+	//if (!children)
+	//	children = new std::vector<UctNode>();
 
 	// Store win chance as black
 	setEval(result, color);
@@ -26,7 +46,7 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 
 		// TODO: Think about how we should bonus the nodes scored high here
 		// TODO: Optimize memory allocations ~ They're very poorly done here
-		children.emplace_back(UctNode{ rIdx, moveProb });
+		children->emplace_back(UctNode{ rIdx, moveProb });
 	}
 }
 
@@ -44,7 +64,7 @@ UctNode* UctNode::selectChild(int color, bool isRoot)
 	auto numerator	= std::sqrt(static_cast<double>(this->visits));
 	auto fpuEval	= getEval(color); // Set estimated eval equal to parent eval
 
-	for (const auto& child : children)
+	for (const auto& child : *children)
 	{
 		auto winrate = fpuEval;
 		if (child.visits)
@@ -64,12 +84,19 @@ UctNode* UctNode::selectChild(int color, bool isRoot)
 		++idx;
 	}
 
-	return &children[bestIdx];
+	return &(*children)[bestIdx];
 }
 
-bool UctNode::isExpanded()
+bool UctNode::isExpanded() const
 {
 	return expanded;
+}
+
+bool UctNode::empty() const
+{
+	if (!children)
+		return true;
+	return children->empty();
 }
 
 void UctNode::scoreNode(bool win)
