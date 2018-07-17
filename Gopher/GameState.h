@@ -20,6 +20,7 @@ struct NetInput
 class GameState
 {
 public:
+	// Should these be stored as floats for the network?
 	using BoardState = std::vector<int>;
 
 	GameState() = default;

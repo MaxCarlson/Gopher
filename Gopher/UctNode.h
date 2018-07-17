@@ -17,6 +17,8 @@ struct UctNode
 	int			visits		= 0;	// Total visits passing through node
 	float		wins		= 0.0;	// Wins from blacks perspective
 	bool		expanded	= false;
+	
+	std::vector<UctNode>* children = nullptr;
 
 	void del();
 	void expand(const GameState& state, const Board& board, const NetResult& result, int color);
@@ -35,5 +37,4 @@ struct UctNode
 	float getEval(int color) const;
 	bool isWin(int color) const;
 
-	std::vector<UctNode>* children = nullptr;
 };

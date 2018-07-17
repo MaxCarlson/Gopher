@@ -124,6 +124,8 @@ void mainLoop()
 
 	std::string line;
 
+	std::cerr << "Hello!";
+
 	int id = 0;
 	int gtpStatus = GTP_OKAY;
 

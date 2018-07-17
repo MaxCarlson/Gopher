@@ -59,6 +59,7 @@ void moveNewRoot(UctNode& best, UctNode* newRoot)
 void switchRoot(UctNode& best)
 {
 	// TODO: Do this on another thread!
+	// TODO: Add thread pool to do it in!
 	auto* newRoot = new UctNode{ best };
 	moveNewRoot(best, newRoot);
 	root->del();

@@ -38,7 +38,7 @@ template<class T>
 void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 {
 	std::cout << '\n';
-	auto out = outputBuffer[0];
+	const auto& out = outputBuffer[0];
 	for (auto i = 0; i < out.size(); ++i)
 	{
 		if (i % 19 == 0 && i != 0)
@@ -48,11 +48,12 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 			<< std::setw(6) << out[i] << ", ";
 	}
 	std::cout << '\n';
+	std::cout << outputBuffer[1][0] << ", " << outputBuffer[1][1];
+	std::cout << '\n';
 }
 
 NetResult run(const GameState& state, int color)
 {
-
 	NetInput input = state.genNetInput(color);
 	
 	auto start = Time::startTimer();

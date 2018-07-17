@@ -7,7 +7,6 @@
 
 int main()
 {
-
 	Net::init();
 
 	// Quick and dirty fix to make random number generator non-deterministic
@@ -22,5 +21,3 @@ int main()
 	return 0;
 }
 
-// TODO List:
-// Criticality heuristics (how critical is the position to winning the game / information sharing)
