@@ -47,7 +47,7 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 	}
 }
 
-UctNode* UctNode::selectChild(int color, bool isRoot)
+UctNode& UctNode::selectChild(int color, bool isRoot)
 {
 	int idx		= 0;
 	int bestIdx = 0;
@@ -85,7 +85,7 @@ UctNode* UctNode::selectChild(int color, bool isRoot)
 		++idx;
 	}
 
-	return &(*children)[bestIdx];
+	return (*children)[bestIdx];
 }
 
 bool UctNode::isExpanded() const
@@ -132,4 +132,3 @@ bool UctNode::isWin(int color) const
 {
 	return getEval(color) > 0.5;
 }
-

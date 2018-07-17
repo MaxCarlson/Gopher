@@ -20,7 +20,7 @@ struct UctNode
 
 	void del();
 	void expand(const GameState& state, const Board& board, const NetResult& result, int color);
-	UctNode* selectChild(int color, bool isRoot);
+	UctNode& selectChild(int color, bool isRoot);
 	bool isExpanded() const;
 	bool empty() const;
 	void update(float eval);

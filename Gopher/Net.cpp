@@ -74,7 +74,7 @@ NetResult run(const GameState& state, int color)
 	// Evaluate!
 	model->Evaluate(inputDataMap, outputDataMap, device);
 
-	// TODO: Effeciancy here can definitely be improved.
+	// TODO: Efficiency here can definitely be improved.
 	// Allocating memory twice seems stupid
 	int i = 0;
 	NetResult result;

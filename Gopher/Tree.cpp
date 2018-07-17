@@ -46,14 +46,11 @@ UctNode& findBestMove()
 
 // Make sure the newRoots children aren't deleted with
 // the rest of the obsolete tree
-void moveNewRoot(UctNode& best, std::unique_ptr<UctNode>& newRoot)
+void moveNewRoot(UctNode& best, UctNode* newRoot)
 {
-	int i = 0;
-	int idx = 0;
 	for(auto& child : *root->children)
 		if (best.idx == child.idx)
 		{
-			newRoot->children = child.children;
 			child.children = nullptr;
 			break;
 		}
@@ -62,11 +59,10 @@ void moveNewRoot(UctNode& best, std::unique_ptr<UctNode>& newRoot)
 void switchRoot(UctNode& best)
 {
 	// TODO: Do this on another thread!
-	//auto oldRoot = root.release();
-	auto newRoot = std::make_unique<UctNode>(std::move(best));
+	auto* newRoot = new UctNode{ best };
 	moveNewRoot(best, newRoot);
 	root->del();
-	root.reset(newRoot.get());
+	root.reset(newRoot);
 }
 
 } // End Tree::

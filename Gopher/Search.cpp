@@ -13,7 +13,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board b = board;
-		playout(b, state, &Tree::getRoot(), 0, color);
+		playout(b, state, Tree::getRoot(), 0, color);
 	}
 
 	// TODO: Add time based search instead of playout based!
@@ -24,7 +24,9 @@ coord Search::search(const Board & board, GameState& state, int color)
 	return idx;
 }
 
-float Search::playout(Board& board, GameState & state, UctNode* const node, int depth, int color)
+UctNode* test = nullptr;
+
+float Search::playout(Board& board, GameState & state, UctNode& node, int depth, int color)
 {
 	++depth;
 
@@ -35,26 +37,25 @@ float Search::playout(Board& board, GameState & state, UctNode* const node, int 
 	// TODO: Dynamically lower total nodes expanded when expanding later in search
 	float value;
 	const auto isRoot = depth == 1;
+	if (isRoot)
+		test = &node;
 
 	// TODO: Need to handle end game conditions better
-	if (!node->isExpanded())
+	if (!node.isExpanded())
 	{
 		NetResult netResult = Net::run(state, color);
 
-		node->expand(state, board, netResult, color);
+		node.expand(state, board, netResult, color);
 
-		value = node->getNetEval(color);
+		value = node.getNetEval(color);
 	}
-	else if (!node->empty())
+	else if (!node.empty())
 	{
-		const auto& bestChild = node->selectChild(color, isRoot);
+		auto& bestChild = node.selectChild(color, isRoot);
 
-		board.makeMove({ bestChild->idx, color });
+		board.makeMove({ bestChild.idx, color });
 		state.makeMove(board);
 
-		// Flip the result of our opponents playout
-		// If they won we lost
-		//
 		value = playout(board, state, bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)
@@ -64,13 +65,9 @@ float Search::playout(Board& board, GameState & state, UctNode* const node, int 
 	// How should this branch(Leaf but previously expanded) be handled?
 	// Return recorded score?
 	else
-		value = node->getEval(color);
+		value = node.getEval(color);
 
-	node->update(value);
+	node.update(value);
 
 	return value;
-}
-
-void Search::walkTree(Board & board, GameState & state, int & color)
-{
 }
