@@ -13,7 +13,7 @@ public:
 
 private:
 
-	int playout(Board& board, GameState& state, UctNode* const node, int depth, int color);
+	float playout(Board& board, GameState& state, UctNode* const node, int depth, int color);
 	void walkTree(Board& board, GameState& state, int& color);
 };
 

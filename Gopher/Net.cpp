@@ -59,10 +59,10 @@ NetResult run(const GameState& state, int color)
 
 
 	// This needs to be called here and not before, for some reason
-	const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
+	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
 	//
 	// Only for debugging while GPU is being used for training!
-	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
+	const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };

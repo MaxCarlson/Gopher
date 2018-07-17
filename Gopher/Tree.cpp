@@ -59,7 +59,7 @@ void moveNewRoot(UctNode& best, std::unique_ptr<UctNode>& newRoot)
 		}
 }
 
-void cleanUp(UctNode& best)
+void switchRoot(UctNode& best)
 {
 	// TODO: Do this on another thread!
 	//auto oldRoot = root.release();

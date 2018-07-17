@@ -10,6 +10,6 @@ namespace Tree
 	UctNode& getRoot();
 	void initRoot(const Board & board, GameState& state, int color);
 	UctNode& findBestMove();
-	void cleanUp(UctNode& best);
+	void switchRoot(UctNode& best);
 }
 

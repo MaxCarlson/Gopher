@@ -9,7 +9,7 @@ inline int idxToRealIdx(int idx)
 	return (y + 1) * BoardRealSize + (x + 1);
 }
 
-UctNode::UctNode(int16_t idx, float prior) : idx(idx), prior(prior) 
+UctNode::UctNode(int16_t idx, float prior) : idx(idx), policy(prior) 
 {
 	children = new std::vector<UctNode>();
 }
@@ -30,11 +30,8 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 {
 	expanded = true;
 
-	//if (!children)
-	//	children = new std::vector<UctNode>();
-
 	// Store win chance as black
-	setEval(result, color);
+	setNetEval(result, color);
 
 	int idx = -1;
 	for (const auto moveProb : result.moves())
@@ -61,17 +58,21 @@ UctNode* UctNode::selectChild(int color, bool isRoot)
 	// TODO: Look into reducing the estimated eval of 
 	// low quality moves
 	//
+	// TODO: ? Numerator as it is makes all child policy values worthless
+	// if parent visits is zero. Test whether or not we should add one to the numerator!
+	// Probably in combination with not expanding leaf nodes until n visits
 	auto numerator	= std::sqrt(static_cast<double>(this->visits));
-	auto fpuEval	= getEval(color); // Set estimated eval equal to parent eval
+	auto fpuEval	= getNetEval(color); // Set estimated eval equal to parent eval
 
 	for (const auto& child : *children)
 	{
+		// Use parent eval if child's hasn't been
+		// evaluated by network
 		auto winrate = fpuEval;
 		if (child.visits)
-			winrate = (static_cast<double>(child.wins)
-					/  static_cast<double>(child.visits));
+			winrate = child.getEval(color);
 
-		auto psa	= child.prior;
+		auto psa	= child.policy;
 		auto denom	= 1.0 + child.visits;
 		auto uct	= UCT_EXPLORE * psa * (numerator / denom);
 		auto val	= winrate + uct;
@@ -99,24 +100,32 @@ bool UctNode::empty() const
 	return children->empty();
 }
 
-void UctNode::scoreNode(bool win)
+void UctNode::update(float eval)
 {
-	//wins += color == BLACK ? (result <= 0) : (result >= 0);
-	wins += win;
+	++visits;
+	wins += eval;
 }
 
-void UctNode::setEval(const NetResult & result, int color)
+void UctNode::setNetEval(const NetResult & result, int color)
 {
 	value = result.winChance(NetResult::TO_MOVE);
 	if (color == WHITE)
 		value = 1.0 - value;
 }
 
-float UctNode::getEval(int color) const
+float UctNode::getNetEval(int color) const
 {
 	if (color == WHITE)
 		return 1.0 - value;
 	return value;
+}
+
+float UctNode::getEval(int color) const
+{
+	const auto score = wins / static_cast<double>(visits);
+	if (color == WHITE)
+		return 1.0 - score;
+	return score;
 }
 
 bool UctNode::isWin(int color) const
