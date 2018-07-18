@@ -18,7 +18,7 @@ inline Stone flipColor(Stone stone)
 
 inline Stone flipColor(int stone) { return flipColor(static_cast<Stone>(stone)); }
 
-inline std::string printStone(Stone stone)
+inline std::string stoneString(Stone stone)
 {
 	switch (stone)
 	{
@@ -36,4 +36,4 @@ inline std::string printStone(Stone stone)
 	return "Stone out of bounds!";
 }
 
-inline std::string printStone(int stone) { return printStone(static_cast<Stone>(stone)); }
+inline std::string stoneString(int stone) { return stoneString(static_cast<Stone>(stone)); }

@@ -99,7 +99,7 @@ inline std::string moveToString(const Move& m, bool color = false)
 		int y = m.idx / BoardRealSize;
 
 		if(color)
-			ss << printStone(m.color) << " ";
+			ss << stoneString(m.color) << " ";
 
 		ss << letters[x - 1] << flipY[y];
 	}
