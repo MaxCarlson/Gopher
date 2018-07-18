@@ -5,6 +5,7 @@ class GameState;
 struct Board;
 using coord = int;
 
+// TODO: Probably make this into a class/struct
 namespace Tree
 {
 	UctNode& getRoot();

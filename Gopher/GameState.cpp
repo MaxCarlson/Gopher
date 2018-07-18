@@ -37,7 +37,7 @@ NetInput GameState::genNetInput(int color) const
 	// TODO: Should we branch here or no?
 	std::fill_n(input.slices.data(), BoardSize2, static_cast<float>(color - 1));
 
-	printStates();
+
 	
 	// Fill the rest of the binary slices
 	int stateIdx	= 0;
@@ -71,7 +71,12 @@ NetInput GameState::genNetInput(int color) const
 		}
 	}
 	
-	printSlices(input);
+	// Debug
+	// TODO: Add a function to verify slices and to a
+	// limited extent states against the current board!
+	//
+	//printStates();
+	//printSlices(input);
 
 	return input;
 }

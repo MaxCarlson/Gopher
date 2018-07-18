@@ -73,13 +73,11 @@ void switchRoot(UctNode& best)
 
 void printStats(int color)
 {
+	int ccolor = color;
 	auto* node = &findBestMove(root.get());
 
-	int ccolor = color;
-
-	std::cerr << "Line: ";
-
 	// This could cause issues with empty/malformed nodes?
+	std::cerr << "Line: ";
 	while (!node->empty())
 	{
 		std::cerr << moveToString(node->idx) << " " << node->getEval(ccolor) << ", ";
@@ -94,6 +92,7 @@ void printNodeInfo(UctNode * node)
 {
 	// Print histogram of visit counts
 	// and their average network expert score
+	// TODO: Make horizontal Histogram?
 	std::map<int, std::pair<int, float>> hist;
 	if (node->empty())
 		return;

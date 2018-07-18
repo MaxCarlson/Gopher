@@ -29,21 +29,15 @@ coord Search::search(const Board & board, GameState& state, int color)
 	return idx;
 }
 
-UctNode* test = nullptr;
-
 float Search::playout(Board& board, GameState & state, UctNode& node, int depth, int color)
 {
 	++depth;
 
 	// TODO: Implement stop if Passes >= 2
 	// TODO: Add output 362 for passes to Net
-	// TODO: Add dynamic depth increases with a limit early on, lossening later in the search
 	// TODO: Need to limit expansions somehow as search grows larger
-	// TODO: Dynamically lower total nodes expanded when expanding later in search
 	float value;
 	const auto isRoot = depth == 1;
-	if (isRoot)
-		test = &node;
 
 	// TODO: Need to handle end game conditions better
 	if (!node.isExpanded())
