@@ -67,6 +67,9 @@ struct NetResult
 	void process()
 	{
 		softmax(output[WIN_CHANCE]);
+		// Do we want to softmax the policy?
+		// If so, we should probably do it on the GPU!
+		//softmax(output[MOVES]);
 	}
 };
 

@@ -25,10 +25,8 @@ public:
 
 	GameState() = default;
 
-	int moves = 0;
-
 	// Where are we going to add the latest state to
-	int stateIdx = 0;
+	int moveCount = 0;
 	std::vector<BoardState> states;
 
 	void makeMove(const Board& board);

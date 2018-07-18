@@ -47,11 +47,11 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 	}
 }
 
-UctNode& UctNode::selectChild(int color, bool isRoot)
+UctNode& UctNode::selectChild(int color, bool isRoot) const
 {
 	int idx		= 0;
 	int bestIdx = 0;
-	static constexpr double UCT_EXPLORE = 0.35;
+	static constexpr double UCT_EXPLORE = 0.95; // Doesn't seem to effect search much at all!
 	//static constexpr double FPU_REDUCTION = 0.25;
 	double best = std::numeric_limits<double>::lowest();
 
@@ -61,7 +61,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot)
 	// TODO: ? Numerator as it is makes all child policy values worthless
 	// if parent visits is zero. Test whether or not we should add one to the numerator!
 	// Probably in combination with not expanding leaf nodes until n visits
-	auto numerator	= std::sqrt(static_cast<double>(this->visits));
+	auto parentVis	= std::sqrt(static_cast<double>(this->visits));
 	auto fpuEval	= getNetEval(color); // Set estimated eval equal to parent eval
 
 	for (const auto& child : *children)
@@ -72,10 +72,10 @@ UctNode& UctNode::selectChild(int color, bool isRoot)
 		if (child.visits)
 			winrate = child.getEval(color);
 
-		auto psa	= child.policy;
-		auto denom	= 1.0 + child.visits;
-		auto uct	= UCT_EXPLORE * psa * (numerator / denom);
-		auto val	= winrate + uct;
+		auto psa		= child.policy;
+		auto childVis	= 1.0 + child.visits;
+		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis);
+		auto val		= winrate + uct;
 
 		if (val > best)
 		{
@@ -122,7 +122,7 @@ float UctNode::getNetEval(int color) const
 
 float UctNode::getEval(int color) const
 {
-	const auto score = wins / static_cast<double>(visits);
+	const auto score = wins / static_cast<float>(visits);
 	if (color == WHITE)
 		return 1.0 - score;
 	return score;
