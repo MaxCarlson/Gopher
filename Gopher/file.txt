@@ -1,0 +1,1 @@
+Selected CPU as the process wide default device.

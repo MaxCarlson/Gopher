@@ -162,6 +162,7 @@
     <ClInclude Include="Playout.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="RedirectStreams.h" />
     <ClInclude Include="Search.h" />
     <ClInclude Include="SearchTree.h" />
     <ClInclude Include="Stone.h" />

@@ -5,8 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-
-
+#include "RedirectStreams.h"
 
 //static const std::string modelPath = "models/PolicyModel/";
 static const std::string modelPath = "models/";
@@ -22,11 +21,18 @@ namespace Net
 void init()
 {
 	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
+	
+	{
+		//std::cout << "hello";
+		//std::fclose(stdout);
+		auto rd = RedirectStream(STDERR_FILENO);
 
-	model     = CNTK::Function::Load(ifs);
-	inputVar  = model->Arguments()[0];
-	policyOut = model->Outputs()[0];
-	valueOut  = model->Outputs()[1];
+		model = CNTK::Function::Load(ifs);
+		inputVar = model->Arguments()[0];
+		policyOut = model->Outputs()[0];
+		valueOut = model->Outputs()[1];
+	}
+
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
@@ -37,19 +43,19 @@ void init()
 template<class T>
 void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 {
-	std::cout << '\n';
+	std::cerr << '\n';
 	const auto& out = outputBuffer[0];
 	for (auto i = 0; i < out.size(); ++i)
 	{
 		if (i % 19 == 0 && i != 0)
-			std::cout << '\n';
+			std::cerr << '\n';
 
-		std::cout << std::fixed << std::setprecision(2)
+		std::cerr << std::fixed << std::setprecision(2)
 			<< std::setw(6) << out[i] << ", ";
 	}
-	std::cout << '\n';
-	std::cout << outputBuffer[1][0] << ", " << outputBuffer[1][1];
-	std::cout << '\n';
+	std::cerr << '\n';
+	std::cerr << outputBuffer[1][0] << ", " << outputBuffer[1][1];
+	std::cerr << '\n';
 }
 
 NetResult run(const GameState& state, int color)
