@@ -122,11 +122,8 @@ void mainLoop()
 
 	buildCommandsMap(options);
 
-	std::string line;
-
-	std::cerr << "Hello!";
-
 	int id = 0;
+	std::string line;
 	int gtpStatus = GTP_OKAY;
 
 	while (gtpStatus && std::getline(std::cin, line))

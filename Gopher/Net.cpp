@@ -22,17 +22,15 @@ void init()
 {
 	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
 	
+	// Don't let CNTK's priting to stderr interfere with
+	// GTP on engine load
 	{
-		//std::cout << "hello";
-		//std::fclose(stdout);
 		auto rd = RedirectStream(STDERR_FILENO);
-
-		model = CNTK::Function::Load(ifs);
-		inputVar = model->Arguments()[0];
-		policyOut = model->Outputs()[0];
-		valueOut = model->Outputs()[1];
+		model	= CNTK::Function::Load(ifs);
 	}
-
+	inputVar	= model->Arguments()[0];
+	policyOut	= model->Outputs()[0];
+	valueOut	= model->Outputs()[1];
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
@@ -62,9 +60,6 @@ NetResult run(const GameState& state, int color)
 {
 	NetInput input = state.genNetInput(color);
 	
-	auto start = Time::startTimer();
-
-
 	// This needs to be called here and not before, for some reason
 	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
 	//
@@ -94,8 +89,6 @@ NetResult run(const GameState& state, int color)
 		std::move(std::begin(outputData[0]), std::end(outputData[0]), std::begin(result.output[i++]));
 	}
 	result.process();
-
-	//std::cerr << "\n Search Time: " << Time::endTime<std::chrono::duration<double>>(start) << '\n';
 
 	// Debugging only!
 	//printNetOut(outputVar.Shape().TotalSize(), result.output);
