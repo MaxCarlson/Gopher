@@ -35,6 +35,9 @@ public:
 
 	// Generate the input the Net takes
 	NetInput genNetInput(int color) const;
+
+	void printSlices(const NetInput& input) const;
+	void printStates() const;
 };
 
 
