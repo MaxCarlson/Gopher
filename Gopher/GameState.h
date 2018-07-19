@@ -12,6 +12,10 @@ static constexpr int InputSize = BoardDepth * BoardSize2;
 
 using NetSlice = std::vector<float>;
 
+// Holds all the previous moves made 
+// in a vector stack. Used for feeding NetInput
+//
+// 
 class GameState
 {
 public:

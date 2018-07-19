@@ -28,29 +28,6 @@ inline int getPaddedIdx(int x, int y)
 	return (y + 1) * BoardRealSize + (x + 1);
 }
 
-bool verifySlices(const NetInput& input, const GameState& state) 
-{
-	for (int s = state.moveCount - 1; s >= 0; --s)
-	{
-		const auto& st = state.states[s];
-	}
-}
-
-NetInput GameState::genNetInput(int color) const
-{
-	NetInput input;
-
-	
-	// Debug
-	// TODO: Add a function to verify slices and to a
-	// limited extent states against the current board!
-	//
-	//printStates();
-	//printSlices(input);
-
-	return input;
-}
-
 template<class It>
 void printBoardVec(It begin, It end, int size)
 {
@@ -94,7 +71,7 @@ NetInput::NetInput(const GameState& state, int color)
 	for (int i = 0; (i < state.moveCount && i < BoardHistory); ++i)
 	{
 		++stateIdx;
-		for (int c = 0; c < 2; ++c)
+		for (int c = BLACK; c <= WHITE; ++c)
 		{
 			int idx = 0;
 			for (int y = 0; y < BoardSize; ++y)
@@ -112,12 +89,18 @@ NetInput::NetInput(const GameState& state, int color)
 					// TODO: Pass trivial(simple/repeatable) but non zero input into the net
 					// here and in the python CNTK trainer and verify output is identical (also verify
 					// that the orientation in the 1D array is correct here)
-					slices[slIdx] = static_cast<float>(state.states[state.moveCount - stateIdx][pIdx] == c + 1);
+					slices[slIdx] = static_cast<float>(state.states[state.moveCount - stateIdx][pIdx] == c);
 					++slIdx;
 					++idx;
 				}
 		}
 	}
+	// TODO: Some really weird issues with cerr here sometimes
+	// Occasionally it will print out JUNK that isn't in the array,
+	// the second print statement won't print it
+	//
+	//printSlices(state);
+	//printSlices(state);
 }
 
 void NetInput::printSlices(const GameState& state) const
