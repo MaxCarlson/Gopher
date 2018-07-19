@@ -40,7 +40,7 @@ namespace Gtp
 {
 	Board board;
 	MoveStack moveStack;
-	GameState states;
+	GameState stateStack;
 
 	//Stone color = Stone::BLACK;
 	std::map<std::string, std::function<int(std::istringstream&, int)>> options;
@@ -118,7 +118,7 @@ void mainLoop()
 {
 	// Initialize board and root state
 	board.init();
-	states.makeMove(board);
+	stateStack.makeMove(board);
 
 	buildCommandsMap(options);
 
@@ -278,7 +278,7 @@ int play(std::istringstream& is, int id)
 		return gtpFailure(id, "invalid coordinates for move");
 
 	board.makeMoveGtp(m);
-	states.makeMove(board);
+	stateStack.makeMove(board);
 
 	if (isPass(m) || isResign(m))
 		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
@@ -297,14 +297,14 @@ int generateMove(std::istringstream& is, int id)
 	Stone color = gtpWOrB(colorStr);
 
 	//coord idx = monte.genMove(color);
-	coord idx = search.search(board, states, color);
+	coord idx = search.search(board, stateStack, color);
 
 	//coord idx = uct.search(board, color);
 
 	Move m = { idx, color };
 
 	board.makeMoveGtp(m);
-	states.makeMove(board);
+	stateStack.makeMove(board);
 
 	// Rudimentry move stack
 	moveStack.emplace_back(m);
@@ -325,7 +325,7 @@ int setBoardSize(std::istringstream& is, int id)
 int clearBoard(std::istringstream& is, int id)
 {
 	board.init();
-	states.clear();
+	stateStack.clear();
 	return gtpSuccess(id, "");
 }
 

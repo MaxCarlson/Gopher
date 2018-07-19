@@ -58,7 +58,7 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 
 NetResult run(const GameState& state, int color)
 {
-	NetInput input = state.genNetInput(color);
+	NetInput input(state, color);
 	
 	// This needs to be called here and not before, for some reason
 	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();

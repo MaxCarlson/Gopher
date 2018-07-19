@@ -4,7 +4,7 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 1.5;// 25000;
+static constexpr int TOTAL_PLAYOUTS = 361 * 1;// 25000;
 
 coord Search::search(const Board & board, GameState& state, int color)
 {

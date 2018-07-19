@@ -12,11 +12,6 @@ static constexpr int InputSize = BoardDepth * BoardSize2;
 
 using NetSlice = std::vector<float>;
 
-struct NetInput
-{
-	std::vector<float> slices;
-};
-
 class GameState
 {
 public:
@@ -33,11 +28,13 @@ public:
 	void popState();
 	void clear();
 
-	// Generate the input the Net takes
-	NetInput genNetInput(int color) const;
-
-	void printSlices(const NetInput& input) const;
 	void printStates() const;
 };
 
+struct NetInput
+{
+	NetInput(const GameState& state, int color);
+	void printSlices(const GameState& state) const;
 
+	std::vector<float> slices;
+};
