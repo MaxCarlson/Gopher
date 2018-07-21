@@ -11,7 +11,8 @@ namespace Tree
 	UctNode& getRoot();
 	void initRoot(const Board & board, GameState& state, int color);
 	UctNode& findBestMove(UctNode* node);
-	void switchRoot(UctNode& best);
+	void updateRoot(const Board & board, GameState& state, int color, int bestIdx);
+	void updateRoot(UctNode& best);
 	void printStats(int color);
 
 	// Debug function for looking at nodes and their

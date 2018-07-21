@@ -8,8 +8,8 @@
 #include "RedirectStreams.h"
 
 //static const std::string modelPath = "models/PolicyModel/";
-static const std::string modelPath = "models/";
-static const std::string fileName = "GoNet.dnn";
+static const std::string modelPath	= "models/";
+static const std::string fileName	= "GoNet.dnn";
 
 namespace Net
 {
@@ -58,6 +58,8 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 
 NetResult run(const GameState& state, int color)
 {
+
+	// TODO: Look into caching these inputs
 	NetInput input(state, color);
 	
 	// This needs to be called here and not before, for some reason
@@ -66,6 +68,11 @@ NetResult run(const GameState& state, int color)
 	// Only for debugging while GPU is being used for training!
 	const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
+	// TODO: CNTK seems to crash an inordinate amount here,
+	// seems to happen more if device gets init and pauses before inputVal
+	// figure out why and if we can prevent it!
+	// Especially with CPU, not as much with GPU!
+	//
 	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };
 

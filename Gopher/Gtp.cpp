@@ -116,9 +116,11 @@ void buildCommandsMap(Map& options)
 
 void mainLoop()
 {
-	// Initialize board and root state
+	// Initialize board, root state, and tree
+	// TODO: Look into loading games from SGF and so forth
 	board.init();
 	stateStack.makeMove(board);
+	Tree::initRoot(board, stateStack, BLACK);
 
 	buildCommandsMap(options);
 
@@ -270,7 +272,7 @@ int play(std::istringstream& is, int id)
 	int idx = getIdxFromGtp(tmp);
 
 	Move m = { idx, color };
-
+	
 
 	if (isPass(m) || isResign(m))
 		;
@@ -282,6 +284,9 @@ int play(std::istringstream& is, int id)
 
 	if (isPass(m) || isResign(m))
 		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
+
+	// Update the tree to the new rootstate
+	Tree::updateRoot(board, stateStack, color, m.idx);
 
 	// Rudimentry move stack
 	moveStack.emplace_back(m);

@@ -60,7 +60,6 @@ NetInput::NetInput(const GameState& state, int color)
 {
 	slices.resize(InputSize, 0.f);
 
-
 	// Fill the color slice with appropriate color
 	// TODO: Should we branch here or no?
 	std::fill_n(slices.data(), BoardSize2, static_cast<float>(color - 1));

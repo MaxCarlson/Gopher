@@ -23,6 +23,7 @@ struct UctNode
 	void del();
 	void expand(const GameState& state, const Board& board, const NetResult& result, int color);
 	UctNode& selectChild(int color, bool isRoot) const;
+	UctNode* findChild(int idx) const;
 	bool isExpanded() const;
 	bool empty() const;
 	void update(float eval);

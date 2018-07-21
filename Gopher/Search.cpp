@@ -4,7 +4,7 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 1;// 25000;
+static constexpr int TOTAL_PLAYOUTS = 361 * 1.5;
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
@@ -22,10 +22,10 @@ coord Search::search(const Board & board, GameState& state, int color)
 	Tree::printNodeInfo(&Tree::getRoot());
 
 	// TODO: Add time based search instead of playout based!
-	auto& best = Tree::findBestMove(&Tree::getRoot());
-	coord idx = best.idx;
+	auto& best	= Tree::findBestMove(&Tree::getRoot());
+	coord idx	= best.idx;
+	Tree::updateRoot(best);
 
-	Tree::switchRoot(best);
 	return idx;
 }
 

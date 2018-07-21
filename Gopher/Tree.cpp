@@ -49,6 +49,19 @@ UctNode& findBestMove(UctNode* node)
 	return *bestNode;
 }
 
+void updateRoot(const Board & board, GameState& state, int color, int bestIdx)
+{
+	if (!root)
+		initRoot(board, state, color);
+
+	auto* child = root->findChild(bestIdx);
+
+	if (!child)
+		throw std::runtime_error("Attempting to update root to non-existant child!");
+
+	updateRoot(*child);
+}
+
 // Make sure the newRoots children aren't deleted with
 // the rest of the obsolete tree
 void moveNewRoot(UctNode& best, UctNode* newRoot)
@@ -61,7 +74,7 @@ void moveNewRoot(UctNode& best, UctNode* newRoot)
 		}
 }
 
-void switchRoot(UctNode& best)
+void updateRoot(UctNode& best)
 {
 	// TODO: Do this on another thread!
 	// TODO: Add thread pool to do it in!

@@ -30,7 +30,8 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 {
 	expanded = true;
 
-	// Store win chance as black
+	// Store win chance as black 
+	// (Net returns win chance as side to move)
 	setNetEval(result, color);
 
 	int idx = -1;
@@ -86,6 +87,21 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 	}
 
 	return (*children)[bestIdx];
+}
+
+UctNode* UctNode::findChild(int idx) const
+{
+	auto childIt = std::find_if(std::begin(*children), 
+		std::end(*children), 
+		[&](UctNode& n)
+	{
+		return n.idx == idx;
+	});
+
+	UctNode* child = nullptr;
+	if (childIt != std::end(*children))
+		child = &*childIt;
+	return child;
 }
 
 bool UctNode::isExpanded() const
