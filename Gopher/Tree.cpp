@@ -26,7 +26,7 @@ void initRoot(const Board & board, GameState & state, int color)
 
 	if (!root->isExpanded())
 	{
-		NetResult netResult = Net::run(state, color);
+		NetResult netResult = Net::inference(state, color);
 		root->expand(state, board, netResult, color);
 		root->update(root->getNetEval(BLACK));
 	}
@@ -51,6 +51,8 @@ UctNode& findBestMove(UctNode* node)
 
 void updateRoot(const Board & board, GameState& state, int color, int bestIdx)
 {
+	// Should be impossible
+	// TODO: Remove unnecessary params if it is impossible
 	if (!root)
 		initRoot(board, state, color);
 
@@ -62,24 +64,18 @@ void updateRoot(const Board & board, GameState& state, int color, int bestIdx)
 	updateRoot(*child);
 }
 
-// Make sure the newRoots children aren't deleted with
-// the rest of the obsolete tree
-void moveNewRoot(UctNode& best, UctNode* newRoot)
-{
-	for(auto& child : *root->children)
-		if (best.idx == child.idx)
-		{
-			child.children = nullptr;
-			break;
-		}
-}
-
 void updateRoot(UctNode& best)
 {
 	// TODO: Do this on another thread!
 	// TODO: Add thread pool to do it in!
 	auto* newRoot = new UctNode{ best };
-	moveNewRoot(best, newRoot);
+
+	// Make sure we don't delete newRoots children 
+	// with the rest of the obsolete tree
+	auto child = root->findChild(best.idx);
+	if (child)
+		child->children = nullptr;
+
 	root->del();
 	root.reset(newRoot);
 }
@@ -101,11 +97,11 @@ void printStats(int color)
 	std::cerr << '\n';
 }
 
+// Print histogram of visit counts
+// and their average network expert score
+// TODO: Make horizontal Histogram?
 void printNodeInfo(UctNode * node)
 {
-	// Print histogram of visit counts
-	// and their average network expert score
-	// TODO: Make horizontal Histogram?
 	std::map<int, std::pair<int, float>> hist;
 	if (node->empty())
 		return;

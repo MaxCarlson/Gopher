@@ -4,7 +4,7 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 1.5;
+static constexpr int TOTAL_PLAYOUTS = 361 * 3.5;
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
@@ -42,10 +42,9 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	// TODO: Need to handle end game conditions better
 	if (!node.isExpanded())
 	{
-		NetResult netResult = Net::run(state, color);
+		NetResult netResult = Net::inference(state, color);
 
 		node.expand(state, board, netResult, color);
-
 		value = node.getNetEval(color);
 	}
 	else if (!node.empty())
@@ -58,10 +57,9 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 		value = playout(board, state, bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)
-		// That will be undone at the very end
 		state.popState();
 	}
-	// How should this branch(Leaf but previously expanded) be handled?
+	// How should this branch(empty leaf but previously expanded) be handled?
 	// Return recorded score?
 	else
 		value = node.getEval(color);

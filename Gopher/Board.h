@@ -121,6 +121,7 @@ struct MoveStack;
 
 
 // TODO: Move stuff around and check sizeof to find good alignment
+// TODO: Make board logic simpler to follow/debug
 struct Board
 {
 	int moveCount;

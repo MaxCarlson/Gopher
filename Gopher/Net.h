@@ -7,6 +7,7 @@
 class GameState;
 
 // Apply softmax to the input vector
+// TODO: This should really be done by the network!
 template<class T>
 void softmax(std::vector<T>& vec)
 {
@@ -64,21 +65,18 @@ struct NetResult
 		return output[WIN_CHANCE][side];
 	}
 
+	// Should be on GPU but still only takes
+	// about 0.01% of total CPU time during search
 	void process()
 	{
 		softmax(output[WIN_CHANCE]);
-		// Do we want to softmax the policy?
-		// If so, we should probably do it on the GPU!
-		//softmax(output[MOVES]);
+		softmax(output[MOVES]);
 	}
 };
 
 namespace Net
 {
 	void init();
-	
-	// We'll eventually pass this the board
-	NetResult run(const GameState& state, int color);
-
+	NetResult inference(const GameState& state, int color);
 }
 

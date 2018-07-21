@@ -9,7 +9,9 @@ using coord = int;
 struct UctNode
 {
 	UctNode() = default;
-	UctNode(int16_t idx, float prior);		
+	UctNode(int16_t idx, float prior);
+
+	using Children = std::vector<UctNode>;
 
 	int16_t		idx;				// Index of move on padded board
 	float		policy;				// Policy networks output, how much expert likes move
@@ -18,24 +20,23 @@ struct UctNode
 	float		wins		= 0.0;	// Wins from blacks perspective
 	bool		expanded	= false;
 	
-	std::vector<UctNode>* children = nullptr;
+	Children* children = nullptr;
 
-	void del();
-	void expand(const GameState& state, const Board& board, const NetResult& result, int color);
-	UctNode& selectChild(int color, bool isRoot) const;
-	UctNode* findChild(int idx) const;
-	bool isExpanded() const;
-	bool empty() const;
-	void update(float eval);
+	void		del();
+	void		expand(const GameState& state, const Board& board, const NetResult& result, int color);
+	UctNode&	selectChild(int color, bool isRoot) const;
+	UctNode*	findChild(int idx) const;
+	bool		isExpanded() const;
+	bool		empty() const;
+	void		update(float eval);
 
 	// Set the network evaluation from blacks perspective
-	void setNetEval(const NetResult& result, int color);
+	void		setNetEval(const NetResult& result, int color);
 	// Get the origional Value networks 
 	// value of this node accorrding to color
-	float getNetEval(int color) const;
+	float		getNetEval(int color) const;
 	// Get the current evaluation of this node
 	// (wins / visits) according to color
-	float getEval(int color) const;
-	bool isWin(int color) const;
+	float		getEval(int color) const;
 
 };

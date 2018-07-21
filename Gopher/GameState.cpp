@@ -23,11 +23,6 @@ void GameState::clear()
 	moveCount = 0;
 }
 
-inline int getPaddedIdx(int x, int y)
-{
-	return (y + 1) * BoardRealSize + (x + 1);
-}
-
 template<class It>
 void printBoardVec(It begin, It end, int size)
 {

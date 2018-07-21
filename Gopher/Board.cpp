@@ -710,7 +710,7 @@ coord Board::playRandom(Stone color)
 		return Pass;
 	}
 
-	auto rng = Random::fastRandom(free.size());
+	auto rng = static_cast<int>(Random::fastRandom(free.size()));
 	for (int i = rng; i < free.size(); ++i)
 		if (tryRandomMove(color, idx, i))
 			return idx;

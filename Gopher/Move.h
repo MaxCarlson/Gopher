@@ -70,6 +70,13 @@ inline int xyToIdx(int x, int y)
 	return y * BoardRealSize + x;
 }
 
+// Convert a non-padded x and y index into 
+// a padded idx e.g. A19 (x=0,y=0) -> idx=22
+inline int getPaddedIdx(int x, int y)
+{
+	return (y + 1) * BoardRealSize + (x + 1);
+}
+
 inline std::vector<int> fillFlipY()
 {
 	std::vector<int> flips;

@@ -56,9 +56,8 @@ void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 	std::cerr << '\n';
 }
 
-NetResult run(const GameState& state, int color)
+NetResult inference(const GameState& state, int color)
 {
-
 	// TODO: Look into caching these inputs
 	NetInput input(state, color);
 	
@@ -98,7 +97,7 @@ NetResult run(const GameState& state, int color)
 	result.process();
 
 	// Debugging only!
-	//printNetOut(outputVar.Shape().TotalSize(), result.output);
+	//printNetOut(361, result.output);
 
 	return result;
 }

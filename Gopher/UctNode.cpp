@@ -11,7 +11,7 @@ inline int idxToRealIdx(int idx)
 
 UctNode::UctNode(int16_t idx, float prior) : idx(idx), policy(prior) 
 {
-	children = new std::vector<UctNode>();
+	children = new Children();
 }
 
 void UctNode::del()
@@ -23,7 +23,6 @@ void UctNode::del()
 		delete children;
 		children = nullptr;
 	}
-		
 }
 
 void UctNode::expand(const GameState& state, const Board& board, const NetResult& result, int color)
@@ -52,9 +51,8 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 {
 	int idx		= 0;
 	int bestIdx = 0;
-	static constexpr double UCT_EXPLORE = 0.95; // Doesn't seem to effect search much at all!
-	//static constexpr double FPU_REDUCTION = 0.25;
-	double best = std::numeric_limits<double>::lowest();
+	//static constexpr double UCT_EXPLORE = 0.95; // Doesn't seem to effect search much at all!
+	auto best = std::numeric_limits<float>::lowest();
 
 	// TODO: Look into reducing the estimated eval of 
 	// low quality moves
@@ -62,20 +60,20 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 	// TODO: ? Numerator as it is makes all child policy values worthless
 	// if parent visits is zero. Test whether or not we should add one to the numerator!
 	// Probably in combination with not expanding leaf nodes until n visits
-	auto parentVis	= std::sqrt(static_cast<double>(this->visits));
-	auto fpuEval	= getNetEval(color); // Set estimated eval equal to parent eval
+	const auto parentVis	= std::sqrt(static_cast<float>(this->visits));
+	const auto pNetEval		= getNetEval(color); // Set estimated eval equal to parent eval
 
 	for (const auto& child : *children)
 	{
 		// Use parent eval if child's hasn't been
 		// evaluated by network
-		auto winrate = fpuEval;
+		auto winrate = pNetEval;
 		if (child.visits)
 			winrate = child.getEval(color);
 
 		auto psa		= child.policy;
-		auto childVis	= 1.0 + child.visits;
-		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis);
+		auto childVis	= 1.f + child.visits;
+		auto uct		= psa * (parentVis / childVis); // UCT_EXPLORE * Appears to do nothing much
 		auto val		= winrate + uct;
 
 		if (val > best)
@@ -85,6 +83,11 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 		}
 		++idx;
 	}
+
+	// TODO: Unlikey or never? Child chosen with -policy
+	//auto& child = children->at(bestIdx);
+	//if (child.policy <= 0.f)
+	//	int a = 5;
 
 	return (*children)[bestIdx];
 }
@@ -142,9 +145,4 @@ float UctNode::getEval(int color) const
 	if (color == WHITE)
 		return 1.0 - score;
 	return score;
-}
-
-bool UctNode::isWin(int color) const
-{
-	return getEval(color) > 0.5;
 }
