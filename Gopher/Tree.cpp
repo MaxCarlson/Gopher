@@ -89,7 +89,8 @@ void printStats(int color)
 	std::cerr << "Line: ";
 	while (!node->empty())
 	{
-		std::cerr << moveToString(node->idx) << " " << node->getEval(ccolor) << ", ";
+		std::cerr << moveToString(node->idx) << " " 
+			<< std::fixed << std::setprecision(2) << node->getEval(ccolor) << ", ";
 		ccolor = flipColor(color);
 
 		node = &findBestMove(node);

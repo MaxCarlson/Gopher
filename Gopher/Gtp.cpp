@@ -301,7 +301,6 @@ int generateMove(std::istringstream& is, int id)
 
 	Stone color = gtpWOrB(colorStr);
 
-	//coord idx = monte.genMove(color);
 	coord idx = search.search(board, stateStack, color);
 
 	//coord idx = uct.search(board, color);

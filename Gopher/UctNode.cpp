@@ -49,8 +49,8 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 
 UctNode& UctNode::selectChild(int color, bool isRoot) const
 {
-	int idx		= 0;
-	int bestIdx = 0;
+	auto idx     = 0;
+	auto bestIdx = 0;
 	//static constexpr double UCT_EXPLORE = 0.95; // Doesn't seem to effect search much at all!
 	auto best = std::numeric_limits<float>::lowest();
 
@@ -78,8 +78,8 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 
 		if (val > best)
 		{
-			bestIdx = idx;
-			best = val;
+			bestIdx	= idx;
+			best	= val;
 		}
 		++idx;
 	}
@@ -94,13 +94,14 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 
 UctNode* UctNode::findChild(int idx) const
 {
-	auto childIt = std::find_if(std::begin(*children), 
+	auto childIt = std::find_if(
+		std::begin(*children), 
 		std::end(*children), 
 		[&](UctNode& n)
 	{
-		return n.idx == idx;
+		return n.idx == idx; 
 	});
-
+	
 	UctNode* child = nullptr;
 	if (childIt != std::end(*children))
 		child = &*childIt;
