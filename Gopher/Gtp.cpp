@@ -1,6 +1,4 @@
 #include "Gtp.h"
-#include "MonteCarlo.h"
-#include "Uct.h"
 #include "GameState.h"
 #include "Search.h"
 
@@ -39,7 +37,6 @@ static const std::string ENGINE_NAME = "Gopher";
 namespace Gtp
 {
 	Board board;
-	MoveStack moveStack;
 	GameState stateStack;
 
 	//Stone color = Stone::BLACK;
@@ -288,9 +285,6 @@ int play(std::istringstream& is, int id)
 	// Update the tree to the new rootstate
 	Tree::updateRoot(board, stateStack, color, m.idx);
 
-	// Rudimentry move stack
-	moveStack.emplace_back(m);
-
 	return gtpSuccess(id, "");
 }
 
@@ -309,9 +303,6 @@ int generateMove(std::istringstream& is, int id)
 
 	board.makeMoveGtp(m);
 	stateStack.makeMove(board);
-
-	// Rudimentry move stack
-	moveStack.emplace_back(m);
 
 	if (isPass(m) || isResign(m))
 		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
@@ -375,32 +366,12 @@ int gtpPrintBoard(std::istringstream& is, int id)
 	return gtpSuccess(id);
 }
 
-// Mainly just for quick testing
+// TODO: Rebuild for Net
 int playSelf(std::istringstream& is, int id)
 {
-
 	int passes = 0;
 	for (int i = 0; i < 10000; ++i)
 	{
-		int color = Stone::WHITE;
-		if (i % 2 == 0)
-			color = Stone::BLACK;
-
-		coord idx = uct.search(board, color);
-		Move m = { idx, color };
-
-		board.makeMoveGtp(m);
-		//moveStack.emplace_back(m);
-
-		board.printBoard();
-
-		if (isPass(m))
-			++passes;
-		else if (passes)
-			passes = 0;
-
-		if (passes > 1 || isResign(m))
-			break;
 	}
 
 	return gtpSuccess(id);

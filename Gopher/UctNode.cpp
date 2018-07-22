@@ -94,6 +94,9 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 
 UctNode* UctNode::findChild(int idx) const
 {
+	if (!children)
+		return nullptr;
+
 	auto childIt = std::find_if(
 		std::begin(*children), 
 		std::end(*children), 

@@ -35,31 +35,24 @@ void initRoot(const Board & board, GameState & state, int color)
 	std::cerr << "Net eval for " << stoneString(color) << " " << eval << '\n';
 }
 
-UctNode& findBestMove(UctNode* node)
+UctNode& findBestMove(UctNode* node, int color)
 {
 	// TODO: Should we look at both wins and win ratio?
 	auto bestNode  = std::max_element(
 		std::begin(*node->children), 
 		std::end(*node->children), 
-		[&](const UctNode& node0, const UctNode& node1)
-	{
-		return node0.visits < node1.visits;
-	});
+		UctNodePred{ color }
+	);
 
 	return *bestNode;
 }
 
 void updateRoot(const Board & board, GameState& state, int color, int bestIdx)
 {
-	// Should be impossible
-	// TODO: Remove unnecessary params if it is impossible
-	if (!root)
+	if (!root || !root->isExpanded())
 		initRoot(board, state, color);
 
 	auto* child = root->findChild(bestIdx);
-
-	if (!child)
-		throw std::runtime_error("Attempting to update root to non-existant child!");
 
 	updateRoot(*child);
 }
@@ -72,7 +65,7 @@ void updateRoot(UctNode& best)
 
 	// Make sure we don't delete newRoots children 
 	// with the rest of the obsolete tree
-	auto child = root->findChild(best.idx);
+	auto* child = root->findChild(best.idx);
 	if (child)
 		child->children = nullptr;
 
@@ -83,7 +76,7 @@ void updateRoot(UctNode& best)
 void printStats(int color)
 {
 	int ccolor = color;
-	auto* node = &findBestMove(root.get());
+	auto* node = &findBestMove(root.get(), color);
 
 	// This could cause issues with empty/malformed nodes?
 	std::cerr << "Line: ";
@@ -93,7 +86,7 @@ void printStats(int color)
 			<< std::fixed << std::setprecision(2) << node->getEval(ccolor) << ", ";
 		ccolor = flipColor(color);
 
-		node = &findBestMove(node);
+		node = &findBestMove(node, ccolor);
 	}
 	std::cerr << '\n';
 }

@@ -132,44 +132,29 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Amaf.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="Gtp.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MonteCarlo.cpp" />
-    <ClCompile Include="MovePicker.cpp" />
-    <ClCompile Include="Playout.cpp" />
     <ClCompile Include="Net.cpp" />
     <ClCompile Include="Search.cpp" />
-    <ClCompile Include="SearchTree.cpp" />
     <ClCompile Include="Threads.cpp" />
     <ClCompile Include="Tree.cpp" />
-    <ClCompile Include="TreeNode.cpp" />
-    <ClCompile Include="Uct.cpp" />
     <ClCompile Include="UctNode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Amaf.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Gtp.h" />
-    <ClInclude Include="MovePicker.h" />
-    <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Move.h" />
-    <ClInclude Include="MoveStats.h" />
-    <ClInclude Include="Playout.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="RedirectStreams.h" />
     <ClInclude Include="Search.h" />
-    <ClInclude Include="SearchTree.h" />
     <ClInclude Include="Stone.h" />
     <ClInclude Include="Threads.h" />
     <ClInclude Include="Tree.h" />
-    <ClInclude Include="TreeNode.h" />
-    <ClInclude Include="Uct.h" />
     <ClInclude Include="UctNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -40,3 +40,18 @@ struct UctNode
 	float		getEval(int color) const;
 
 };
+
+struct UctNodePred
+{
+	UctNodePred(int color) :color(color) {}
+	bool operator()(const UctNode& n0, const UctNode& n1)
+	{
+		if (n0.visits != n1.visits)
+			return n0.visits < n1.visits;
+		if (n0.visits == 0)
+			return n0.policy < n1.policy;
+
+		return n0.getEval(color) < n1.getEval(color);
+	}
+	int color;
+};

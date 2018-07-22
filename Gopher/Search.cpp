@@ -6,6 +6,13 @@
 
 static constexpr int TOTAL_PLAYOUTS = 10;//361 * 1;
 
+
+// TODO Sometimes search picks literally the worst move by policy standards
+// (But it's a move that's been visited a ton. Why was it visited?)
+//
+// TODO: Find out why it seems to evaluate an awful position for black
+// as a 100% win chance!!
+
 coord Search::search(const Board & board, GameState& state, int color)
 {
 	Tree::initRoot(board, state, color);
@@ -22,7 +29,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	Tree::printNodeInfo(&Tree::getRoot());
 
 	// TODO: Add time based search instead of playout based!
-	auto& best	= Tree::findBestMove(&Tree::getRoot());
+	auto& best	= Tree::findBestMove(&Tree::getRoot(), color);
 	coord idx	= best.idx;
 	Tree::updateRoot(best);
 
