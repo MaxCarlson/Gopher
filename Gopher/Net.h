@@ -51,10 +51,11 @@ struct NetResult
 
 	std::vector<std::vector<float>> output;
 
+	// Vector indexes of win chances
 	enum Side
 	{
-		TO_MOVE,
-		OPPONENT
+		OPPONENT,
+		TO_MOVE
 	};
 
 	const std::vector<float>& moves() const { return output[MOVES];	  }

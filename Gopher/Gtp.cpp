@@ -267,9 +267,12 @@ int play(std::istringstream& is, int id)
 
 	is >> tmp;
 	int idx = getIdxFromGtp(tmp);
+	Move m	= { idx, color };
 
-	Move m = { idx, color };
-	
+	// We have to do some extra work here in case
+	// user is playing the same color move 2x or more
+	// times in a row
+	Tree::verifyRoot(board, stateStack, color);
 
 	if (isPass(m) || isResign(m))
 		;
@@ -294,12 +297,8 @@ int generateMove(std::istringstream& is, int id)
 	is >> std::skipws >> colorStr;
 
 	Stone color = gtpWOrB(colorStr);
-
-	coord idx = search.search(board, stateStack, color);
-
-	//coord idx = uct.search(board, color);
-
-	Move m = { idx, color };
+	coord idx	= search.search(board, stateStack, color);
+	Move m		= { idx, color };
 
 	board.makeMoveGtp(m);
 	stateStack.makeMove(board);

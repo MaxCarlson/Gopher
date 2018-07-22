@@ -19,7 +19,7 @@ UctNode & getRoot()
 	return *root.get();
 }
 
-void initRoot(const Board & board, GameState & state, int color)
+void verifyRoot(const Board & board, GameState & state, int color)
 {
 	if (!root)
 		root = std::make_unique<UctNode>(Pass, 0.f);
@@ -30,7 +30,12 @@ void initRoot(const Board & board, GameState & state, int color)
 		root->expand(state, board, netResult, color);
 		root->update(root->getNetEval(BLACK));
 	}
-	
+}
+
+void initRoot(const Board & board, GameState & state, int color)
+{	
+	verifyRoot(board, state, color);
+
 	auto eval = root->getEval(color);
 	std::cerr << "Net eval for " << stoneString(color) << " " << eval << '\n';
 }
@@ -50,7 +55,7 @@ UctNode& findBestMove(UctNode* node, int color)
 void updateRoot(const Board & board, GameState& state, int color, int bestIdx)
 {
 	if (!root || !root->isExpanded())
-		initRoot(board, state, color);
+		verifyRoot(board, state, color);
 
 	auto* child = root->findChild(bestIdx);
 
