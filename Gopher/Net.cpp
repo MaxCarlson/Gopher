@@ -7,7 +7,6 @@
 #include <iomanip>
 #include "RedirectStreams.h"
 
-//static const std::string modelPath = "models/PolicyModel/";
 static const std::string modelPath	= "models/";
 static const std::string fileName	= "GoNet.dnn";
 
@@ -25,7 +24,7 @@ void init()
 	// Don't let CNTK's priting to stderr interfere with
 	// GTP on engine load
 	{
-		auto rd = RedirectStream(STDERR_FILENO);
+		//auto rd = RedirectStream(STDERR_FILENO);
 		model	= CNTK::Function::Load(ifs);
 	}
 	inputVar	= model->Arguments()[0];
@@ -62,10 +61,10 @@ NetResult inference(const GameState& state, int color)
 	NetInput input(state, color);
 	
 	// This needs to be called here and not before, for some reason
-	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
+	const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
 	//
 	// Only for debugging while GPU is being used for training!
-	const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
+	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	// TODO: CNTK seems to crash an inordinate amount here,
 	// seems to happen more if device gets init and pauses before inputVal

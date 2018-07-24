@@ -37,11 +37,14 @@ void initRoot(const Board & board, GameState & state, int color)
 	verifyRoot(board, state, color);
 
 	auto eval = root->getEval(color);
-	std::cerr << "Net eval for " << stoneString(color) << " " << eval << '\n';
+	std::cerr << "Net eval for " << stoneString(color) << " root " << eval << '\n';
 }
 
-UctNode& findBestMove(UctNode* node, int color)
+UctNode* findBestMove(UctNode* node, int color)
 {
+	if (node->empty())
+		return nullptr;
+
 	// TODO: Should we look at both wins and win ratio?
 	auto bestNode  = std::max_element(
 		std::begin(*node->children), 
@@ -49,7 +52,7 @@ UctNode& findBestMove(UctNode* node, int color)
 		UctNodePred{ color }
 	);
 
-	return *bestNode;
+	return &*bestNode;
 }
 
 void updateRoot(const Board & board, GameState& state, int color, int bestIdx)
@@ -81,17 +84,17 @@ void updateRoot(UctNode& best)
 void printStats(int color)
 {
 	int ccolor = color;
-	auto* node = &findBestMove(root.get(), color);
+	auto* node = findBestMove(root.get(), color);
 
 	// This could cause issues with empty/malformed nodes?
 	std::cerr << "Line: ";
 	while (!node->empty())
 	{
-		std::cerr << moveToString(node->idx) << " " 
+		std::cerr << moveToString(node->idx) << " "
 			<< std::fixed << std::setprecision(2) << node->getEval(ccolor) << ", ";
-		ccolor = flipColor(color);
+		ccolor = flipColor(ccolor);
 
-		node = &findBestMove(node, ccolor);
+		node = findBestMove(node, ccolor);
 	}
 	std::cerr << '\n';
 }

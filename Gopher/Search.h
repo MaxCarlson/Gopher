@@ -14,6 +14,7 @@ public:
 private:
 
 	float playout(Board& board, GameState& state, UctNode& node, int depth, int color);
+	bool resignOrPass(const UctNode* best, coord& idx, int color) const;
 };
 
 inline Search search;

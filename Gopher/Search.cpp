@@ -4,14 +4,8 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 10;//361 * 1;
+static constexpr int TOTAL_PLAYOUTS = 361 * 6;
 
-
-// TODO Sometimes search picks literally the worst move by policy standards
-// (But it's a move that's been visited a ton. Why was it visited?)
-//
-// TODO: Find out why it seems to evaluate an awful position for black
-// as a 100% win chance!!
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
@@ -22,6 +16,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 		Board b = board;
 		playout(b, state, Tree::getRoot(), 0, color);
 
+		// TODO: Config option for # of printouts during search
 		if (i % (TOTAL_PLAYOUTS / 10) == 0)
 			Tree::printStats(color);
 	}
@@ -29,9 +24,17 @@ coord Search::search(const Board & board, GameState& state, int color)
 	Tree::printNodeInfo(&Tree::getRoot());
 
 	// TODO: Add time based search instead of playout based!
-	auto& best	= Tree::findBestMove(&Tree::getRoot(), color);
-	coord idx	= best.idx;
-	Tree::updateRoot(best);
+	// TODO: Add in passing!
+	coord idx;
+	auto* best	= Tree::findBestMove(&Tree::getRoot(), color);
+
+	if (resignOrPass(best, idx, color))
+		;
+	else if (best)
+	{
+		idx = best->idx;
+		Tree::updateRoot(*best);
+	}
 
 	return idx;
 }
@@ -74,4 +77,30 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	node.update(value);
 
 	return value;
+}
+
+// TODO: Make passing more comprehensive. 
+// TODO: Tune Resign
+bool Search::resignOrPass(const UctNode* best, coord& idx, int color) const
+{
+	auto rOrp		 = false;
+	const auto& root = Tree::getRoot();
+	static constexpr auto resignThresh = 0.05;
+
+	// Pass if there are no moves avalible
+	if (!best)
+	{
+		rOrp	= true;
+		idx		= Pass;
+	}
+
+	// Resign if win chance gets too low.
+	// This is important for faster play testing of new versions
+	if (root.getEval(color) < resignThresh)
+	{
+		rOrp	= true;
+		idx		= Resign;
+	}
+
+	return rOrp;
 }

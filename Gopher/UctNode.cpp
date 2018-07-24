@@ -52,7 +52,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 	auto idx     = 0;
 	auto bestIdx = 0;
 	//static constexpr double UCT_EXPLORE = 0.95; // Doesn't seem to effect search much at all!
-	auto best = std::numeric_limits<float>::lowest();
+	auto best	 = std::numeric_limits<float>::lowest();
 
 	// TODO: Look into reducing the estimated eval of 
 	// low quality moves
@@ -131,6 +131,7 @@ void UctNode::update(float eval)
 
 void UctNode::setNetEval(const NetResult & result, int color)
 {
+	// Record netEval from blacks perspective
 	value = result.winChance(NetResult::TO_MOVE);
 	if (color == WHITE)
 		value = 1.0 - value;
