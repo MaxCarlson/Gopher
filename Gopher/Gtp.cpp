@@ -320,6 +320,7 @@ int clearBoard(std::istringstream& is, int id)
 {
 	board.init();
 	stateStack.clear();
+	Tree::initRoot(board, stateStack, BLACK);
 	return gtpSuccess(id, "");
 }
 
@@ -368,12 +369,24 @@ int gtpPrintBoard(std::istringstream& is, int id)
 // TODO: Rebuild for Net
 int playSelf(std::istringstream& is, int id)
 {
+	int col = BLACK;
 	int passes = 0;
 	for (int i = 0; i < 10000; ++i)
 	{
+		coord idx = search.search(board, stateStack, col);
 
+
+		std::istringstream mvStr;
+		if(col == BLACK)
+			mvStr = std::istringstream("genmove b");
+		else 
+			mvStr = std::istringstream("genmove w");
+
+		int code = generateMove(mvStr, 1);
+		col = flipColor(col);
 	}
 
+	clearBoard(is, id);
 	return gtpSuccess(id);
 }
 

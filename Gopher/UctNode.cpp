@@ -51,7 +51,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 {
 	auto idx     = 0;
 	auto bestIdx = 0;
-	//static constexpr double UCT_EXPLORE = 0.95; // Doesn't seem to effect search much at all!
+	static constexpr double UCT_EXPLORE = 0.75; // Doesn't seem to effect search much at all!
 	auto best	 = std::numeric_limits<float>::lowest();
 
 	// TODO: Look into reducing the estimated eval of 
@@ -73,7 +73,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 
 		auto psa		= child.policy;
 		auto childVis	= 1.f + child.visits;
-		auto uct		= psa * (parentVis / childVis); // UCT_EXPLORE * Appears to do nothing much
+		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis); // UCT_EXPLORE * Appears to do nothing much
 		auto val		= winrate + uct;
 
 		if (val > best)
@@ -134,13 +134,13 @@ void UctNode::setNetEval(const NetResult & result, int color)
 	// Record netEval from blacks perspective
 	value = result.winChance(NetResult::TO_MOVE);
 	if (color == WHITE)
-		value = 1.0 - value;
+		value = 1.f - value;
 }
 
 float UctNode::getNetEval(int color) const
 {
 	if (color == WHITE)
-		return 1.0 - value;
+		return 1.f - value;
 	return value;
 }
 
@@ -148,6 +148,6 @@ float UctNode::getEval(int color) const
 {
 	const auto score = wins / static_cast<float>(visits);
 	if (color == WHITE)
-		return 1.0 - score;
+		return 1.f - score;
 	return score;
 }

@@ -21,6 +21,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 			Tree::printStats(color);
 	}
 
+	// Debugging. Look at spread of search through tree
 	Tree::printNodeInfo(&Tree::getRoot());
 
 	// TODO: Add time based search instead of playout based!
