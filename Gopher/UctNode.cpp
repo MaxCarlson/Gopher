@@ -29,6 +29,8 @@ void UctNode::del()
 void UctNode::expand(const GameState& state, const Board& board, const NetResult& result, int color)
 {
 	expanded = true;
+	if (!children)
+		children = new Children();
 
 	// Store win chance as black 
 	// (Net returns win chance as side to move)

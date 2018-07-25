@@ -338,7 +338,11 @@ int fixedHandicap(std::istringstream& is, int id)
 	bool sucess	= board.setFixedHandicap(count);
 
 	if (sucess)
+	{
+		stateStack.makeMove(board);
+		Tree::initRoot(board, stateStack, WHITE, true);
 		return gtpSuccess(id, board.stoneStrVerts());
+	}
 
 	return gtpFailure(id, "Invalid # of stones for board size!");
 }

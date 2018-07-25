@@ -60,12 +60,13 @@ NetInput::NetInput(const GameState& state, int color)
 	std::fill_n(slices.data(), BoardSize2, static_cast<float>(color - 1));
 
 	// Fill the rest of the binary slices
-	int stateIdx = 0;
+	int stateOffset = 0;
 	int slIdx = BoardSize2;
 	for (int i = 0; (i < state.moveCount && i < BoardHistory); ++i)
 	{
-		++stateIdx;
-		for (int c = BLACK; c <= WHITE; ++c)
+		
+		int stateIdx = state.moveCount - ++stateOffset;
+		for (int c = color; c != OFFBOARD; )
 		{
 			int idx = 0;
 			for (int y = 0; y < BoardSize; ++y)
@@ -73,20 +74,18 @@ NetInput::NetInput(const GameState& state, int color)
 				{
 					// Index into the padded state vector that matches
 					// our idx
-					const int pIdx = getPaddedIdx(x, y);
-
-					// Index into the the particular slice in the 1D slices vector
-					//const int inIdx = stateIdx * (c+1) * BoardSize2 + idx;
+					int pIdx = getPaddedIdx(x, y);
 
 					// TODO: VERIFY THIS IS WORKING AS INTENDED
 					// 
 					// TODO: Pass trivial(simple/repeatable) but non zero input into the net
 					// here and in the python CNTK trainer and verify output is identical (also verify
 					// that the orientation in the 1D array is correct here)
-					slices[slIdx] = static_cast<float>(state.states[state.moveCount - stateIdx][pIdx] == c);
+					slices[slIdx] = static_cast<float>(state.states[stateIdx][pIdx] == c);
 					++slIdx;
 					++idx;
 				}
+			c = c == color ? flipColor(c) : OFFBOARD;
 		}
 	}
 	// TODO: Some really weird issues with cerr here sometimes

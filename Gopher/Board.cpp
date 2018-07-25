@@ -730,9 +730,9 @@ bool Board::setFixedHandicap(int count)
 	if (count > 9)
 		return false;
 
-	static constexpr int high	= 3;
-	static constexpr int low	= BoardSize - 1 - high;
-	static constexpr int mid	= BoardSize / 2;
+	static constexpr int high	= 4;
+	static constexpr int low	= BoardRealSize - 1 - high;
+	static constexpr int mid	= BoardRealSize / 2;
 
 	if (count >= 2)
 	{
@@ -747,13 +747,20 @@ bool Board::setFixedHandicap(int count)
 		makeMove({ getIdx(low, high), BLACK });
 
 	if (count >= 5 && count % 2)
-		makeMove({ getIdx(mid, mid), BLACK });
+		makeMove({ getIdx(mid,  mid), BLACK });
 
 	if (count >= 6)
 	{
-		makeMove({ getIdx(low, mid), BLACK });
-		makeMove({ getIdx(mid, low), BLACK });
+		makeMove({ getIdx(low,  mid), BLACK });
+		makeMove({ getIdx(high, mid), BLACK });
 	}
+
+	if (count >= 8)
+	{
+		makeMove({ getIdx(mid,  low), BLACK });
+		makeMove({ getIdx(mid, high), BLACK });
+	}
+
 	return true;
 }
 

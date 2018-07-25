@@ -59,7 +59,6 @@ NetResult inference(const GameState& state, int color)
 {
 	// TODO: Look into caching these inputs
 	NetInput input(state, color);
-	input.printSlices(state);
 	
 	// This needs to be called here and not before, for some reason
 	const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
