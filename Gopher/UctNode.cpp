@@ -23,6 +23,7 @@ void UctNode::del()
 		delete children;
 		children = nullptr;
 	}
+	expanded = false;
 }
 
 void UctNode::expand(const GameState& state, const Board& board, const NetResult& result, int color)

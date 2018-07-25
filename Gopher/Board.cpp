@@ -724,3 +724,49 @@ coord Board::playRandom(Stone color)
 	return Pass;
 }
 
+// These (handicap) moves are outside of the game stateStack
+bool Board::setFixedHandicap(int count)
+{
+	if (count > 9)
+		return false;
+
+	static constexpr int high	= 3;
+	static constexpr int low	= BoardSize - 1 - high;
+	static constexpr int mid	= BoardSize / 2;
+
+	if (count >= 2)
+	{
+		makeMove({ getIdx(high, high), BLACK });
+		makeMove({ getIdx(low,   low), BLACK });
+	}
+
+	if (count >= 3)
+		makeMove({ getIdx(high, low), BLACK });
+
+	if (count >= 4)
+		makeMove({ getIdx(low, high), BLACK });
+
+	if (count >= 5 && count % 2)
+		makeMove({ getIdx(mid, mid), BLACK });
+
+	if (count >= 6)
+	{
+		makeMove({ getIdx(low, mid), BLACK });
+		makeMove({ getIdx(mid, low), BLACK });
+	}
+	return true;
+}
+
+std::string Board::stoneStrVerts() const
+{
+	std::stringstream ss;
+
+	foreachPoint([&](int idx, int stone)
+	{
+		if (stone == OFFBOARD || stone == NONE)
+			return;
+		ss << moveToString(idx) << ' ';
+	});
+	ss << '\n';
+	return ss.str();
+}

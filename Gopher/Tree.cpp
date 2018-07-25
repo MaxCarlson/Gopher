@@ -26,14 +26,20 @@ void verifyRoot(const Board & board, GameState & state, int color)
 
 	if (!root->isExpanded())
 	{
+		board.printBoard();
+
 		NetResult netResult = Net::inference(state, color);
+		state.printStates();
 		root->expand(state, board, netResult, color);
 		root->update(root->getNetEval(BLACK));
 	}
 }
 
-void initRoot(const Board & board, GameState & state, int color)
+void initRoot(const Board & board, GameState & state, int color, bool reset)
 {	
+	if (reset)
+		root->del();
+
 	verifyRoot(board, state, color);
 
 	auto eval = root->getEval(color);

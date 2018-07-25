@@ -206,6 +206,8 @@ public:
 	int& at(int idx) { return points[idx]; }
 
 	void setKomi(float num) { komi = num; }
+	bool setFixedHandicap(int count);
+	std::string stoneStrVerts() const;
 
 	template<class F>
 	void foreachPoint(F&& f);

@@ -10,7 +10,7 @@ namespace Tree
 {
 	UctNode& getRoot();
 	void verifyRoot(const Board& board, GameState& state, int color);
-	void initRoot(const Board & board, GameState& state, int color);
+	void initRoot(const Board & board, GameState& state, int color, bool reset=false);
 	UctNode* findBestMove(UctNode* node, int color);
 	void updateRoot(const Board & board, GameState& state, int color, int bestIdx);
 	void updateRoot(UctNode& best);

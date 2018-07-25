@@ -43,7 +43,7 @@ void printBoardVec(It begin, It end, int size)
 
 void GameState::printStates() const
 {
-	for (int i = 0; i < moveCount; ++i)
+	for (int i = moveCount - 1; i >= 0; --i)
 	{
 		auto begin	= states[i].begin();
 		auto end	= states[i].end();

@@ -4,7 +4,7 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 6;
+static constexpr int TOTAL_PLAYOUTS = 361 * 5;
 
 
 coord Search::search(const Board & board, GameState& state, int color)
@@ -27,7 +27,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	// TODO: Add time based search instead of playout based!
 	// TODO: Add in passing!
 	coord idx;
-	auto* best	= Tree::findBestMove(&Tree::getRoot(), color);
+	auto* best = Tree::findBestMove(&Tree::getRoot(), color);
 
 	if (resignOrPass(best, idx, color))
 		;

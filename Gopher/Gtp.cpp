@@ -10,7 +10,7 @@
 #include <map>
 #include <array>
 
-std::array<std::string, 14> Commands =
+std::array<std::string, 15> Commands =
 {
 	"name",
 	"version",
@@ -21,6 +21,10 @@ std::array<std::string, 14> Commands =
 	"play",
 	"boardsize",
 	"clear_board",
+	"fixed_handicap",
+	// TODO: 
+	//"place_free_handicap",
+	//"set_free_handicap",
 	"genmove",
 	"final_score",
 	"quit",
@@ -104,11 +108,12 @@ void buildCommandsMap(Map& options)
 	options.emplace(Commands[6], play);
 	options.emplace(Commands[7], setBoardSize);
 	options.emplace(Commands[8], clearBoard);
-	options.emplace(Commands[9], generateMove);
-	options.emplace(Commands[10], finalScore);
-	options.emplace(Commands[11], quitGtp);
-	options.emplace(Commands[12], gtpPrintBoard);
-	options.emplace(Commands[13], playSelf);
+	options.emplace(Commands[9], fixedHandicap);
+	options.emplace(Commands[10], generateMove);
+	options.emplace(Commands[11], finalScore);
+	options.emplace(Commands[12], quitGtp);
+	options.emplace(Commands[13], gtpPrintBoard);
+	options.emplace(Commands[14], playSelf);
 }
 
 void mainLoop()
@@ -320,8 +325,22 @@ int clearBoard(std::istringstream& is, int id)
 {
 	board.init();
 	stateStack.clear();
-	Tree::initRoot(board, stateStack, BLACK);
+	Tree::initRoot(board, stateStack, BLACK, true);
 	return gtpSuccess(id, "");
+}
+
+int fixedHandicap(std::istringstream& is, int id)
+{
+	std::string str;
+	is >> str;
+
+	int count	= std::atoi(str.c_str());
+	bool sucess	= board.setFixedHandicap(count);
+
+	if (sucess)
+		return gtpSuccess(id, board.stoneStrVerts());
+
+	return gtpFailure(id, "Invalid # of stones for board size!");
 }
 
 int finalScore(std::istringstream& is, int id)
@@ -373,17 +392,21 @@ int playSelf(std::istringstream& is, int id)
 	int passes = 0;
 	for (int i = 0; i < 10000; ++i)
 	{
-		coord idx = search.search(board, stateStack, col);
+		coord idx	= search.search(board, stateStack, col);
+		Move m		= { idx, col };
+		col			= flipColor(col);
 
+		if (isPass(m))
+			++passes;
+		else
+			passes = 0;
 
-		std::istringstream mvStr;
-		if(col == BLACK)
-			mvStr = std::istringstream("genmove b");
-		else 
-			mvStr = std::istringstream("genmove w");
+		if (isResign(m) || passes >= 2)
+			break;
 
-		int code = generateMove(mvStr, 1);
-		col = flipColor(col);
+		board.makeMoveGtp(m);
+		board.printBoard();
+		stateStack.makeMove(board);
 	}
 
 	clearBoard(is, id);
