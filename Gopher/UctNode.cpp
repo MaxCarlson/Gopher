@@ -37,7 +37,7 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 	setNetEval(result, color);
 
 	int idx = -1;
-	for (const auto moveProb : result.moves())
+	for (const auto& moveProb : result.moves())
 	{
 		++idx;
 		const int16_t rIdx = idxToRealIdx(idx);

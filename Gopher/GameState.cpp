@@ -98,12 +98,11 @@ NetInput::NetInput(const GameState& state, int color)
 
 void NetInput::printSlices(const GameState& state) const
 {
-	int idx = 0;
-	for (int i = 0; i < state.moveCount * 2; ++i)
+	for (int sidx = 0; sidx < slices.size(); sidx += BoardSize2)
 	{
-		auto begin = slices.begin() + idx;
-		auto end = begin + BoardSize2;
+		auto begin	= slices.begin() + sidx;
+		auto end	= begin + BoardSize2;
+
 		printBoardVec(begin, end, BoardSize);
-		idx += BoardSize2;
 	}
 }

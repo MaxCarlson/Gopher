@@ -6,6 +6,7 @@ struct NetResult;
 struct Board;
 using coord = int;
 
+// TODO: Non expanded nodes on init like leelaZero
 struct UctNode
 {
 	UctNode() = default;

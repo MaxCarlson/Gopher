@@ -4,13 +4,21 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 5;
+static constexpr int TOTAL_PLAYOUTS = 361 * 8;
 
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
 	Tree::initRoot(board, state, color);
 
+	// TODO: Force more exploration!@
+	// TODO: Look at the slices, they look weird after 2 moves!
+	// Also print out weird!
+	//board.printBoard();
+	//state.printStates();
+	//NetInput inp(state, color);
+	//inp.printSlices(state);
+	
 	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
 	{
 		Board b = board;
