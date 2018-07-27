@@ -4,7 +4,7 @@
 #include "GameState.h"
 #include "Net.h"
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 8;
+static constexpr int TOTAL_PLAYOUTS = 361 * 4;
 
 
 coord Search::search(const Board & board, GameState& state, int color)
@@ -24,7 +24,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 		Board b = board;
 		playout(b, state, Tree::getRoot(), 0, color);
 
-		// TODO: Config option for # of printouts during search
+		// TODO: Config option for printing frequency
 		if (i % (TOTAL_PLAYOUTS / 10) == 0)
 			Tree::printStats(color);
 	}

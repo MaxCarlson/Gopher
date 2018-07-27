@@ -107,7 +107,7 @@ void printStats(int color)
 // TODO: Make horizontal Histogram?
 void printNodeInfo(UctNode * node)
 {
-	std::map<int, std::pair<int, float>> hist;
+	std::map<int, std::pair<int, std::vector<const UctNode*>>> hist;
 	if (node->empty())
 		return;
 
@@ -115,18 +115,33 @@ void printNodeInfo(UctNode * node)
 	{
 		auto find = hist.find(child.visits);
 		if (find == hist.end())
-			hist.emplace(child.visits, std::make_pair(1, child.policy));
+			hist.emplace(child.visits, std::make_pair(1, std::vector<const UctNode*>{ &child }));
 		else
 		{
 			++find->second.first;
-			find->second.second += child.policy;
+			find->second.second.emplace_back(&child);
 		}
 	}
-	std::cerr << "Visits, Count, Avg Policy \n";
+
+	std::cerr << "Visits, Count, Avg Policy, Coords, idx, NetValue \n";
 	for (const auto& h : hist)
+	{
+		double avgPol = 0.0;
+		for (const auto& c : h.second.second)
+			avgPol += c->policy;
+		avgPol /= h.second.second.size();
+
 		std::cerr << std::setw(3) << h.first
-		<< ", " << std::setw(3) << h.second.first << ", "
-		<< h.second.second / h.second.first << '\n';
+			<< ", " << std::setw(3) << h.second.first << ", "
+			<< avgPol << ' ';
+
+		const auto& node = h.second.second[0];
+		if (h.second.second.size() == 1)
+			std::cerr << moveToString(node->idx) 
+				<< ' ' << node->idx << ' ' << node->value;
+		std::cerr << '\n';
+	}
+		
 }
 
 } // End Tree::

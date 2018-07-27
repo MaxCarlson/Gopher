@@ -31,6 +31,8 @@ void printBoardVec(It begin, It end, int size)
 	for (auto it = begin; it != end; ++it)
 	{
 		std::cerr << *it << ' ';
+		// Format the new lines based on 
+		// size of board length
 		++i;
 		if (i >= size)
 		{
@@ -64,11 +66,9 @@ NetInput::NetInput(const GameState& state, int color)
 	int slIdx = BoardSize2;
 	for (int i = 0; (i < state.moveCount && i < BoardHistory); ++i)
 	{
-		
 		int stateIdx = state.moveCount - ++stateOffset;
 		for (int c = color; c != OFFBOARD; )
 		{
-			int idx = 0;
 			for (int y = 0; y < BoardSize; ++y)
 				for (int x = 0; x < BoardSize; ++x)
 				{
@@ -83,7 +83,6 @@ NetInput::NetInput(const GameState& state, int color)
 					// that the orientation in the 1D array is correct here)
 					slices[slIdx] = static_cast<float>(state.states[stateIdx][pIdx] == c);
 					++slIdx;
-					++idx;
 				}
 			c = c == color ? flipColor(c) : OFFBOARD;
 		}

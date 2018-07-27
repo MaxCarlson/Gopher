@@ -54,7 +54,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 {
 	auto idx     = 0;
 	auto bestIdx = 0;
-	static constexpr double UCT_EXPLORE = 0.75; // Doesn't seem to effect search much at all!
+	static constexpr float UCT_EXPLORE = 0.875; // TODO: Very low values cause one awful move to be picked. Should explore why
 	auto best	 = std::numeric_limits<float>::lowest();
 
 	// TODO: Look into reducing the estimated eval of 
@@ -76,7 +76,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 
 		auto psa		= child.policy;
 		auto childVis	= 1.f + child.visits;
-		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis); // UCT_EXPLORE * Appears to do nothing much
+		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis); 
 		auto val		= winrate + uct;
 
 		if (val > best)
@@ -86,11 +86,6 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 		}
 		++idx;
 	}
-
-	// TODO: Unlikey or never? Child chosen with -policy
-	//auto& child = children->at(bestIdx);
-	//if (child.policy <= 0.f)
-	//	int a = 5;
 
 	return (*children)[bestIdx];
 }
