@@ -63,8 +63,6 @@ NetResult inference(const GameState& state, int color)
 	// This needs to be called here and not before, for some reason
 	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
 	const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
-	//
-	// Only for debugging while GPU is being used for training!
 	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	// TODO: CNTK seems to crash an inordinate amount here,

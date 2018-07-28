@@ -137,8 +137,8 @@ void printNodeInfo(UctNode * node)
 
 		const auto& node = h.second.second[0];
 		if (h.second.second.size() == 1)
-			std::cerr << moveToString(node->idx) 
-				<< ' ' << node->idx << ' ' << node->value;
+			std::cerr << std::setw(4) << std::right << moveToString(node->idx)
+				<< ' ' << std::setw(4) << std::right << node->idx << ' ' << node->value;
 		std::cerr << '\n';
 	}
 		

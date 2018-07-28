@@ -3,12 +3,15 @@
 #include "Board.h"
 #include "GameState.h"
 #include "Net.h"
+#include "Random.h"
+#include <iomanip>
 
 static constexpr int TOTAL_PLAYOUTS = 361 * 4;
 
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
+	auto start = Time::startTimer();
 	Tree::initRoot(board, state, color);
 
 	// TODO: Force more exploration!@
@@ -44,6 +47,9 @@ coord Search::search(const Board & board, GameState& state, int color)
 		idx = best->idx;
 		Tree::updateRoot(*best);
 	}
+
+	auto end = Time::endTime<std::chrono::duration<double>>(start);
+	std::cerr << "Search Time: " << std::fixed << std::setprecision(1) << end << "s\n";
 
 	return idx;
 }

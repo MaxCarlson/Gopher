@@ -40,13 +40,13 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 	for (const auto& moveProb : result.moves())
 	{
 		++idx;
-		const int16_t rIdx = idxToRealIdx(idx);
+		const auto rIdx = idxToRealIdx(idx);
 		if (!board.isValidNoSuicide({ rIdx, color }))
 			continue;
 
 		// TODO: Think about how we should bonus the nodes scored high here
 		// TODO: Optimize memory allocations ~ They're very poorly done here
-		children->emplace_back(UctNode{ rIdx, moveProb });
+		children->emplace_back(UctNode{ static_cast<int16_t>(rIdx), moveProb });
 	}
 }
 
@@ -63,7 +63,7 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 	// TODO: ? Numerator as it is makes all child policy values worthless
 	// if parent visits is zero. Test whether or not we should add one to the numerator!
 	// Probably in combination with not expanding leaf nodes until n visits
-	const auto parentVis	= std::sqrt(static_cast<float>(this->visits));
+	const auto parentVis	= std::sqrt((static_cast<float>(this->visits))); // std::log
 	const auto pNetEval		= getNetEval(color); // Set estimated eval equal to parent eval
 
 	for (const auto& child : *children)
