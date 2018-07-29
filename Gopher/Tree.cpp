@@ -104,7 +104,6 @@ void printStats(int color)
 
 // Print histogram of visit counts
 // and their average network expert score
-// TODO: Make horizontal Histogram?
 void printNodeInfo(UctNode * node, int color)
 {
 	std::map<int, std::pair<int, std::vector<const UctNode*>>> hist;

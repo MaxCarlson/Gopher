@@ -58,7 +58,10 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 
 UctNode* UctNode::selectChild(int color, bool isRoot) const
 {
-	static constexpr float UCT_EXPLORE = 0.875; // TODO: Very low values cause one awful move to be picked. Should explore why
+	// TODO: Test this against default as well as
+	// against UCT_EXPLORE in it's usual place (UCT_E * psa)
+	static constexpr float EXPLORE		= 1.15;
+	//static constexpr float UCT_EXPLORE	= 0.875; // TODO: Very low values cause one awful move to be picked. Should explore why
 
 	auto idx     = 0;
 	auto bestIdx = 0;
@@ -70,7 +73,7 @@ UctNode* UctNode::selectChild(int color, bool isRoot) const
 	// TODO: ? Numerator as it is makes all child policy values worthless
 	// if parent visits is zero. Test whether or not we should add one to the numerator!
 	// Probably in combination with not expanding leaf nodes until n visits
-	const auto parentVis	= std::sqrt((static_cast<float>(this->visits))); // std::log
+	const auto parentVis	= ((static_cast<float>(this->visits))); // std::log
 	const auto pNetEval		= getNetEval(color); // Set estimated eval equal to parent eval
 
 	UctNode* bestNode = nullptr;
@@ -82,12 +85,9 @@ UctNode* UctNode::selectChild(int color, bool isRoot) const
 		if (child.visits)
 			winrate = child.getEval(color);
 
-		if (child.idx == 100)
-			int a = 5;
-
 		auto psa		= child.policy;
 		auto childVis	= 1.f + child.visits;
-		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis); 
+		auto uct		= psa * std::pow(parentVis / childVis, EXPLORE);
 		auto val		= winrate + uct;
 
 		if (val > best)
