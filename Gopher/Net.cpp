@@ -62,8 +62,8 @@ NetResult inference(const GameState& state, int color)
 
 	// This needs to be called here and not before, for some reason
 	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
-	const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
-	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
+	//const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
+	const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	// TODO: CNTK seems to crash an inordinate amount here,
 	// seems to happen more if device gets init and pauses before inputVal

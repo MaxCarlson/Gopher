@@ -6,7 +6,8 @@
 #include "Random.h"
 #include <iomanip>
 
-static constexpr int TOTAL_PLAYOUTS = 361 * 4;
+static constexpr int TOTAL_PLAYOUTS		= 361 * 0.25;
+static constexpr int EXPAND_THRESHOLD	= 0;
 
 
 coord Search::search(const Board & board, GameState& state, int color)
@@ -15,8 +16,6 @@ coord Search::search(const Board & board, GameState& state, int color)
 	Tree::initRoot(board, state, color);
 
 	// TODO: Force more exploration!@
-	// TODO: Look at the slices, they look weird after 2 moves!
-	// Also print out weird!
 	//board.printBoard();
 	//state.printStates();
 	//NetInput inp(state, color);
@@ -33,7 +32,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	}
 
 	// Debugging. Look at spread of search through tree
-	Tree::printNodeInfo(&Tree::getRoot());
+	Tree::printNodeInfo(&Tree::getRoot(), color);
 
 	// TODO: Add time based search instead of playout based!
 	// TODO: Add in passing!
@@ -65,7 +64,7 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	const auto isRoot = depth == 1;
 
 	// TODO: Need to handle end game conditions better
-	if (!node.isExpanded())
+	if (!node.isExpanded() && node.visits >= EXPAND_THRESHOLD)
 	{
 		NetResult netResult = Net::inference(state, color);
 
@@ -74,12 +73,12 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	}
 	else if (!node.empty())
 	{
-		auto& bestChild = node.selectChild(color, isRoot);
+		auto* bestChild = node.selectChild(color, isRoot);
 
-		board.makeMove({ bestChild.idx, color });
+		board.makeMove({ bestChild->idx, color });
 		state.makeMove(board);
 
-		value = playout(board, state, bestChild, depth, flipColor(color));
+		value = playout(board, state, *bestChild, depth, flipColor(color));
 
 		// Roll back the board state (Not the actual board though)
 		state.popState();
@@ -87,7 +86,7 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	// How should this branch(empty leaf but previously expanded) be handled?
 	// Return recorded score?
 	else
-		value = node.getEval(color);
+		value = node.getNetEval(color);
 
 	node.update(value);
 

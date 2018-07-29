@@ -18,6 +18,6 @@ namespace Tree
 
 	// Debug function for looking at nodes and their
 	// network evaluations
-	void printNodeInfo(UctNode* node);
+	void printNodeInfo(UctNode* node, int color);
 }
 

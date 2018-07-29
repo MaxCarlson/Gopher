@@ -105,7 +105,7 @@ void printStats(int color)
 // Print histogram of visit counts
 // and their average network expert score
 // TODO: Make horizontal Histogram?
-void printNodeInfo(UctNode * node)
+void printNodeInfo(UctNode * node, int color)
 {
 	std::map<int, std::pair<int, std::vector<const UctNode*>>> hist;
 	if (node->empty())
@@ -123,22 +123,27 @@ void printNodeInfo(UctNode * node)
 		}
 	}
 
-	std::cerr << "Visits, Count, Avg Policy, Coords, idx, NetValue \n";
+	std::cerr << "Visits, Count, AvgPolicy, AvgEval, Coords, idx, NetValue \n";
 	for (const auto& h : hist)
 	{
-		double avgPol = 0.0;
+		auto avgPol		= 0.0;
+		auto avgEval	= 0.0;
 		for (const auto& c : h.second.second)
+		{
 			avgPol += c->policy;
-		avgPol /= h.second.second.size();
+			avgEval = c->getEval(color);
+		}
+		avgPol	/= h.second.second.size();
+		avgEval /= h.second.second.size();
 
-		std::cerr << std::setw(3) << h.first
-			<< ", " << std::setw(3) << h.second.first << ", "
-			<< avgPol << ' ';
+		std::cerr << std::setw(6) << h.first
+			<< ", " << std::setw(5) << h.second.first << ", " << std::setw(9)
+			<< avgPol << ", " << std::setw(7) << std::right << avgEval << ',';
 
 		const auto& node = h.second.second[0];
 		if (h.second.second.size() == 1)
-			std::cerr << std::setw(4) << std::right << moveToString(node->idx)
-				<< ' ' << std::setw(4) << std::right << node->idx << ' ' << node->value;
+			std::cerr << std::setw(7) << std::right << moveToString(node->idx)
+			<< ", " << std::setw(3) << std::right << node->idx << ", " << std::setw(8) << node->value;
 		std::cerr << '\n';
 	}
 		

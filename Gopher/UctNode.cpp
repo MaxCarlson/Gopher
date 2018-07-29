@@ -37,6 +37,7 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 	setNetEval(result, color);
 
 	int idx = -1;
+	float legalPolicy = 0.f;
 	for (const auto& moveProb : result.moves())
 	{
 		++idx;
@@ -44,17 +45,23 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 		if (!board.isValidNoSuicide({ rIdx, color }))
 			continue;
 
+		legalPolicy += moveProb;
 		// TODO: Think about how we should bonus the nodes scored high here
 		// TODO: Optimize memory allocations ~ They're very poorly done here
 		children->emplace_back(UctNode{ static_cast<int16_t>(rIdx), moveProb });
 	}
+
+	// Renormalize after illegal moves removed ?
+	//for (auto& child : *children)
+	//	child.policy /= legalPolicy;
 }
 
-UctNode& UctNode::selectChild(int color, bool isRoot) const
+UctNode* UctNode::selectChild(int color, bool isRoot) const
 {
+	static constexpr float UCT_EXPLORE = 0.875; // TODO: Very low values cause one awful move to be picked. Should explore why
+
 	auto idx     = 0;
 	auto bestIdx = 0;
-	static constexpr float UCT_EXPLORE = 0.875; // TODO: Very low values cause one awful move to be picked. Should explore why
 	auto best	 = std::numeric_limits<float>::lowest();
 
 	// TODO: Look into reducing the estimated eval of 
@@ -66,13 +73,17 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 	const auto parentVis	= std::sqrt((static_cast<float>(this->visits))); // std::log
 	const auto pNetEval		= getNetEval(color); // Set estimated eval equal to parent eval
 
-	for (const auto& child : *children)
+	UctNode* bestNode = nullptr;
+	for (auto& child : *children)
 	{
 		// Use parent eval if child's hasn't been
 		// evaluated by network
 		auto winrate = pNetEval;
 		if (child.visits)
 			winrate = child.getEval(color);
+
+		if (child.idx == 100)
+			int a = 5;
 
 		auto psa		= child.policy;
 		auto childVis	= 1.f + child.visits;
@@ -81,13 +92,12 @@ UctNode& UctNode::selectChild(int color, bool isRoot) const
 
 		if (val > best)
 		{
-			bestIdx	= idx;
-			best	= val;
+			bestNode	= &child;
+			best		= val;
 		}
-		++idx;
 	}
 
-	return (*children)[bestIdx];
+	return bestNode;
 }
 
 UctNode* UctNode::findChild(int idx) const
