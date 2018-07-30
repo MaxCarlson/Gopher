@@ -28,8 +28,9 @@ void init()
 		model	= CNTK::Function::Load(ifs);
 	}
 	inputVar	= model->Arguments()[0];
-	policyOut	= model->Outputs()[0];
-	valueOut	= model->Outputs()[1];
+	policyOut	= model->Outputs()[NetResult::MOVES];
+	valueOut	= model->Outputs()[NetResult::WIN_CHANCE];
+
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
@@ -41,7 +42,7 @@ template<class T>
 void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 {
 	std::cerr << '\n';
-	const auto& out = outputBuffer[0];
+	const auto& out = outputBuffer[NetResult::MOVES];
 	for (auto i = 0; i < out.size(); ++i)
 	{
 		if (i % 19 == 0 && i != 0)
@@ -62,13 +63,16 @@ NetResult inference(const GameState& state, int color)
 
 	// This needs to be called here and not before, for some reason
 	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
-	//const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
-	const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
+	const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
+	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	// TODO: CNTK seems to crash an inordinate amount here,
 	// seems to happen more if device gets init and pauses before inputVal
 	// figure out why and if we can prevent it!
 	// Especially with CPU, not as much with GPU!
+	//
+	// Note: Crash here seems to be fixed by increasing 
+	// Linker -> System -> Stack reserve size from 1MB to 5MB
 	//
 	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };

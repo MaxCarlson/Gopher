@@ -93,6 +93,7 @@
       <AdditionalOptions>/NATVIS:C:\Users\C-60\Desktop\cppPrograms\Containers\Containers\ContainersDbgNativis.natvis %(AdditionalOptions)</AdditionalOptions>
       <AdditionalLibraryDirectories>C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU\cntk\cntk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Cntk.Core-2.5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>5000000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,6 +129,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU\cntk\cntk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Cntk.Core-2.5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>5000000</StackReserveSize>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
