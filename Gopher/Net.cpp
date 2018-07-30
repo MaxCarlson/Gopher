@@ -17,20 +17,36 @@ namespace Net
 	CNTK::Variable		policyOut;
 	CNTK::Variable		valueOut;
 
+	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
+	const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
+	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
+
+	// Allow the default device to be decided at runtime through
+	// cmdLine options or cfg file
+	//auto* device = &CNTK::DeviceDescriptor::UseDefaultDevice();
+
 void init()
 {
+	std::cout << "second";
+
+
 	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
-	
-	// Don't let CNTK's priting to stderr interfere with
-	// GTP on engine load
-	{
+	std::cout << "third";
+
+	// System call or QtProcess::execute/start cannot load the model! Why?
+	//{
+		// Don't let CNTK's priting to stderr interfere with
+		// GTP on engine load
 		//auto rd = RedirectStream(STDERR_FILENO);
-		model	= CNTK::Function::Load(ifs);
-	}
+		model	= CNTK::Function::Load(ifs, device);
+	//}
+	std::cout << "forth";
+
 	inputVar	= model->Arguments()[0];
 	policyOut	= model->Outputs()[NetResult::MOVES];
 	valueOut	= model->Outputs()[NetResult::WIN_CHANCE];
 
+	std::cout << "fifth";
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
@@ -60,11 +76,6 @@ NetResult inference(const GameState& state, int color)
 {
 	// TODO: Look into caching these inputs
 	NetInput input(state, color);
-
-	// This needs to be called here and not before, for some reason
-	//const auto& device = CNTK::DeviceDescriptor::UseDefaultDevice();
-	const auto& device = CNTK::DeviceDescriptor::GPUDevice(0);
-	//const auto& device = CNTK::DeviceDescriptor::CPUDevice(); 
 
 	// TODO: CNTK seems to crash an inordinate amount here,
 	// seems to happen more if device gets init and pauses before inputVal

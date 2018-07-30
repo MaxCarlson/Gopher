@@ -87,7 +87,7 @@ UctNode* UctNode::selectChild(int color, bool isRoot) const
 
 		auto psa		= child.policy;
 		auto childVis	= 1.f + child.visits;
-		auto uct		= psa * std::pow(parentVis / childVis, EXPLORE);
+		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis);
 		auto val		= winrate + uct;
 
 		if (val > best)
