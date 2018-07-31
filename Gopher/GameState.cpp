@@ -7,9 +7,9 @@ void GameState::makeMove(const Board & board)
 		states.emplace_back(BoardState{});
 		states[moveCount].resize(BoardRealSize2);
 	}
-
 	// Copy the board's points into the next state
-	std::copy_n(board.points, BoardRealSize2, states[moveCount++].data());
+	//std::copy_n(board.points, BoardRealSize2, states[moveCount++].data());
+	std::copy(std::begin(board.points), std::end(board.points), std::begin(states[moveCount++]));
 }
 
 void GameState::popState()

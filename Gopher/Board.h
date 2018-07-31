@@ -1,6 +1,7 @@
 #pragma once
 #include "Stone.h"
 #include "Move.h"
+#include <array>
 
 // As is don't pass in any type needing memory 
 // management
@@ -119,7 +120,6 @@ struct Neighbors
 
 struct MoveStack;
 
-
 // TODO: Move stuff around and check sizeof to find good alignment
 // TODO: Make board logic simpler to follow/debug
 struct Board
@@ -131,8 +131,9 @@ struct Board
 
 	// Info about squares (points) on the board
 	// TODO: Make this char?
-	int points[BoardMaxIdx];
+	std::array<int, BoardMaxIdx> points;
 
+	// Can probably get rid of this as it's not as needed with net?
 	FastList<coord, BoardMaxIdx> free;
 
 	// Number of neighbors a stone at idx has of each type
@@ -240,6 +241,7 @@ public:
 	template<class F>
 	void foreachInGroupBreak(groupId id, F&& f) const;
 
+	// TODO: Can probably get rid of the free list as with net we don't really need it
 	template<class F>
 	void foreachFreePoint(F&& f) const;
 };

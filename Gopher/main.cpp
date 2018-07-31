@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-/* // TODO: Must Build boost
+ // TODO: Must Build boost
 #include <boost\program_options.hpp>
 
 namespace po = boost::program_options;
@@ -22,11 +22,11 @@ void parseCmd(int argc, char * argv[])
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 }
-*/
+
 
 int main(int argc, char * argv[])
 {
-	//parseCmd(argc, argv);
+	parseCmd(argc, argv);
 
 	Net::init();
 	// Quick and dirty fix to make random number generator non-deterministic

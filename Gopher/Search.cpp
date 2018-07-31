@@ -7,7 +7,7 @@
 #include "Options.h"
 #include <iomanip>
 
-static constexpr int TOTAL_PLAYOUTS		= 361 * 1;
+static constexpr int TOTAL_PLAYOUTS		= 361 * 0.1;
 static constexpr int EXPAND_THRESHOLD	= 0;
 
 
@@ -45,7 +45,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	if (options.training && options.rngMovesNumber > state.moveCount)
 		moveNoise(best, color);
 
-	if (resignOrPass(best, idx, color))
+	if (resignOrPass(state, best, idx, color))
 		;
 	else if (best)
 	{
@@ -101,14 +101,15 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 
 // TODO: Make passing more comprehensive. 
 // TODO: Tune Resign
-bool Search::resignOrPass(const UctNode* best, coord& idx, int color) const
+bool Search::resignOrPass(const GameState& state, const UctNode* best, coord& idx, int color) const
 {
 	auto rOrp		 = false;
 	const auto& root = Tree::getRoot();
-	static constexpr auto resignThresh = 0.25; // TODO: Play with resign value for validation. Probably should be 15-20%?
 
 	// Pass if there are no moves avalible
-	if (!best)
+	// Or if we're past the max moves allowed for validation
+	if (!best || (options.training 
+		&& options.valMaxMoves < state.moveCount))
 	{
 		rOrp	= true;
 		idx		= Pass;
@@ -116,7 +117,7 @@ bool Search::resignOrPass(const UctNode* best, coord& idx, int color) const
 
 	// Resign if win chance gets too low.
 	// This is important for faster play testing of new versions
-	if (root.getEval(color) < resignThresh)
+	if (root.getEval(color) < options.resignThresh)
 	{
 		rOrp	= true;
 		idx		= Resign;

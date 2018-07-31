@@ -14,7 +14,7 @@ public:
 private:
 
 	float playout(Board& board, GameState& state, UctNode& node, int depth, int color);
-	bool resignOrPass(const UctNode* best, coord& idx, int color) const;
+	bool resignOrPass(const GameState& state, const UctNode* best, coord& idx, int color) const;
 	void moveNoise(UctNode* best, int color) const;
 };
 
