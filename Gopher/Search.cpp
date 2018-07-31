@@ -6,7 +6,7 @@
 #include "Random.h"
 #include <iomanip>
 
-static constexpr int TOTAL_PLAYOUTS		= 361 * 4;
+static constexpr int TOTAL_PLAYOUTS		= 361 * 1;
 static constexpr int EXPAND_THRESHOLD	= 0;
 
 

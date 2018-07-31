@@ -7,12 +7,7 @@
 
 int main()
 {
-	std::cout << "first";
-
 	Net::init();
-
-	std::cout << "hi";
-
 	// Quick and dirty fix to make random number generator non-deterministic
 	// for purposes of self-play
 	//std::random_device rd;

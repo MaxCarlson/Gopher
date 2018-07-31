@@ -27,26 +27,19 @@ namespace Net
 
 void init()
 {
-	std::cout << "second";
-
-
 	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
-	std::cout << "third";
 
-	// System call or QtProcess::execute/start cannot load the model! Why?
-	//{
-		// Don't let CNTK's priting to stderr interfere with
-		// GTP on engine load
-		//auto rd = RedirectStream(STDERR_FILENO);
-		model	= CNTK::Function::Load(ifs, device);
-	//}
-	std::cout << "forth";
-
+	try
+	{
+		model = CNTK::Function::Load(ifs, device);
+	}
+	catch (const std::runtime_error& error)
+	{
+		std::cerr << "Failed to load CNTK model! " << error.what() << '\n';
+	}
 	inputVar	= model->Arguments()[0];
 	policyOut	= model->Outputs()[NetResult::MOVES];
 	valueOut	= model->Outputs()[NetResult::WIN_CHANCE];
-
-	std::cout << "fifth";
 
 	// TODO: Now we need to 
 	// 1: Figure out how we want to store the binary board states
