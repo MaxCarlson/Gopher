@@ -27,8 +27,9 @@ namespace Net
 
 void init()
 {
+	// TODO: Check load status here too? Add more descrptive failures?
 	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
-
+	
 	try
 	{
 		model = CNTK::Function::Load(ifs, device);

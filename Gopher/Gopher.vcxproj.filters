@@ -83,5 +83,8 @@
     <ClInclude Include="RedirectStreams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

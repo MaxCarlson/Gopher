@@ -4,6 +4,7 @@
 #include "GameState.h"
 #include "Net.h"
 #include "Random.h"
+#include "Options.h"
 #include <iomanip>
 
 static constexpr int TOTAL_PLAYOUTS		= 361 * 1;
@@ -38,6 +39,11 @@ coord Search::search(const Board & board, GameState& state, int color)
 	// TODO: Add in passing!
 	coord idx;
 	auto* best = Tree::findBestMove(&Tree::getRoot(), color);
+
+	// When performing validation we don't want the engine to play
+	// the same games against itself over and over. Add some randomness to early moves
+	if (options.training && options.rngMovesNumber < state.moveCount)
+		moveNoise(best, color);
 
 	if (resignOrPass(best, idx, color))
 		;
@@ -99,7 +105,7 @@ bool Search::resignOrPass(const UctNode* best, coord& idx, int color) const
 {
 	auto rOrp		 = false;
 	const auto& root = Tree::getRoot();
-	static constexpr auto resignThresh = 0.05;
+	static constexpr auto resignThresh = 0.25; // TODO: Play with resign value for validation. Probably should be 15-20%?
 
 	// Pass if there are no moves avalible
 	if (!best)
@@ -117,4 +123,21 @@ bool Search::resignOrPass(const UctNode* best, coord& idx, int color) const
 	}
 
 	return rOrp;
+}
+
+void Search::moveNoise(UctNode* best, int color) const
+{
+	auto roll = Random::fastRandom(Tree::getRoot().visits);
+
+	// Build map of moves visited during the search
+	int vcounter = 0;
+	std::vector<std::pair<int, UctNode*>> visits;
+	for (auto& child : *Tree::getRoot().children)
+	{
+		if (child.visits)
+		{
+			vcounter += child.visits;
+			visits.emplace_back(child.visits, &child);
+		}
+	}
 }

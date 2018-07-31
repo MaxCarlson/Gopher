@@ -85,7 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\external\eigen_archive;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\external\nsync\public;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\eigen\src\eigen;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\protobuf\src\protobuf\src;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build;C:\Users\C-60\Desktop\cppPrograms\Containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\C-60\Desktop\cppPrograms\dependencies\boost_1_67_0\boost_1_67_0;C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\external\eigen_archive;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\external\nsync\public;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\eigen\src\eigen;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build\protobuf\src\protobuf\src;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0;C:\Users\C-60\Desktop\cppPrograms\dependencies\tensorflow\v1.5.0\tensorflow\contrib\cmake\build;C:\Users\C-60\Desktop\cppPrograms\Containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -120,7 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
-      <AdditionalIncludeDirectories>C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU;C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU;C:\Users\C-60\Desktop\cppPrograms\Containers</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\C-60\Desktop\cppPrograms\dependencies\boost_1_67_0\boost_1_67_0;C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU;C:\Users\C-60\Desktop\cppPrograms\dependencies\CNTK-2-5-1-Windows-64bit-GPU;C:\Users\C-60\Desktop\cppPrograms\Containers</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -153,6 +153,7 @@
     <ClInclude Include="Gtp.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="Net.h" />
+    <ClInclude Include="Options.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="RedirectStreams.h" />
     <ClInclude Include="Search.h" />
