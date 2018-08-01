@@ -40,7 +40,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 
 	// When performing validation we don't want the engine to play
 	// the same games against itself over and over. Add some randomness to early moves
-	if (options.validation && options.rngMovesNumber > state.moveCount)
+	if (true&& options.rngMovesNumber > state.moveCount)
 		moveNoise(best, color);
 
 	if (resignOrPass(state, best, idx, color))
@@ -124,7 +124,7 @@ bool Search::resignOrPass(const GameState& state, const UctNode* best, coord& id
 	return rOrp;
 }
 
-void Search::moveNoise(UctNode* best, int color) const
+void Search::moveNoise(UctNode*& best, int color) const
 {
 	auto roll = Random::fastRandom(Tree::getRoot().visits);
 
@@ -136,13 +136,16 @@ void Search::moveNoise(UctNode* best, int color) const
 		if (child.visits)
 		{
 			vcounter += child.visits;
-			visits.emplace_back(child.visits, &child);
+			visits.emplace_back(vcounter, &child);
 		}
 	}
 
 	// Pick moves proportionally based on
 	// how many visits they have
-	for (const auto& child : visits)
-		if (roll >= child.first)
+	for (auto& child : visits)
+		if (child.first >= roll)
+		{
 			best = child.second;
+			break;
+		}
 }

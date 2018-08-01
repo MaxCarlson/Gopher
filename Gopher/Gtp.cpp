@@ -23,6 +23,8 @@ std::array<std::string, 15> Commands =
 	"clear_board",
 	"fixed_handicap",
 	// TODO: 
+	// CMD line parser that takes args defined earlier
+	// but from inside GTP loop
 	//"place_free_handicap",
 	//"set_free_handicap",
 	"genmove",
