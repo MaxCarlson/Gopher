@@ -7,9 +7,7 @@
 #include "Options.h"
 #include <iomanip>
 
-static constexpr int TOTAL_PLAYOUTS		= 361 * 0.1;
 static constexpr int EXPAND_THRESHOLD	= 0;
-
 
 coord Search::search(const Board & board, GameState& state, int color)
 {
@@ -22,13 +20,13 @@ coord Search::search(const Board & board, GameState& state, int color)
 	//NetInput inp(state, color);
 	//inp.printSlices(state);
 	
-	for (int i = 0; i < TOTAL_PLAYOUTS; ++i)
+	for (int i = 0; i < options.maxPlayouts; ++i)
 	{
 		Board b = board;
 		playout(b, state, Tree::getRoot(), 0, color);
 
 		// TODO: Config option for printing frequency
-		if (i % (TOTAL_PLAYOUTS / 10) == 0)
+		if (i % (options.maxPlayouts / 10) == 0)
 			Tree::printStats(color);
 	}
 
@@ -36,7 +34,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	Tree::printNodeInfo(&Tree::getRoot(), color);
 
 	// TODO: Add time based search instead of playout based!
-	// TODO: Add in passing!
+	// TODO: Add in better passing mechanisms!
 	coord idx;
 	auto* best = Tree::findBestMove(&Tree::getRoot(), color);
 
