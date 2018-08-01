@@ -42,7 +42,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 
 	// When performing validation we don't want the engine to play
 	// the same games against itself over and over. Add some randomness to early moves
-	if (options.training && options.rngMovesNumber > state.moveCount)
+	if (options.validation && options.rngMovesNumber > state.moveCount)
 		moveNoise(best, color);
 
 	if (resignOrPass(state, best, idx, color))
@@ -108,7 +108,7 @@ bool Search::resignOrPass(const GameState& state, const UctNode* best, coord& id
 
 	// Pass if there are no moves avalible
 	// Or if we're past the max moves allowed for validation
-	if (!best || (options.training 
+	if (!best || (options.validation 
 		&& options.valMaxMoves < state.moveCount))
 	{
 		rOrp	= true;
