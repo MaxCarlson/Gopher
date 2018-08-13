@@ -14,7 +14,6 @@ coord Search::search(const Board & board, GameState& state, int color)
 	auto start = Time::startTimer();
 	Tree::initRoot(board, state, color);
 
-	// TODO: Force more exploration!@
 	//board.printBoard();
 	//state.printStates();
 	//NetInput inp(state, color);

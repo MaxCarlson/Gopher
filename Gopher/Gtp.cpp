@@ -1,7 +1,6 @@
 #include "Gtp.h"
 #include "GameState.h"
 #include "Search.h"
-
 #include <cctype>
 #include <sstream>
 #include <iostream>
@@ -9,6 +8,9 @@
 #include <functional>
 #include <map>
 #include <array>
+
+#include "Tree.h"
+#include "UctNode.h"
 
 std::array<std::string, 15> Commands =
 {
@@ -310,10 +312,17 @@ int generateMove(std::istringstream& is, int id)
 	board.makeMoveGtp(m);
 	stateStack.makeMove(board);
 
+	// For viewing the score when engine is playing self in the 
+	// Gopher-Validation script.
+	//auto eval = std::to_string(Tree::getRoot().getEval(color));
+
 	if (isPass(m) || isResign(m))
 		return gtpSuccess(id, isPass(m) ? "pass" : "resign");
 
 	auto xy = gtpIdxToXY(idx);
+
+	// Also for debugging when using Gopher-Validation
+	//return gtpSuccess(id, xy.first, xy.second, " ", eval);
 
 	return gtpSuccess(id, xy.first, xy.second);
 }
