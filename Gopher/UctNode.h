@@ -17,7 +17,7 @@ struct UctNode
 									// Probably cost something heavy with all the vector constructing?
 	int16_t		idx;				// Index of move on padded board
 	float		policy;				// Policy networks output, how much experts like the move
-	float		value		= 0.f;	// Evaluation network gave board state
+	float		value		= 0.f;	// Evaluation network gave board state at this node
 	int			visits		= 0;	// Total visits passing through node
 	float		wins		= 0.0;	// Wins from blacks perspective
 	bool		expanded	= false;	

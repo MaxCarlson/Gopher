@@ -78,7 +78,7 @@ NetInput::NetInput(const GameState& state, int color)
 
 					// TODO: VERIFY THIS IS WORKING AS INTENDED
 					// 
-					// TODO: Pass trivial(simple/repeatable) but non zero input into the net
+					// TODO: Pass trivial but non zero input into the net
 					// here and in the python CNTK trainer and verify output is identical (also verify
 					// that the orientation in the 1D array is correct here)
 					slices[slIdx] = static_cast<float>(state.states[stateIdx][pIdx] == c);

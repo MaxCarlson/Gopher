@@ -144,6 +144,10 @@ inline void rand_sse(unsigned int* result)
 	return;
 }
 
+
+// This is much, much less important now that we're using the net
+// (as that's the ultimate bottleneck. Perhaps this should be replaced with
+// std::uniform_distribution?
 inline unsigned int fastRandom(unsigned int max)
 {
 	static int i = 0;

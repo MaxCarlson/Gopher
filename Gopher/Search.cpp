@@ -39,7 +39,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 
 	// When performing validation we don't want the engine to play
 	// the same games against itself over and over. Add some randomness to early moves
-	if (true&& options.rngMovesNumber > state.moveCount)
+	if (options.validation && options.rngMovesNumber > state.moveCount)
 		moveNoise(best, color);
 
 	if (resignOrPass(state, best, idx, color))

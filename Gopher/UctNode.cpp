@@ -51,6 +51,7 @@ void UctNode::expand(const GameState& state, const Board& board, const NetResult
 		children->emplace_back(UctNode{ static_cast<int16_t>(rIdx), moveProb });
 	}
 
+	// TODO: Test self play with this against best verion
 	// Renormalize after illegal moves removed ?
 	//for (auto& child : *children)
 	//	child.policy /= legalPolicy;
@@ -87,8 +88,8 @@ UctNode* UctNode::selectChild(int color, bool isRoot) const
 
 		auto psa		= child.policy;
 		auto childVis	= 1.f + child.visits;
-		//auto uct		= UCT_EXPLORE * psa * (parentVis / childVis);
-		auto uct		= psa * std::pow(parentVis / childVis, EXPLORE);
+		auto uct		= UCT_EXPLORE * psa * (parentVis / childVis);
+		//auto uct		= psa * std::pow(parentVis / childVis, EXPLORE);
 		auto val		= winrate + uct;
 
 		if (val > best)
