@@ -72,7 +72,7 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 		NetResult netResult = Net::inference(state, color);
 
 		node.expand(state, board, netResult, color);
-		value = node.getNetEval(color);
+		value = node.getNetEval(BLACK);
 	}
 	else if (!node.empty())
 	{
@@ -89,7 +89,7 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	// How should this branch(empty leaf but previously expanded) be handled?
 	// Return recorded score?
 	else
-		value = node.getNetEval(color);
+		value = node.getNetEval(BLACK);
 
 	node.update(value);
 
