@@ -103,21 +103,21 @@ void gtpPanic()
 template<class Map>
 void buildCommandsMap(Map& options)
 {
-	options.emplace(Commands[0], printName);
-	options.emplace(Commands[1], engineVersion);
-	options.emplace(Commands[2], gtpProtocolVersion);
-	options.emplace(Commands[3], listCommands);
-	options.emplace(Commands[4], knownCommand);
-	options.emplace(Commands[5], setKomi);
-	options.emplace(Commands[6], play);
-	options.emplace(Commands[7], setBoardSize);
-	options.emplace(Commands[8], clearBoard);
-	options.emplace(Commands[9], fixedHandicap);
-	options.emplace(Commands[10], generateMove);
-	options.emplace(Commands[11], finalScore);
-	options.emplace(Commands[12], quitGtp);
-	options.emplace(Commands[13], gtpPrintBoard);
-	options.emplace(Commands[14], playSelf);
+	options.emplace(Commands[0],	Gtp::printName);
+	options.emplace(Commands[1],	Gtp::engineVersion);
+	options.emplace(Commands[2],	Gtp::gtpProtocolVersion);
+	options.emplace(Commands[3],	Gtp::listCommands);
+	options.emplace(Commands[4],	Gtp::knownCommand);
+	options.emplace(Commands[5],	Gtp::setKomi);
+	options.emplace(Commands[6],	Gtp::play);
+	options.emplace(Commands[7],	Gtp::setBoardSize);
+	options.emplace(Commands[8],	Gtp::clearBoard);
+	options.emplace(Commands[9],	Gtp::fixedHandicap);
+	options.emplace(Commands[10],	Gtp::generateMove);
+	options.emplace(Commands[11],	Gtp::finalScore);
+	options.emplace(Commands[12],	Gtp::quitGtp);
+	options.emplace(Commands[13],	Gtp::gtpPrintBoard);
+	options.emplace(Commands[14],	Gtp::playSelf);
 }
 
 void mainLoop()
