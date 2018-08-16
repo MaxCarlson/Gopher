@@ -24,15 +24,15 @@ void parseCmd(int argc, char * argv[])
 	po::notify(vm);
 
 	if(vm.count("playouts"))
-		std::cerr << "Playouts set to: " << (options.maxPlayouts = vm["playouts"].as<int>()) << '\n';
+		std::cerr << "Playouts set to: "				<< (options.maxPlayouts		= vm["playouts"].as<int>()) << '\n';
 	if (vm.count("resign"))
-		std::cerr << "Resign threshold set to: " << (options.resignThresh = vm["resign"].as<double>()) << '\n';
+		std::cerr << "Resign threshold set to: "		<< (options.resignThresh	= vm["resign"].as<double>()) << '\n';
 	if (vm.count("val"))
-		std::cerr << "Validation set to: " << (options.validation = vm["val"].as<bool>()) << '\n';
+		std::cerr << "Validation set to: "				<< (options.validation		= vm["val"].as<bool>()) << '\n';
 	if (vm.count("vmax"))
-		std::cerr << "Max validation moves set to: " << (options.valMaxMoves = vm["vmax"].as<int>()) << '\n';
+		std::cerr << "Max validation moves set to: "	<< (options.valMaxMoves		= vm["vmax"].as<int>()) << '\n';
 	if (vm.count("noise"))
-		std::cerr << "Noisy move count set to: " << (options.rngMovesNumber = vm["noise"].as<int>()) << '\n';
+		std::cerr << "Noisy move count set to: "		<< (options.rngMovesNumber	= vm["noise"].as<int>()) << '\n';
 }
 
 

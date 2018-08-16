@@ -99,8 +99,6 @@ struct GroupManager
 	// (which is idx of first group stone)
 	Group groups[BoardMaxIdx];
 
-	FastList<coord, BoardMaxGroups> groupList;
-
 	Group& groupInfoById(const groupId id) { return groups[id]; }
 	const Group& groupInfoById(const groupId id) const { return groups[id]; }
 
@@ -122,6 +120,8 @@ struct MoveStack;
 
 // TODO: Move stuff around and check sizeof to find good alignment
 // TODO: Make board logic simpler to follow/debug
+// TODO: There is a ton of useless functions now that we're using network
+// and not hand written policy. Pair it down!
 struct Board
 {
 	int moveCount;
@@ -225,12 +225,6 @@ public:
 	template<class F>
 	void eachDiagonalNeighbor(int idx, F&& f) const;
 
-	// Loop through each group by groupId
-	template<class F>
-	void foreachGroup(F&& f);
-	template<class F>
-	void foreachGroup(F&& f) const;
-
 	// Loop through the each member in group, 
 	// llambda syntax should be [](int idx) { func }
 	template<class F>
@@ -297,19 +291,6 @@ inline void Board::eachDiagonalNeighbor(int idx, F&& f) const
 	f(idx + BoardRealSize - 1, points[idx + BoardRealSize - 1]);
 	f(idx - BoardRealSize + 1, points[idx - BoardRealSize + 1]);
 	f(idx - BoardRealSize - 1, points[idx - BoardRealSize - 1]);
-}
-
-template<class F>
-inline void Board::foreachGroup(F && f)
-{
-	for (int i = 0; i < groups.groupList.size(); ++i)
-		f(groups.groupList[i]);
-}
-template<class F>
-inline void Board::foreachGroup(F && f) const
-{
-	for (int i = 0; i < groups.groupList.size(); ++i)
-		f(groups.groupList[i]);
 }
 
 template<class F>

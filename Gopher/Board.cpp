@@ -398,7 +398,6 @@ groupId Board::newGroup(coord idx)
 
 	groupAt(idx) = gid;
 	groups.groupNextStone(idx) = 0;
-	groups.groupList.emplace_back(gid);
 
 	return gid;
 }
@@ -459,7 +458,6 @@ void Board::mergeGroups(groupId groupTo, groupId groupFrom)
 	// Connect the group stons
 	groups.groupNextStone(lastInGroup) = groups.groupNextStone(groupTo);
 	groups.groupNextStone(groupTo) = groupFrom;
-	groups.groupList.findErase(groupFrom);
 
 	std::memset(&gfrom, 0, sizeof(Group));
 }
@@ -511,8 +509,6 @@ int Board::groupCapture(groupId gid)
 	});
 
 	Group& g = groups.groupInfoById(gid);
-
-	groups.groupList.findErase(gid); // This could cause performance issues! Perft Test!
 
 	std::memset(&g, 0, sizeof(Group));
 
