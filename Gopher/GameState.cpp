@@ -14,7 +14,8 @@ void GameState::makeMove(const Board & board)
 
 void GameState::popState()
 {
-	// Don't remove states that might later be filled again
+	// Don't remove states that might later be filled again, 
+	// just decrement index into vec
 	--moveCount;
 }
 

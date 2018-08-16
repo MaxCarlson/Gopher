@@ -26,7 +26,7 @@ void parseCmd(int argc, char * argv[])
 	if(vm.count("playouts"))
 		std::cerr << "Playouts set to: " << (options.maxPlayouts = vm["playouts"].as<int>()) << '\n';
 	if (vm.count("resign"))
-		std::cerr << "Resign set to: " << (options.resignThresh = vm["resign"].as<double>()) << '\n';
+		std::cerr << "Resign threshold set to: " << (options.resignThresh = vm["resign"].as<double>()) << '\n';
 	if (vm.count("val"))
 		std::cerr << "Validation set to: " << (options.validation = vm["val"].as<bool>()) << '\n';
 	if (vm.count("vmax"))

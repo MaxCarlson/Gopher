@@ -63,15 +63,17 @@ float Search::playout(Board& board, GameState & state, UctNode& node, int depth,
 	// TODO: Implement stop if Passes >= 2
 	// TODO: Add output 362 for passes to Net
 	// TODO: Need to limit expansions somehow as search grows larger
+	// TODO: Need to handle end game conditions better
 	float value;
 	const auto isRoot = depth == 1;
 
-	// TODO: Need to handle end game conditions better
 	if (!node.isExpanded() && node.visits >= EXPAND_THRESHOLD)
 	{
 		NetResult netResult = Net::inference(state, color);
 
 		node.expand(state, board, netResult, color);
+
+		// Net values are stored from blacks perspective
 		value = node.getNetEval(BLACK);
 	}
 	else if (!node.empty())
