@@ -61,8 +61,8 @@ UctNode* UctNode::selectChild(int color, bool isRoot) const
 {
 	// TODO: Test this against default as well as
 	// against UCT_EXPLORE in it's usual place (UCT_E * psa)
-	static constexpr float EXPLORE		= 1.15;
-	static constexpr float UCT_EXPLORE	= 0.875; // TODO: Very low values cause one awful move to be picked. Should explore why
+	static constexpr float EXPLORE		= 1.15f;
+	static constexpr float UCT_EXPLORE	= 0.875f; // TODO: Very low values cause one awful move to be picked. Should explore why
 
 	auto idx     = 0;
 	auto bestIdx = 0;

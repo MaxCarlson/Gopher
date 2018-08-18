@@ -18,6 +18,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	//state.printStates();
 	//NetInput inp(state, color);
 	//inp.printSlices(state);
+	//options.maxPlayouts = 7000;
 	
 	for (int i = 0; i < options.maxPlayouts; ++i)
 	{

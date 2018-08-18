@@ -1,5 +1,7 @@
 #pragma once
 
+// Struct containing options that can be changed at runtime with command line
+// and eventually through a dialog option after engine start
 struct Options
 {
 	int maxPlayouts			= 361;

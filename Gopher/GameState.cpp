@@ -47,11 +47,8 @@ void printBoardVec(It begin, It end, int size)
 void GameState::printStates() const
 {
 	for (int i = moveCount - 1; i >= 0; --i)
-	{
-		auto begin	= states[i].begin();
-		auto end	= states[i].end();
-		printBoardVec(begin, end, BoardRealSize);
-	}
+		printBoardVec(states[i].begin(), 
+			states[i].end(), BoardRealSize);
 }
 
 NetInput::NetInput(const GameState& state, int color)
@@ -59,7 +56,6 @@ NetInput::NetInput(const GameState& state, int color)
 	slices.resize(InputSize, 0.f);
 
 	// Fill the color slice with appropriate color
-	// TODO: Should we branch here or no?
 	std::fill_n(slices.data(), BoardSize2, static_cast<float>(color - 1));
 
 	// Fill the rest of the binary slices
@@ -88,11 +84,6 @@ NetInput::NetInput(const GameState& state, int color)
 			c = c == color ? flipColor(c) : OFFBOARD;
 		}
 	}
-	// TODO: Some really weird issues with cerr here sometimes
-	// Occasionally it will print out JUNK that isn't in the array,
-	// the second print statement won't print it
-	//
-	//printSlices(state);
 	//printSlices(state);
 }
 

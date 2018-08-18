@@ -74,11 +74,7 @@ NetResult inference(const GameState& state, int color)
 	// TODO: CNTK seems to crash an inordinate amount here,
 	// seems to happen more if device gets init and pauses before inputVal
 	// figure out why and if we can prevent it!
-	// Especially with CPU, not as much with GPU!
-	//
-	// Note: Crash here seems to be fixed by increasing 
-	// Linker -> System -> Stack reserve size from 1MB to 5MB
-	//
+	// Crash seems to happen or be related to cpp std:: memory file
 	auto inputVal = CNTK::Value::CreateBatch(inputVar.Shape(), input.slices, device);
 	std::unordered_map<CNTK::Variable, CNTK::ValuePtr> inputDataMap = { { inputVar, inputVal } };
 
