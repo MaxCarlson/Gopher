@@ -11,7 +11,13 @@ struct Options
 	bool validation			= false;
 	int rngMovesNumber		= 30;
 	int valMaxMoves			= 200;
+
+	// Model options
+
 	std::string path		= "models/GoNet.dnn";
+	int netHistory = 3; // Number of previous board states that are fed to the model (this would be nice to auto detect!)
+	int boardDepth; 
+	int inputSize;		// These are calculated from netHistory prior to running the network.
 };
 
 inline Options options;

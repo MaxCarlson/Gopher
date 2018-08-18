@@ -8,6 +8,9 @@
 #include "RedirectStreams.h"
 #include "Options.h"
 
+// Number of feature layers per board state 
+static constexpr int LayersPerState = 2;
+
 namespace Net
 {
 	CNTK::FunctionPtr	model;
@@ -25,6 +28,10 @@ namespace Net
 
 void init()
 {
+	// Calculate info about the network we're using
+	options.boardDepth	= LayersPerState * options.netHistory + 1;
+	options.inputSize	= options.boardDepth * BoardSize2;
+
 	// TODO: Check load status here too? Add more descrptive failures?
 	std::ifstream ifs(options.path, std::ifstream::in | std::ifstream::binary);
 	
@@ -47,7 +54,7 @@ void init()
 }
 
 template<class T>
-void printNetOut(size_t size, const std::vector<std::vector<T>>& outputBuffer)
+void printNet(size_t size, const std::vector<std::vector<T>>& outputBuffer)
 {
 	std::cerr << '\n';
 	const auto& out = outputBuffer[NetResult::MOVES];

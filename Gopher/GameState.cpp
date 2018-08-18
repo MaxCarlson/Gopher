@@ -1,4 +1,5 @@
 #include "GameState.h"
+#include "Options.h"
 
 void GameState::makeMove(const Board & board)
 {
@@ -53,7 +54,7 @@ void GameState::printStates() const
 
 NetInput::NetInput(const GameState& state, int color)
 {
-	slices.resize(InputSize, 0.f);
+	slices.resize(options.inputSize, 0.f);
 
 	// Fill the color slice with appropriate color
 	std::fill_n(slices.data(), BoardSize2, static_cast<float>(color - 1));
@@ -61,7 +62,7 @@ NetInput::NetInput(const GameState& state, int color)
 	// Fill the rest of the binary slices
 	int stateOffset = 0;
 	int slIdx = BoardSize2;
-	for (int i = 0; (i < state.moveCount && i < BoardHistory); ++i)
+	for (int i = 0; (i < state.moveCount && i < options.netHistory); ++i)
 	{
 		int stateIdx = state.moveCount - ++stateOffset;
 		for (int c = color; c != OFFBOARD; )

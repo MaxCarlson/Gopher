@@ -18,6 +18,7 @@ void parseCmd(int argc, char * argv[])
 		("vmax,m",			po::value<int>(),			"Set max moves during validation")
 		("noise",			po::value<int>(),			"Set the number of moves, move(0-n) where proportional noise is introduced into root move selection")
 		("net,n",			po::value<std::string>(),	"Give an alternate path to the network Gopher should use")
+		("history,h",		po::value<int>(),			"Manually set the number of previous states fed to the model (model's takes a hardcoded number)")
 	;
 
 	po::variables_map vm;
@@ -36,11 +37,16 @@ void parseCmd(int argc, char * argv[])
 		std::cerr << "Noisy move count set to: "		<< (options.rngMovesNumber	= vm["noise"].as<int>()) << '\n';
 	if (vm.count("net"))
 		std::cerr << "Default network path set to: "	<< (options.path			= vm["net"].as<std::string>()) << '\n';
+	if(vm.count("history"))
+		std::cerr << "Previous feature plane count set to: " << (options.netHistory = vm["history"].as<int>()) 
+		<< " careful! this will crash Gopher if it is not the exact number of states the network accepts! \n";
 }
 
 
 int main(int argc, char * argv[])
 {
+	//options.path = "models/leaky.dnn";
+
 	parseCmd(argc, argv);
 
 	Net::init();
