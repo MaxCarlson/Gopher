@@ -12,11 +12,12 @@ void parseCmd(int argc, char * argv[])
 {
 	po::options_description desc("Allowed Options");
 	desc.add_options()
-		("playouts,p",		po::value<int>(),	 "Set max playouts network will search per turn")
-		("resign,r",		po::value<double>(), "% of evaluation at which engine should resign")
-		("val,v",			po::value<bool>(),	 "Set validation")
-		("vmax,m",			po::value<int>(),	 "Set max moves during validation")
-		("noise,n",			po::value<int>(),    "Set the number of moves, move(0-n) where proportional noise is introduced into root move selection")
+		("playouts,p",		po::value<int>(),			"Set max playouts network will search per turn")
+		("resign,r",		po::value<double>(),		"% of evaluation at which engine should resign")
+		("val,v",			po::value<bool>(),			"Set validation")
+		("vmax,m",			po::value<int>(),			"Set max moves during validation")
+		("noise",			po::value<int>(),			"Set the number of moves, move(0-n) where proportional noise is introduced into root move selection")
+		("net,n",			po::value<std::string>(),	"Give an alternate path to the network Gopher should use")
 	;
 
 	po::variables_map vm;
@@ -33,6 +34,8 @@ void parseCmd(int argc, char * argv[])
 		std::cerr << "Max validation moves set to: "	<< (options.valMaxMoves		= vm["vmax"].as<int>()) << '\n';
 	if (vm.count("noise"))
 		std::cerr << "Noisy move count set to: "		<< (options.rngMovesNumber	= vm["noise"].as<int>()) << '\n';
+	if (vm.count("net"))
+		std::cerr << "Default network path set to: "	<< (options.path			= vm["net"].as<std::string>()) << '\n';
 }
 
 

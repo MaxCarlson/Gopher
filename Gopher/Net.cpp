@@ -6,9 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include "RedirectStreams.h"
-
-static const std::string modelPath	= "models/";
-static const std::string fileName	= "GoNet.dnn";
+#include "Options.h"
 
 namespace Net
 {
@@ -28,7 +26,7 @@ namespace Net
 void init()
 {
 	// TODO: Check load status here too? Add more descrptive failures?
-	std::ifstream ifs(modelPath + fileName, std::ifstream::in | std::ifstream::binary);
+	std::ifstream ifs(options.path, std::ifstream::in | std::ifstream::binary);
 	
 	try
 	{
@@ -98,6 +96,9 @@ NetResult inference(const GameState& state, int color)
 		std::move(std::begin(outputData[0]), std::end(outputData[0]), std::begin(result.output[i++]));
 	}
 	result.process();
+
+	if (result.output.size() == 0)
+		int a = 5;
 
 	// Debugging only!
 	//printNetOut(361, result.output);
