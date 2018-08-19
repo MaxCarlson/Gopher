@@ -19,19 +19,29 @@ coord Search::search(const Board & board, GameState& state, int color)
 	//NetInput inp(state, color);
 	//inp.printSlices(state);
 	//options.maxPlayouts = 7000;
+	int maxDepth	= 1;
+	int totalDepth	= 0;
+	int playouts	= 0;
 	
-	for (int i = 0; i < options.maxPlayouts; ++i)
+	for (playouts; playouts < options.maxPlayouts; ++playouts)
 	{
 		Board b = board;
-		playout(b, state, Tree::getRoot(), 0, color);
+		int depth = 0;
+		playout(b, state, Tree::getRoot(), depth, color);
+
+		// Record info about search
+		if (depth > maxDepth)
+			maxDepth = depth;
+		totalDepth += depth;
 
 		// TODO: Config option for printing frequency
-		if (i % (options.maxPlayouts / 10) == 0)
+		if (playouts % (options.maxPlayouts / 10) == 0)
 			Tree::printStats(color);
 	}
 
-	// Debugging. Look at spread of search through tree
-	Tree::printNodeInfo(&Tree::getRoot(), color);
+	// Give some info about search
+	// Look at spread of search through tree
+	Tree::printNodeInfo(&Tree::getRoot(), color, playouts, maxDepth, totalDepth);
 
 	// TODO: Add time based search instead of playout based!
 	// TODO: Add in better passing mechanisms!
@@ -57,7 +67,7 @@ coord Search::search(const Board & board, GameState& state, int color)
 	return idx;
 }
 
-float Search::playout(Board& board, GameState & state, UctNode& node, int depth, int color)
+float Search::playout(Board& board, GameState & state, UctNode& node, int& depth, int color)
 {
 	++depth;
 

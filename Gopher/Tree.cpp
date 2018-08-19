@@ -104,7 +104,7 @@ void printStats(int color)
 
 // Print histogram of visit counts
 // and their average network expert score
-void printNodeInfo(UctNode * node, int color)
+void printNodeInfo(UctNode * node, int color, int playouts, int maxDepth, int totalDepth)
 {
 	std::map<int, std::pair<int, std::vector<const UctNode*>>> hist;
 	if (node->empty())
@@ -145,7 +145,10 @@ void printNodeInfo(UctNode * node, int color)
 			<< ", " << std::setw(3) << std::right << node->idx << ", " << std::setw(8) << node->value;
 		std::cerr << '\n';
 	}
-		
+
+	std::cerr << '\n';
+	fprintf(stderr, "Playouts: %d; Max Depth: %d; Avg Depth: %f\n", 
+		playouts, maxDepth, static_cast<float>(totalDepth) / static_cast<float>(playouts));
 }
 
 } // End Tree::

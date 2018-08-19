@@ -13,11 +13,11 @@ struct Options
 	int valMaxMoves			= 200;
 
 	// Model options
-
 	std::string path		= "models/GoNet.dnn";
-	int netHistory = 3; // Number of previous board states that are fed to the model (this would be nice to auto detect!)
+	int netHistory			= 3; // Number of previous board states that are fed to the model TODO: (this would be nice to auto detect!)
+	// These are calculated from netHistory prior to running the network.
 	int boardDepth; 
-	int inputSize;		// These are calculated from netHistory prior to running the network.
+	int inputSize;		
 };
 
 inline Options options;

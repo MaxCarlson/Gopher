@@ -104,9 +104,6 @@ NetResult inference(const GameState& state, int color)
 	}
 	result.process();
 
-	if (result.output.size() == 0)
-		int a = 5;
-
 	// Debugging only!
 	//printNetOut(361, result.output);
 
