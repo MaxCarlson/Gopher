@@ -4,5 +4,18 @@ Gopher is a [GTP](https://senseis.xmp.net/?GoTextProtocol) compatiable Go game e
 ## Network
 More information about the network being used can be found [here](https://github.com/MaxCarlson/GoNet). Example networks are included under [Gopher/models](https://github.com/MaxCarlson/Gopher/tree/master/Gopher/models), and network path can be changed from the command line. At the moment, networks must be generated in the same format as GoNet describes, and saved as a CNTK model. 
 
+
+## Arguments
+Gopher is under active development, and this list of arguments is changing frequently. 
+
+* `--playouts, -p   (int)`: number of playouts to perform during each search
+* `--resign, -r   (float)`: threshold at which the Gopher will resign. Ex. -r 0.05 will have Gopher resign if the network thinks it has <= 5% win chance
+* `--val, -v       (bool)`: validation mode. This is used internally for play testing the engine against others. 
+* `--vmax, -m:      (int)`: a cap on the maximum number of moves per game while in validation mode. 
+* `--noise          (int)`: adds noise into move selection for the first n moves. Moves will be selected preportionally based on how much the network likes them.
+* `--net, -n     (string)`: change the default path to the network ('Gopher\models\GoNet.dnn')
+* `--history, -h    (int)`: set the number of past+present feature planes the network should recieve
+
+
 ## Under Construction
 Once the Net is integrated and everything is up and running again I'll add some pictures/video of Gophers use and play.
