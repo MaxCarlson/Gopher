@@ -4,6 +4,8 @@ Gopher is a [GTP](https://senseis.xmp.net/?GoTextProtocol) compatiable Go game e
 ## Network
 More information about the network being used can be found [here](https://github.com/MaxCarlson/GoNet). Example networks are included under [Gopher/models](https://github.com/MaxCarlson/Gopher/tree/master/Gopher/models), and network path can be changed from the command line. At the moment, networks must be generated in the same format as GoNet describes, and saved as a CNTK model. 
 
+## Performance
+Gopher plays better than most beginners, but is still not all that strong. I haven't had time to setup an instance of Gopher on one of the Go servers, though I may do that once Gopher is stronger than I am. At the moment Gopher is being played against other versions of itself to determine what features get to survive.
 
 ## Arguments
 Gopher is under active development, and this list of arguments is changing frequently. 
